@@ -13,27 +13,52 @@ class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    username = db.Column(db.String(64))
-    password = db.Column(db.String(64))
+    username = db.Column(db.String(64), nullable=False)
+    password = db.Column(db.String(64), nullable=False)
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
     email = db.Column(db.String(64), nullable=True)
-    phone = db.Column(db.Integer, nullable=True)
-    preferred_com = ********* Should this be another table?
-    dairy = db.Column(db.Boolean)
-    egg = db.Column(db.Boolean)
-    gluten = db.Column(db.Boolean)
-    peanut = db.Column(db.Boolean)
-    sesame = db.Column(db.Boolean)
-    seafood = db.Column(db.Boolean)
-    shellfish = db.Column(db.Boolean)
-    soy = db.Column(db.Boolean)
-    diet_id = db.Column(db.Integer, ForeignKey("diets.diet_id")
+    phone = db.Column(db.String(30), nullable=True)
+    preferred_com = db.Column(db.String(64), nullable=True)  # preferred method of communication, ie, phone
+    diet_id = db.Column(db.Integer, db.ForeignKey("diets.diet_id"))
+    diet_reason = db.Column(db.String(120), nullable=True)  # ie, ethical, religious, general health, specific health
 
-    # def __repr__(self):
-    #     """Provide helpful representation when printed."""
+    avoidances = db.relationship("IngToAvoid", backref=db.backref("users_a"))
 
-    #     return "<User user_id=%s email=%s>" % (self.user_id, self.email)
+    intolerances = db.relationship("Intolerance",
+                                   secondary="userintolerances",
+                                   backref="users")
+    diet = db.relationship('Diet', backref='users')
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<User user_id=%s username=%s diet_id=%s>" % (self.user_id, self.username, self.diet_id)
+
+
+class UserIntolerance(db.Model):
+    """The intolerances that each user has."""
+
+    __tablename__ = "userintolerances"
+
+    user_intol_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    intol_id = db.Column(db.Integer, db.ForeignKey('intolerances.intol_id'), nullable=False)
+
+
+class Intolerance(db.Model):
+    """Spoonacular's list of possible intolerances."""
+
+    __tablename__ = "intolerances"
+
+    intol_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    intol_name = db.Column(db.String(64), nullable=False)
+    intol_description = db.Column(db.String(120), nullable=False)  # Spoonacular's criteria for searching
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Intolerances int_id=%s int_name=%s int_description=%s>" % (self.intol_id, self.intol_name, self.intol_description)
 
 
 class Diet(db.Model):
@@ -42,14 +67,13 @@ class Diet(db.Model):
     __tablename__ = "diets"
 
     diet_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    diet_type = db.Column(db.String(64))
-    description = db.Column(db.String(120))
-
+    diet_type = db.Column(db.String(64), nullable=False)
+    description = db.Column(db.String(120), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Diet diet_id=%s diet_type=%s description=%s>" % (self.diet_id, self.diet_type)
+        return "<Diet diet_id=%s diet_type=%s description=%s>" % (self.diet_id, self.diet_type, self.description)
 
 
 class IngToAvoid(db.Model):
@@ -58,14 +82,51 @@ class IngToAvoid(db.Model):
     __tablename__ = "avoid"
 
     avoid_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, ForeignKey("users.user_id"))
-    ingredient = db.Column(db.String(100))
-    reason = db.Column(db.String(200))
+    ingredient = db.Column(db.String(100), nullable=False)
+    reason = db.Column(db.String(200), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+
+    users = db.relationship('User', backref='ingredients')
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<IngToAvoid avoid_id=%s user_id=%s ingredient=%s reason=%s>" % (self.avoid_id, self.user_id, self.ingredient, self.reason)
+
+
+class Party(db.Model):
+    """Create a dinner party to store and link information about a party"""
+
+    __tablename__ = "parties"
+
+    party_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    title = db.Column(db.String(120), nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+    host = db.relationship("User", backref="parties")
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Party party_id=%s title_id=%s host_id=%s>" % (self.party_id, self.title, self.host_id)
+
+
+class Guest(db.Model):
+    """Add guests to a party"""
+
+    #  this is a true association table now
+
+    __tablename__ = "guests"
+
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    party_id = db.Column(db.Integer, db.ForeignKey("parties.party_id"), nullable=False)
+    guest_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+
+    party = db.relationship("Party", backref="guests")
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Guest record_id=%s party_id=%s guest_id=%s>" % (self.record_id, self.party_id, self.guest_id)
 
 
 ##############################################################################
@@ -75,7 +136,7 @@ def connect_to_db(app):
     """Connect the database to our Flask app."""
 
     # Configure to use our PostgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ratings'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///kind'
 #    app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
