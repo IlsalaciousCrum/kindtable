@@ -2,7 +2,7 @@
 
 from sqlalchemy import func
 
-from Model import connect_to_db, db, User, UserIntolerance, Intolerance, Diet, IngToAvoid, Party, Guest
+from Model import connect_to_db, db, User, UserIntolerance, Intolerance, Diet, IngToAvoid, Party, PartyGuest
 from server import app
 
 
@@ -199,53 +199,53 @@ def load_testdata():
 
     print "loaded parties"
 
-    guest1 = Guest(party_id=1, guest_id=3)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=1, user_id=3)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=1, guest_id=4)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=1, user_id=4)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=1, guest_id=5)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=1, user_id=5)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=1, guest_id=6)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=1, user_id=6)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=2, guest_id=5)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=2, user_id=5)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=2, guest_id=6)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=2, user_id=6)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=2, guest_id=7)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=2, user_id=7)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=3, guest_id=9)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=3, user_id=9)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=3, guest_id=8)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=3, user_id=8)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=3, guest_id=7)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=3, user_id=7)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=4, guest_id=1)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=4, user_id=1)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=4, guest_id=2)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=4, user_id=2)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=5, guest_id=3)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=5, user_id=3)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=5, guest_id=4)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=5, user_id=4)
+    db.session.add(PartyGuest1)
     db.session.commit()
-    guest1 = Guest(party_id=5, guest_id=6)
-    db.session.add(guest1)
+    PartyGuest1 = PartyGuest(party_id=5, user_id=6)
+    db.session.add(PartyGuest1)
     db.session.commit()
 
-    print "loaded guests"
+    print "loaded PartyGuests"
 
 
 if __name__ == "__main__":

@@ -94,6 +94,18 @@ class IngToAvoid(db.Model):
         return "<IngToAvoid avoid_id=%s user_id=%s ingredient=%s reason=%s>" % (self.avoid_id, self.user_id, self.ingredient, self.reason)
 
 
+class PartyGuest(db.Model):
+    """Associate users with a party"""
+
+    #  this is a true association table now
+
+    __tablename__ = "party_guests"
+
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    party_id = db.Column(db.Integer, db.ForeignKey("parties.party_id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+
+
 class Party(db.Model):
     """Create a dinner party to store and link information about a party"""
 
@@ -102,31 +114,15 @@ class Party(db.Model):
     party_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
     host_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
-    host = db.relationship("User", backref="parties")
+
+    users = db.relationship("User",
+                            secondary="party_guests",
+                            backref="parties")
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<Party party_id=%s title_id=%s host_id=%s>" % (self.party_id, self.title, self.host_id)
-
-
-class Guest(db.Model):
-    """Add guests to a party"""
-
-    #  this is a true association table now
-
-    __tablename__ = "guests"
-
-    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    party_id = db.Column(db.Integer, db.ForeignKey("parties.party_id"), nullable=False)
-    guest_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
-
-    party = db.relationship("Party", backref="guests")
-
-    def __repr__(self):
-        """Provide helpful representation when printed."""
-
-        return "<Guest record_id=%s party_id=%s guest_id=%s>" % (self.record_id, self.party_id, self.guest_id)
 
 
 ##############################################################################
