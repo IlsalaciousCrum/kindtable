@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="well spaced" style="width:40%;">
+<h1>Register Food Preferences</h1>
+
+<form action="register" method="POST">
+
+    <div class="form-group">
+        <label>
+            <h4><strong>Intolerances or allergies (select all that apply) :</strong></h4>
+            {% for intolerance in intolerances %}
+              <input type="checkbox" name="intolerances" value="intolerance.intol_id">{{ intolerance.intol_name }}<br>
+            {% endfor %}
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label>
+            <h4><strong>Ingredients I prefer to avoid :</strong></h4>
+                Ingredient: <input type="text" name="ingredient" class="form-control"> Reason: <input type="text" name="reason" class="form-control">
+        </label>
+    </div>
+
+
+
+    <div class="form-group">
+        <input type="submit" value="Register" class="btn">
+    </div>
+
+</form>
+</div>
+{% endblock %}

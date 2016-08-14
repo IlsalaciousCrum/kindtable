@@ -5,7 +5,9 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from Model import connect_to_db, db, User, UserIntolerance, Intolerance, Diet, IngToAvoid, Party, PartyGuest
+from Model import connect_to_db, db, Diet, Intolerance, User
+
+import os
 
 app = Flask(__name__)
 
@@ -17,99 +19,75 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 
 
-# @app.route('/')
-# def index():
-#     """Homepage."""
+@app.route('/')
+def index():
+    """Homepage."""
 
-#     return render_template("homepage.html")
-
-
-# @app.route('/register', methods=['GET'])
-# def register_form():
-#     """Show form for user signup."""
-
-#     return render_template("register_form.html")
+    return render_template("homepage.html")
 
 
-# @app.route('/register', methods=['POST'])
-# def register_process():
-#     """Process registration."""
+@app.route('/register', methods=['GET'])
+def register_form():
+    """Show form for user signup."""
 
-#     # Get form variables
-#     email = request.form["email"]
-#     password = request.form["password"]
-
-#     new_user = User(email=email, password=password, )
-
-#     db.session.add(new_user)
-#     db.session.commit()
-
-#     flash("User %s added." % email)
-#     return redirect("/users/%s" % new_user.user_id)
+    diets = Diet.query.order_by(Diet.diet_type).all()
 
 
-# @app.route('/login', methods=['GET'])
-# def login_form():
-#     """Show login form."""
-
-#     return render_template("login_form.html")
+    return render_template("register_form.html", diets=diets)
 
 
-# @app.route('/login', methods=['POST'])
-# def login_process():
-#     """Process login."""
+@app.route('/register', methods=['POST'])
+def register_process():
+    """Process registration."""
 
-#     # Get form variables
-#     email = request.form["email"]
-#     password = request.form["password"]
+    # Get form variables
+    username = request.form["username"]
+    password = request.form["password"]
+    first_name = request.form["first_name"]
+    last_name = request.form["last_name"]
+    email = request.form["email"]
+    phone = request.form["phone"]
+    preferred_com = request.form["preferred_com"]
+    diet_id = request.form["diet_type"]
 
-#     user = User.query.filter_by(email=email).first()
+    new_user = User(username=username, password=password, first_name=first_name,
+                    last_name=last_name, email=email, phone=phone, preferred_com=preferred_com, diet_id=diet_id)
 
-#     if not user:
-#         flash("No such user")
-#         return redirect("/login")
+    db.session.add(new_user)
+    db.session.commit()
 
-#     if user.password != password:
-#         flash("Incorrect password")
-#         return redirect("/login")
+    newuser = db.session.query(User).filter_by(username=username).first()
+    newuser_id = newuser.user_id
 
-#     session["user_id"] = user.user_id
-
-#     flash("Logged in")
-#     return redirect("/users/%s" % user.user_id)
-
-
-# @app.route('/logout')
-# def logout():
-#     """Log out."""
-
-#     del session["user_id"]
-#     flash("Logged Out.")
-#     return redirect("/")
+    return redirect("/registerfood/%s" % newuser_id)
 
 
-# @app.route("/users")
-# def user_list():
-#     """Show list of users."""
+@app.route('/registerfood/<int:user_id>', methods=['POST'])
+def register_form():
+    """Show form for adding food preferences to profile."""
 
-#     users = User.query.all()
-#     return render_template("user_list.html", users=users)
+    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
 
+    intol_id = int(request.form["intolerances"])
 
-# @app.route("/users/<int:user_id>")
-# def user_detail(user_id):
-#     """Show info about user."""
-
-#     user = User.query.get(user_id)
-#     return render_template("user.html", user=user)
+    return render_template("register_food_preferences.html", intolerances=intolerances)
 
 
-# @app.route("/movies")
-# def movie_list():
-#     """Show list of movies."""
+    diet_id = int(request.form["diet_id"])
+    diet_reason = request.form["diet_reason"]
 
-#     movies = Movie.query.order_by('title').all()
-#     return render_template("movie_list.html", movies=movies)
+
+
+
+
+    new_user = User(email=email, password=password, age=age, zipcode=zipcode)
+
+    db.session.add(new_user)
+    db.session.commit()
+
+    flash("User %s added." % email)
+    return redirect("/users/%s" % new_user.user_id)
+
 
 
 if __name__ == "__main__":
@@ -124,4 +102,4 @@ if __name__ == "__main__":
     # Use the DebugToolbar
     DebugToolbarExtension(app)
 
-    app.run()
+    app.run(host="0.0.0.0")

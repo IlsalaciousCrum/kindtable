@@ -28,6 +28,7 @@ class User(db.Model):
     intolerances = db.relationship("Intolerance",
                                    secondary="userintolerances",
                                    backref="users")
+
     diet = db.relationship('Diet', backref='users')
 
     def __repr__(self):
