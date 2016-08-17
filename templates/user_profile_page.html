@@ -22,11 +22,23 @@
         {% endfor %}</ul>
 </ul>
 
+    <li>Intolerances:</li>
+        <ul>{% for intolerance in this_user.intolerances %}    
+            <li>{{ intolerance.intol_name }}</li>
+                {% endfor %}
+        </ul>
 
 <ul>
     <li><a href="/addintoleranceform">Add an intolerance/allergy</a></li>
-    <li><a href="/addingredienttoavoid">Add an ingredient you would like to avoid</li>
+    <li><a href="/addingredienttoavoid">Add an ingredient you would like to avoid</a></li>
 </ul>
+
+    <li>Friends:</li>
+
+        <ul>{% for person in this_user.friends %}    
+            <li>{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }}) </li>
+                {% endfor %}
+        </ul>
 
 </div>
 {% endblock %}

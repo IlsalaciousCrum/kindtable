@@ -1,33 +1,29 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="well spaced">
-<h1>Register</h1>
+<h1>Create a profile for a friend</h1>
 
-<form action="/registered" method="POST">
+<form action="/friendregistered" method="POST">
 
     <div class="form-group">
         <label>
-            <strong>Email address</strong> (required): <input type="text" name="email" class="form-control">
-  
-            <strong>Password</strong> (required):
-            <input type="password" name="password" class="form-control" required>
+            <strong>Email address</strong> (required): <input type="text" name="email" class="form-control" required>
     
-            First name (optional):
+            Friend's first name (optional):
             <input type="text" name="first_name" class="form-control">
   
-            Last name (optional):
+            Friend's last name (optional):
             <input type="text" name="last_name" class="form-control">
 
-           
 
-            <h4><strong>Diet you prefer to eat (required):</strong></h4>
+            <h4><strong>Diet your friend prefers to eat (required):</strong></h4>
             
             <select name="diet_type">
                 {% for diet in diets %}
                 <option value={{ diet.diet_id }}>{{ diet.diet_type }}</option>
                 {% endfor %}
             </select><br>
-            Reason you follow this diet (optional):<br>
+            Reason they follow this diet (optional):<br>
             <input type="text" name="diet_reason" class="form-control">
 
             </label>
@@ -35,8 +31,10 @@
 
 
     <div class="form-group">
-        <input type="submit" value="Register" class="btn">
+        <input type="submit" value="Create friend profile" class="btn">
     </div>
+
+    <a href="/userprofile">Thanks, I'm done creating friend profiles</a>
 
 </form>
 </div>

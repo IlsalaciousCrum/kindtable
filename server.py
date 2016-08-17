@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from Model import connect_to_db, db, Diet, UserIntolerance, User, IngToAvoid, Intolerance
+from Model import connect_to_db, db, Diet, UserIntolerance, User, IngToAvoid, Intolerance, Friends
 
 import os
 
@@ -47,7 +47,7 @@ def register_users():
     diet_reason = request.form.get("diet_reason")
 
     new_user = User(password=password, first_name=first_name,
-                    last_name=last_name, email=email, diet_id=diet_id, diet_reason=diet_reason)
+                    last_name=last_name, email=email, diet_id=diet_id, diet_reason=diet_reason, verified=True)
 
     db.session.add(new_user)
     db.session.commit()
@@ -61,9 +61,48 @@ def register_users():
     return redirect("/userprofile")
 
 
+@app.route('/createfriendsprofile', methods=['GET'])
+def register_friend_form():
+    """Show form for adding a profile for a friend."""
+
+    diets = Diet.query.order_by(Diet.diet_type).all()
+
+    return render_template("create_friends_profile_form.html", diets=diets)
+
+
+@app.route('/friendregistered', methods=['POST'])
+def friend_profile_registered():
+    """Instantiate User for friend and make connection on friends table."""
+
+    user_id = session.get("user_id")
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    email = request.form.get("email")
+    diet_id = request.form.get("diet_type")
+    diet_reason = request.form.get("diet_reason")
+
+    friend_user = User(first_name=first_name,
+                       last_name=last_name, email=email, diet_id=diet_id, diet_reason=diet_reason)
+
+    db.session.add(friend_user)
+    db.session.commit()
+
+    newfriend = db.session.query(User).filter_by(email=email).first()
+
+    add_to_friends = Friends(user_id=user_id, friend_id=newfriend.user_id)
+
+    db.session.add(add_to_friends)
+    db.session.commit()
+
+    flash("A profile has been created for your friend: %s." % first_name)
+    return redirect("/createfriendsprofile")
+
+
 @app.route('/addintoleranceform', methods=['GET'])
 def get_an_intolerance():
     """Get information about a user intolerance"""
+
+    user_id = session.get("user_id")
 
     intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
     user_id = session.get("user_id")
@@ -187,15 +226,14 @@ def add_a_friend():
     user_id = session.get("user_id")
     email_address = request.form.get("email_address")
 
-    your_friend = db.session.query(User).filter(User.email == friend_email).first()
+    your_friend = db.session.query(User).filter(User.email == email_address).first()
 
-    # if your_friend:
-    #     new_friend =
-
-
-    all_users = User.quert
-
-    return render_template("/add_a_friend.html", user_id=user_id)
+    if your_friend:
+        newfriend = Friends(user_id=user_id, friend_id=friend_id)
+        flash("Friend added.")
+        return redirect("/addafriend")
+    elif not your_friend:
+        return
 
 
 @app.route('/addaparty', methods=['GET'])

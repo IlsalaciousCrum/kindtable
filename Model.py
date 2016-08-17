@@ -13,7 +13,9 @@ class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    email = db.Column(db.String(64), nullable=False, unique=True)
     password = db.Column(db.String(64), nullable=True)
+    verified = db.Column(db.Boolean, default=False, nullable=False)
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
     email = db.Column(db.String(64), nullable=False, unique=True)
@@ -21,8 +23,6 @@ class User(db.Model):
     diet_reason = db.Column(db.String(120), nullable=True)  # ie, ethical, religious, general health, specific health
 
     avoidances = db.relationship("IngToAvoid", backref=db.backref("users_a"))
-
-    friends = db.relationship("Friends", backref=db.backref("users"))
 
     intolerances = db.relationship("Intolerance",
                                    secondary="userintolerances",
@@ -43,7 +43,10 @@ class Friends(db.Model):
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    friend_id = db.Column(db.Integer, nullable=False)
+    friend_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+
+    users = db.relationship("User", foreign_keys=[user_id], backref="friends")
+    friends = db.relationship("User", foreign_keys=[friend_id], backref="users")
 
     def __repr__(self):
         """Provide helpful representation when printed."""
