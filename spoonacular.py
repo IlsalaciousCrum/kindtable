@@ -5,11 +5,11 @@ import json
 url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
 headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
 
-payload = {'query': 'recipe', 'diet': guest_diets(partyid), 'type': 'main course',
-           'number': 60, 'intolerances': guest_intolerances(), 'excludeIngredients': guest_avoidances()}
+# payload = {'query': 'recipe', 'diet': guest_diets(partyid), 'type': 'main course',
+#            'number': 60, 'intolerances': guest_intolerances(), 'excludeIngredients': guest_avoidances()}
 
-# payload = {'query': 'recipe', 'diet': 'vegan', 'type': 'main course',
-#            'number': 60, 'intolerances': 'gluten', 'excludeIngredients': 'peanuts, broccoli'}
+payload = {'query': 'recipe', 'diet': 'vegan', 'type': 'main course',
+           'number': 60, 'intolerances': 'gluten', 'excludeIngredients': 'peanuts, broccoli'}
 
 response = requests.get(url, headers=headers, params=payload)
 
@@ -25,7 +25,7 @@ for recipe in result['results']:  # for each business, get details and dump into
     title = recipe['title']
     print title
     line = json.dumps(recipe)
-    f.write(title + _id)
+    # f.write(title + _id)
     f.write(line+'\n')
 
 

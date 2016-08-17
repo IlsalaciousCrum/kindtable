@@ -13,17 +13,16 @@ class User(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    username = db.Column(db.String(64), nullable=False)
-    password = db.Column(db.String(64), nullable=False)
+    password = db.Column(db.String(64), nullable=True)
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
-    email = db.Column(db.String(64), nullable=True)
-    phone = db.Column(db.String(30), nullable=True)
-    preferred_com = db.Column(db.String(64), nullable=True)  # preferred method of communication, ie, phone
+    email = db.Column(db.String(64), nullable=False, unique=True)
     diet_id = db.Column(db.Integer, db.ForeignKey("diets.diet_id"))
     diet_reason = db.Column(db.String(120), nullable=True)  # ie, ethical, religious, general health, specific health
 
     avoidances = db.relationship("IngToAvoid", backref=db.backref("users_a"))
+
+    friends = db.relationship("Friends", backref=db.backref("users"))
 
     intolerances = db.relationship("Intolerance",
                                    secondary="userintolerances",
@@ -34,7 +33,22 @@ class User(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<User user_id=%s username=%s diet_id=%s>" % (self.user_id, self.username, self.diet_id)
+        return "<User user_id=%s email=%s  first_name=%s last_name=%s>" % (self.user_id, self.email, self.first_name, self.last_name)
+
+
+class Friends(db.Model):
+    """Makes connections between the user and other users they know"""
+
+    __tablename__ = "friends"
+
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    friend_id = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Friends record_id=%s user_id=%s  friend_id=%s>" % (self.record_id, self.user_id, self.friend_id)
 
 
 class UserIntolerance(db.Model):

@@ -43,8 +43,7 @@ def guest_intolerances(partyid):
     for guest in party_guests:
         f = guest.user_id
         person = User.query.get(f)
-        
-        person_intolerances = person.intolerances # this is where it goes awry
+        person_intolerances = person.intolerances  # this is where it goes awry
         for each in person_intolerances:
             intolerance_set.add(each.intol_name)
     return intolerance_set

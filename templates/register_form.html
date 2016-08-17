@@ -1,78 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="well spaced" style="width:40%;">
+<div class="well spaced">
 <h1>Register</h1>
 
-<form action="register" method="POST">
+<form action="/registered" method="POST">
 
     <div class="form-group">
         <label>
-            <strong>Username</strong> (required):
-            <input type="text" name="username" class="form-control">
-        </label>
-    </div>
-
-    <div class="form-group">
-        <label>
+            <strong>Email address</strong> (required): <input type="text" name="email" class="form-control">
+  
             <strong>Password</strong> (required):
             <input type="password" name="password" class="form-control">
-        </label>
-    </div>
-
-    <div class="form-group">
-        <label>
+    
             First name (optional):
             <input type="text" name="first_name" class="form-control">
-        </label>
-    </div>
-
-    <div class="form-group">
-        <label>
+  
             Last name (optional):
             <input type="text" name="last_name" class="form-control">
-        </label>
-    </div>
 
-   <div class="form-group">
-        <label>
-            <h4>Preferred method of communication (optional):</h4>
-            <input type="radio" name="preferred_method" value="text"> Call or text:<input type="phone" name="tphone" class="form-control"><br>
-            <input type="radio" name="preferred_method" value="email"> Email: <input type="text" name="email" class="form-control"><br>
-            <input type="radio" name="preferred_method" value="other"> Other: <input type="text" name="preferred_method" class="form-control">
-        </label>
-    </div>
+           
 
-    <div class="form-group">
-        <label>
-            <h4><strong>Diet I prefer to eat :</strong></h4>
+            <h4><strong>Diet you prefer to eat (required):</strong></h4>
             
             <select name="diet_type">
                 {% for diet in diets %}
                 <option value={{ diet.diet_id }}>{{ diet.diet_type }}</option>
                 {% endfor %}
             </select><br>
-            Reason I follow this diet (optional):<br>
+            Reason you follow this diet (optional):<br>
             <input type="text" name="diet_reason" class="form-control">
 
-        </label>
-    </div>
-
-    <div class="form-group">
-        <label>
-            <h4><strong>Intolerances or allergies (select all that apply) :</strong></h4>
-            {% for intolerance in intol_list %}
-              <input type="checkbox" name="intolerances" value="intolerance.intol_id">{{ intolerance.intol_name }}<br>
-            {% endfor %}
-        </label>
-    </div>
-
-    <div class="form-group">
-        <label>
-            <h4><strong>Ingredients I prefer to avoid :</strong></h4>
-                <input type="text" name="ingredient" class="form-control">
-        </label>
-    </div>
-
+            </label>
+        </div>
 
 
     <div class="form-group">
