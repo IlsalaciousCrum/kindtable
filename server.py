@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from Model import connect_to_db, db, Diet, UserIntolerance, User, IngToAvoid, Intolerance, Friends
+from Model import connect_to_db, db, Diet, UserIntolerance, User, IngToAvoid, Intolerance, Friends, Party
 
 import os
 
@@ -200,12 +200,14 @@ def show_user_profile():
     this_user = db.session.query(User).filter(User.user_id == user_id).first()
     this_users_avoids = db.session.query(IngToAvoid).filter(IngToAvoid.user_id == user_id).all()
     this_users_diet = db.session.query(Diet).filter(this_user.diet_id == Diet.diet_id).first()
+    this_users_parties = db.session.query(Party).filter(this_user.user_id == Party.host_id).all()
 
     return render_template("/user_profile_page.html",
                            user_id=user_id,
                            this_user=this_user,
                            this_users_avoids=this_users_avoids,
-                           this_users_diet=this_users_diet)
+                           this_users_diet=this_users_diet,
+                           this_users_parties=this_users_parties)
 
 
 @app.route('/friendprofile', methods=['GET'])
@@ -238,38 +240,54 @@ def add_a_friend():
     """Add a friend connections to the friends table"""
 
     user_id = session.get("user_id")
+    print user_id
     email_address = request.form.get("email_address")
+    print email_address
 
-    your_friend = db.session.query(User).filter(User.email == email_address).first()
+    in_database = db.session.query(User).filter(User.email == email_address).first()
+    print in_database
 
-    check_friend = db.session.query(User).filter(Friends.user_id == user_id, Friends.friend_id == your_friend.user_id).first()
+    check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
+    print check_for_friend
 
-    if check_friend:
+    if not in_database:
+        flash("Looks like there is no profile yet for your friend. Would you like to create one?")
+        return redirect("/createfriendsprofile")
+    elif check_for_friend:
         flash("This person is already one of your friends. Would you like to add someone else?")
-        return redirect("/addafriend")
+        return redirect("/findafriend")
     else:
-        if your_friend:
-            friend_id = your_friend.user_id
-            newfriend = Friends(user_id=user_id, friend_id=friend_id)
-            db.session.add(newfriend)
-            db.session.commit()
-            flash("Friend added.")
-            return redirect("/findafriend")
-        elif not your_friend:
-            flash("Looks like there is no profile yet for your friend. Would you like to create one?")
-            return redirect("/createfriendsprofile")
+        friend_id = in_database.user_id
+        newfriend = Friends(user_id=user_id, friend_id=friend_id)
+        db.session.add(newfriend)
+        db.session.commit()
+        flash("Friend added.")
+        return redirect("/findafriend")
 
 
 @app.route('/addaparty', methods=['GET'])
-def register_party():
-    """Add a new dinner party to the dinner party table"""
+def show_party_form():
+    """Show the dinner party form"""
 
     user_id = session.get("user_id")
 
     return render_template("/add_a_party.html", user_id=user_id)
 
 
-@app.route('/addaguest', methods=['GET'])
+@app.route('/party_added', methods=['POST'])
+def party_added():
+    """Add a new dinner party to the dinner party table"""
+
+    user_id = session.get("user_id")
+    title = request.form.get("title")
+    new_party = Party(host_id=user_id, title=title)
+    db.session.add(new_party)
+    db.session.commit()
+
+    return redirect("/userprofile")
+
+
+@app.route('/addaguest', methods=['POST'])
 def register_guest():
     """Add a guest to a dinner party"""
 

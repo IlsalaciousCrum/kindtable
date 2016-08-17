@@ -32,5 +32,12 @@
             <li><a href="/findafriend">Add more friends.</a></li>
         </ul>
     </li>    
+    <li>Parties:</li>
+        {% for party in this_users_parties %}
+                    <ul><li><a href="/partyprofile?party_id={{ party.party_id }}">
+                {{ party.title }}</a> </li>
+                {% endfor %}
+            <li><a href="/addaparty">Add another party.</a></li></ul>
+
 </div>
 {% endblock %}
