@@ -140,6 +140,7 @@ def add_an_ingredient():
     """Add an user's ingredient to avoid to the user profile"""
 
     user_id = session.get("user_id")
+
     ingredient = request.form.get("ingredient")
     reason = request.form.get("reason")
 
@@ -159,7 +160,7 @@ def login_form():
     return render_template("login_form.html")
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/loggedin', methods=['POST'])
 def login_process():
     """Process login."""
 
@@ -170,19 +171,16 @@ def login_process():
     user = User.query.filter_by(email=email).first()
 
     if user:
-        if user.password is None:
-            flash("Would you like to claim this email address as your own? Someone has already saved a place for you.")
-            return redirect("/register")
-        elif user.password != password:
+        if user.password != password:
             flash("Incorrect password")
             return redirect("/login")
+        elif user.password == password:
+            session["user_id"] = user.user_id
+            flash("Logged in")
+            return redirect("/userprofile")
     elif not user:
         flash("You seem to be new here. Would you like to register? If not, please check your email address")
         return redirect("/register")
-    elif user.password == password:
-        session["user_id"] = user.user_id
-        flash("Logged in")
-        return redirect("/userprofile")
 
 
 @app.route('/logout')
@@ -196,7 +194,7 @@ def logout():
 
 @app.route('/userprofile', methods=['GET'])
 def show_user_profile():
-    """Add a guest to a dinner party"""
+    """Show logged in user's profile"""
 
     user_id = session.get("user_id")
     this_user = db.session.query(User).filter(User.user_id == user_id).first()
@@ -210,16 +208,32 @@ def show_user_profile():
                            this_users_diet=this_users_diet)
 
 
+@app.route('/friendprofile', methods=['GET'])
+def show_friend_profile():
+    """Show logged in user's profile"""
+
+    user_id = request.args.get("friends_id")
+    this_user = db.session.query(User).filter(User.user_id == user_id).first()
+    this_users_avoids = db.session.query(IngToAvoid).filter(IngToAvoid.user_id == user_id).all()
+    this_users_diet = db.session.query(Diet).filter(this_user.diet_id == Diet.diet_id).first()
+
+    return render_template("/friends_profile_page.html",
+                           user_id=user_id,
+                           this_user=this_user,
+                           this_users_avoids=this_users_avoids,
+                           this_users_diet=this_users_diet)
+
+
 @app.route('/findafriend', methods=['GET'])
 def get_a_friend():
     """Find a friend to add to the friends table"""
 
     user_id = session.get("user_id")
 
-    return render_template("/add_a_friend.html", user_id=user_id)
+    return render_template("find_a_friend.html", user_id=user_id)
 
 
-@app.route('/addafriend', methods=['post'])
+@app.route('/addafriend', methods=['POST'])
 def add_a_friend():
     """Add a friend connections to the friends table"""
 
@@ -228,12 +242,22 @@ def add_a_friend():
 
     your_friend = db.session.query(User).filter(User.email == email_address).first()
 
-    if your_friend:
-        newfriend = Friends(user_id=user_id, friend_id=friend_id)
-        flash("Friend added.")
+    check_friend = db.session.query(User).filter(Friends.user_id == user_id, Friends.friend_id == your_friend.user_id).first()
+
+    if check_friend:
+        flash("This person is already one of your friends. Would you like to add someone else?")
         return redirect("/addafriend")
-    elif not your_friend:
-        return
+    else:
+        if your_friend:
+            friend_id = your_friend.user_id
+            newfriend = Friends(user_id=user_id, friend_id=friend_id)
+            db.session.add(newfriend)
+            db.session.commit()
+            flash("Friend added.")
+            return redirect("/findafriend")
+        elif not your_friend:
+            flash("Looks like there is no profile yet for your friend. Would you like to create one?")
+            return redirect("/createfriendsprofile")
 
 
 @app.route('/addaparty', methods=['GET'])

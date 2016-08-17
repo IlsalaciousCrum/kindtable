@@ -10,35 +10,27 @@
     <li>Diet: {{ this_users_diet.diet_type }}</li>
     <li>Diet Reason: {{ this_user.diet_reason }}</li>
     <li>Intolerances:</li>
-        <ul>{% for intolerance in this_user.intolerances %}    
+        <ul>
+            {% for intolerance in this_user.intolerances %}    
             <li>{{ intolerance.intol_name }}</li>
                 {% endfor %}
+            <li><a href="/addintoleranceform">Add an intolerance/allergy</a></li>
         </ul>
     <li>Ingredients to avoid:</li>
         <ul>
-        {% for avoid in this_users_avoids %}
-        <li>{{ avoid.ingredient }}</li>
-        <li style="list-style-type:none">Reason: {{ avoid.reason}}</li>
-        {% endfor %}</ul>
-</ul>
-
-    <li>Intolerances:</li>
-        <ul>{% for intolerance in this_user.intolerances %}    
-            <li>{{ intolerance.intol_name }}</li>
-                {% endfor %}
-        </ul>
-
-<ul>
-    <li><a href="/addintoleranceform">Add an intolerance/allergy</a></li>
-    <li><a href="/addingredienttoavoid">Add an ingredient you would like to avoid</a></li>
-</ul>
-
+            {% for avoid in this_users_avoids %}
+            <li>{{ avoid.ingredient }}</li>
+            <li style="list-style-type:none">Reason: {{ avoid.reason}}</li>
+            {% endfor %}
+            <li><a href="/addingredienttoavoid">Add an ingredient you would like to avoid</a></li>
+        </ul> 
     <li>Friends:</li>
-
         <ul>{% for person in this_user.friends %}    
-            <li>{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }}) </li>
+            <li><a href="/friendprofile?friends_id={{ person.friends.user_id }}">
+                {{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</a> </li>
                 {% endfor %}
+            <li><a href="/findafriend">Add more friends.</a></li>
         </ul>
-
+    </li>    
 </div>
 {% endblock %}
