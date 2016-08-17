@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="well spaced">
+<h1>User Profile</h1>
+
+<ul>
+    <li>Email address: {{ this_user.email }}</li>
+    <li> First name: {{ this_user.first_name }}</li>
+    <li>Last name: {{ this_user.last_name }}</li>
+    <li>Diet: {{ this_users_diet.diet_type }}</li>
+    <li>Diet Reason: {{ this_user.diet_reason }}</li>
+    <li>Intolerances:</li>
+        <ul>{% for intolerance in this_user.intolerances %}    
+            <li>{{ intolerance.intol_name }}</li>
+                {% endfor %}
+        </ul>
+    <li>Ingredients to avoid:</li>
+        <ul>
+        {% for avoid in this_users_avoids %}
+        <li>{{ avoid.ingredient }}</li>
+        <li style="list-style-type:none">Reason: {{ avoid.reason}}</li>
+        {% endfor %}</ul>
+</ul>
+
+
+<ul>
+    <li><a href="/addintoleranceform">Add an intolerance/allergy</a></li>
+    <li><a href="/addingredienttoavoid">Add an ingredient you would like to avoid</li>
+</ul>
+
+</div>
+{% endblock %}
