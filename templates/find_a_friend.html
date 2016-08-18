@@ -2,6 +2,11 @@
 {% block content %}
 <div class="well spaced">
 
+    <p>You are already friends with:</p>
+        {% for person in this_user.friends %}    
+                {{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }}<br>
+                {% endfor %}
+
 <form action="/addafriend" method="POST">
     <div class="form-group">
         <label>

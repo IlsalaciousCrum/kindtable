@@ -5,7 +5,7 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session
 from flask_debugtoolbar import DebugToolbarExtension
 
-from Model import connect_to_db, db, Diet, UserIntolerance, User, IngToAvoid, Intolerance, Friends, Party
+from Model import connect_to_db, db, Diet, UserIntolerance, User, IngToAvoid, Intolerance, Friends, Party, PartyGuest
 
 import os
 
@@ -105,11 +105,14 @@ def get_an_intolerance():
     user_id = session.get("user_id")
 
     intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
-    user_id = session.get("user_id")
+    this_user = User.query.get(user_id)
 
     flash("Intolerance added.")
 
-    return render_template("/add_food_intolerance.html", intol_list=intol_list, user_id=user_id)
+    return render_template("/add_food_intolerance.html",
+                           intol_list=intol_list,
+                           user_id=user_id,
+                           this_user=this_user)
 
 
 @app.route('/intolerance_added', methods=['POST'])
@@ -131,8 +134,9 @@ def get_an_ingredient():
     """Get a user's ingredient to avoid"""
 
     user_id = session.get("user_id")
+    avoids = db.session.query(IngToAvoid).filter(IngToAvoid.user_id == user_id).all()
 
-    return render_template("/add_ingredient_to_avoid.html", user_id=user_id)
+    return render_template("/add_ingredient_to_avoid.html", user_id=user_id, avoids=avoids)
 
 
 @app.route('/ingredientadded', methods=['POST'])
@@ -231,8 +235,11 @@ def get_a_friend():
     """Find a friend to add to the friends table"""
 
     user_id = session.get("user_id")
+    this_user = User.query.get(user_id)
 
-    return render_template("find_a_friend.html", user_id=user_id)
+    return render_template("find_a_friend.html",
+                           user_id=user_id,
+                           this_user=this_user)
 
 
 @app.route('/addafriend', methods=['POST'])
@@ -240,29 +247,25 @@ def add_a_friend():
     """Add a friend connections to the friends table"""
 
     user_id = session.get("user_id")
-    print user_id
     email_address = request.form.get("email_address")
-    print email_address
 
     in_database = db.session.query(User).filter(User.email == email_address).first()
-    print in_database
 
-    check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
-    print check_for_friend
-
-    if not in_database:
+    if in_database is not None:
+        check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
+        if check_for_friend:
+            flash("This person is already one of your friends. Would you like to add someone else?")
+            return redirect("/findafriend")
+        else:
+            friend_id = in_database.user_id
+            newfriend = Friends(user_id=user_id, friend_id=friend_id)
+            db.session.add(newfriend)
+            db.session.commit()
+            flash("Friend added.")
+            return redirect("/findafriend")
+    else:
         flash("Looks like there is no profile yet for your friend. Would you like to create one?")
         return redirect("/createfriendsprofile")
-    elif check_for_friend:
-        flash("This person is already one of your friends. Would you like to add someone else?")
-        return redirect("/findafriend")
-    else:
-        friend_id = in_database.user_id
-        newfriend = Friends(user_id=user_id, friend_id=friend_id)
-        db.session.add(newfriend)
-        db.session.commit()
-        flash("Friend added.")
-        return redirect("/findafriend")
 
 
 @app.route('/addaparty', methods=['GET'])
@@ -283,24 +286,48 @@ def party_added():
     new_party = Party(host_id=user_id, title=title)
     db.session.add(new_party)
     db.session.commit()
+    party = db.session.query(Party).filter(Party.title == title).first()
 
-    return redirect("/userprofile")
+    return render_template("/party_profile.html", party=party)
 
 
-@app.route('/addaguest', methods=['POST'])
-def register_guest():
-    """Add a guest to a dinner party"""
+@app.route('/party_profile/<int:party_id>')
+def show_party_profile(party_id):
+    """Show the party profile"""
 
     user_id = session.get("user_id")
+    party = Party.query.get(party_id)
 
-    return render_template("/add_a_party.html", user_id=user_id)
-
-
-
-
+    return render_template("/party_profile.html", user_id=user_id,
+                           party=party)
 
 
+@app.route('/addaguest/<int:party_id>')
+def register_guest(party_id):
+    """Show form for adding a guest to a dinner party"""
 
+    user_id = session.get("user_id")
+    this_user = User.query.get(user_id)
+    party = Party.query.get(party_id)
+    party_guests = party.users
+
+    return render_template("/add_a_guest.html",
+                           party=party,
+                           this_user=this_user,
+                           party_guests=party_guests)
+
+
+@app.route('/guest_added', methods=['POST'])
+def guest_added():
+    """Add a guest to a diner party"""
+
+    party_id = request.form.get("party_id")
+    guest = request.form.get("guest")
+    new_guest = PartyGuest(party_id=party_id, user_id=guest)
+    db.session.add(new_guest)
+    db.session.commit()
+
+    return redirect('/addaguest/' + party_id)
 
 
 

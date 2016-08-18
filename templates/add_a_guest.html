@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="well spaced">
+
+<form action="/guest_added" method="POST">
+    <div class="form-group">
+        <label>
+            <h4><strong>Add a guest to {{ party.title }}:</strong></h4>
+
+                <p>Already invited:</p>
+                {% for person in party_guests %}
+                {{ person.first_name}} {{ person.last_name }} {{ person.email }}<br>
+                {% endfor %}<br><br>
+
+                <p>More friends to add:</p>
+                <select name="guest">
+                <option disabled selected value> -- select an option -- </option>
+                {% for person in this_user.friends %}
+                <option value={{ person.friends.user_id }}>  {{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</option>
+                {% endfor %}
+            </select><br>           
+        </label>
+    </div>
+
+    <div class="form-group">
+
+        <input type="hidden" name="party_id" value={{ party.party_id }}>
+        <input type="submit" value="Add guest" class="btn">
+    </div>
+</form>
+
+<a href="/party_profile/{{ party.party_id }}">Thanks, I'm done adding guests.</a>
+</div>
+{% endblock %}

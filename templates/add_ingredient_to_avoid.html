@@ -2,6 +2,12 @@
 {% block content %}
 <div class="well spaced">
 
+
+    <p>Already avoiding:</p>
+    {% for avoid in avoids %}
+    {{ avoid.ingredient}}<br>
+    {% endfor %}<br><br>
+
 <form action="/ingredientadded" method="POST">
     <div class="form-group">
         <label>

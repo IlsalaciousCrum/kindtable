@@ -1,0 +1,20 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="well spaced">
+<h1>Party Profile: {{ party.title }}</h1>
+
+<ul>
+    <li>Guests:</li>
+        <ul>
+            {% for guest in party.users %}    
+            <li>{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }}</li>
+                {% endfor %}
+            <li><a href="/addaguest/{{ party.party_id }}">Add more guests</a></li>
+        </ul>
+</ul> 
+
+<a href="/userprofile">Back to my profile page</a><br>
+<a href="#">Select recipes for this party</a> 
+</div>
+{% endblock %}
