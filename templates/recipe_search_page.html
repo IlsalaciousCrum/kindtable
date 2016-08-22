@@ -1,0 +1,58 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div>
+<h1>{{ responses.get('number', None) }} Recipes found for <a href="/party_profile/<int:party_id>">{{ party.title }}</a></h1>
+
+<!-- <ul>
+    <li>Guests:</li>
+        <ul>
+            {% for guest in party.users %}    
+            <li>{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }}</li>
+                {% endfor %}
+            <li><a href="/addaguest/{{ party.party_id }}">Add more guests</a></li>
+        </ul>
+</ul> 
+
+<a href="/userprofile">Back to my profile page</a><br>
+
+<form action="/searchrecipes" method="POST">
+    <input type="hidden" name="party_id" value={{ party.party_id  }}>
+    <button>Show recipe options for this party</button>
+</form>
+ -->
+
+<!--         each_response["title"] = title
+        each_response["recipe_url"] = recipe_url
+        each_response["image_url"] = image_url
+
+
+party=party,
+call_spoon=call_spoon,
+get_diets=get_diets,
+get_avoid=get_avoid,
+get_intolerance=get_intolerance)
+ -->
+
+
+    <div class="container">
+        <div id="recipe-list" class="row">
+            {% for i in range(responses.get('number', None)) %}
+                <div class="col-md-4">
+                    <h4><a href="{{ responses['response'][i].get('recipe_url') }}">{{ responses['response'][i].get('title') }}</a></h4>
+                    <a href="{{ responses['response'][i].get('recipe_url') }}">
+                    <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle" width="280" height="280">
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+      
+    </div>
+          
+</div>
+
+{% endblock %}
+
+
+--------
+

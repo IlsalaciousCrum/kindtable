@@ -3,18 +3,19 @@
 <div class="well spaced">
 
 
-    <p>Ingredients to avoid for {{ this_user.first_name }} :</p>
+    <p>Ingredients to avoid for {{ newfriend.first_name }} {{newfriend.last_name }}:</p>
     {% for avoid in avoids %}
     {{ avoid.ingredient}}<br>
     {% endfor %}<br><br>
 
-<form action="/ingredientadded" method="POST">
+<form action="/friendingredientadded" method="POST">
+    <input type="hidden" name="user_id" value={{ newfriend.user_id  }}>
     <div class="form-group">
         <label>
-            <h4><strong>Add an ingredient you would like to avoid:</strong></h4>
+            <h4><strong>Add an ingredient your friend would like to avoid:</strong></h4>
             <input type="text" name="ingredient" class="form-control">
 
-            Add a reason you like to avoid this ingredient (optional):
+            Add a reason your friend avoids ingredient (optional):
             <input type="text" name="reason" class="form-control">
         </label>
     </div>
@@ -25,7 +26,7 @@
     </div>
     </div>
 
-<a href="/userprofile">Thanks, I'm done adding ingredients</a>
+<a href="/friendprofile?friends_id={{ newfriend.user_id }}">Thanks, I'm done adding ingredients</a>
 
 </form>
 </div>

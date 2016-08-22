@@ -2,13 +2,13 @@
 {% block content %}
 <div class="well spaced">
 
-    <p>Intolerances for {{ this_user.first_name }}:</p>
-    {% for intolerance in this_user.intolerances %}    
+    <p>Intolerances for {{ newfriend.first_name }} {{ newfriend.last_name }}:</p>
+    {% for intolerance in newfriend.intolerances %}    
     {{ intolerance.intol_name }}<br>
     {% endfor %}
 
-<form action="/intolerance_added" method="POST">
-
+<form action="/friendintolerance_added" method="POST">
+     <input type="hidden" name="user_id" value={{ newfriend.user_id  }}>
     <div class="form-group">
         <label>
             <h4><strong>Add an intolerances or allergy:</strong></h4>
@@ -29,8 +29,10 @@
     </div>
     </div>
 
-<a href="/userprofile">Thanks, I'm done adding intolerances/allergies</a>
-
 </form>
+
+<a href="/friendprofile?friends_id={{ newfriend.user_id }}">Thanks, I'm done adding intolerances/allergies</a>
+
+
 </div>
 {% endblock %}

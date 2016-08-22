@@ -8,13 +8,18 @@
     <li>Guests:</li>
         <ul>
             {% for guest in party.users %}    
-            <li>{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }}</li>
+            <li>{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }})</li>
                 {% endfor %}
             <li><a href="/addaguest/{{ party.party_id }}">Add more guests</a></li>
         </ul>
 </ul> 
 
 <a href="/userprofile">Back to my profile page</a><br>
-<a href="#">Select recipes for this party</a> 
+
+<form action="/searchrecipes" method="POST">
+    <input type="hidden" name="party_id" value={{ party.party_id  }}>
+    <button>Show recipe options for this party</button>
+</form>
+
 </div>
 {% endblock %}

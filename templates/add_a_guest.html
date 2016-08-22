@@ -7,12 +7,12 @@
         <label>
             <h4><strong>Add a guest to {{ party.title }}:</strong></h4>
 
-                <p>Already invited:</p>
+                <p>Guests invited:</p>
                 {% for person in party_guests %}
                 {{ person.first_name}} {{ person.last_name }} {{ person.email }}<br>
                 {% endfor %}<br><br>
 
-                <p>More friends to add:</p>
+                <p>Add guests:</p>
                 <select name="guest">
                 <option disabled selected value> -- select an option -- </option>
                 {% for person in this_user.friends %}

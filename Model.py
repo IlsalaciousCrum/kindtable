@@ -3,9 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-
 ##############################################################################
 # Model definitions
+
 
 class User(db.Model):
     """User of K(i)nd website. Guests and hosts are stored in the same table."""
