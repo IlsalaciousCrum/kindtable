@@ -1,3 +1,4 @@
 *kind*
 *.pyc
 secrets.sh
+.DS_Store
