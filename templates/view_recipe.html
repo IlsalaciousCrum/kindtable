@@ -1,0 +1,31 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+<h1>{{  title  }}</h1>
+
+
+    <form action="/addtorecipebox" method="POST">
+        <input type="hidden" name="party_id" value="{{ party_id  }}">
+        <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
+        <input type="hidden" name="title" value="{{  title  }}">
+        <input type="hidden" name="recipe_image_url" value="{{  recipe_image_url  }}">
+        <input type="hidden" name="recipe_url" value="{{ recipe_url }}">
+        <button>Remember this recipe for later</button>
+    </form>
+
+<form action="/searchrecipes" method="POST">
+    <input type="hidden" name="party_id" value="{{ party_id  }}">
+    <button>Back to recipe search page</button>
+</form>
+
+<a href="/party_profile/{{ party_id  }}">Back to party profile</a>
+
+<iframe sandbox="allow-same-origin allow-scripts" src="{{ recipe_url}}" width=100% height=500></iframe>
+
+</div>
+{% endblock %}
+
+
+--------
+
