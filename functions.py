@@ -1,19 +1,53 @@
 # # from sqlalchemy import func
 
-from Model import connect_to_db, db, User, UserIntolerance, Intolerance, Diet, IngToAvoid, PartyGuest, Party
+from Model import connect_to_db, db, User, UserIntolerance, Intolerance, Diet, IngToAvoid, PartyGuest, Party, Friends
 # from server import app
+
+from flask import Flask, render_template, request, flash, redirect, session, jsonify
 
 import requests
 import os
 import json
 
 
-# payload = {'query': 'recipe', 'diet': 'vegan', 'type': 'main course',
-#            'number': 60, 'intolerances': 'gluten', 'excludeIngredients': 'peanuts, broccoli'}
+def make_user(email, first_name, last_name, diet_id, diet_reason, verified=False, password=None):
+    """Instantiates a new user and returns that user's user_id"""
+
+    new_user = User(password=password, first_name=first_name,
+                    last_name=last_name, email=email, diet_id=diet_id, diet_reason=diet_reason, verified=verified)
+    db.session.add(new_user)
+    db.session.commit()
+
+    newuser = db.session.query(User).filter_by(email=email).first()
+    user_id = newuser.user_id
+    return user_id
 
 
-# payload = {'query': 'recipe', 'diet': guest_diets(partyid), 'type': 'main course',
-#            'number': 60, 'intolerances': guest_intolerances(), 'excludeIngredients': guest_avoidances()}
+def make_friendship(user_id, friend_id):
+    """Instantiates a new friendship on the friend table"""
+    add_to_friends = Friends(user_id=user_id, friend_id=friend_id)
+    db.session.add(add_to_friends)
+    db.session.commit()
+    return
+
+
+def make_intolerances(intol_ids, user_id):
+    """Instantiates new intolerances on the intolerances table"""
+    for intol_id in intol_ids:
+        new_intol = UserIntolerance(user_id=user_id, intol_id=intol_id)
+        db.session.add(new_intol)
+        db.session.commit()
+        return
+
+
+def make_avoidance(user_id, ingredient, reason):
+    """Instantiate new avoidances on the avoids table"""
+
+    new_avoid = IngToAvoid(user_id=user_id, ingredient=ingredient, reason=reason)
+    db.session.add(new_avoid)
+    db.session.commit
+    return
+
 
 def guest_diets(partyid):
     """Query that gets the diet of each guest coming to the party"""
@@ -63,10 +97,9 @@ def guest_intolerances(partyid):
         ', '.join(intolerance_string)
     return intolerance_string
 
-# ************************************************
-
 
 def spoonacular_request(party_id):
+    """Assembles an API request to Spoonacular"""
 
     diet_string = guest_diets(party_id)
     intolerance_string = guest_intolerances(party_id)
@@ -75,7 +108,7 @@ def spoonacular_request(party_id):
     url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
     headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
     payload = {'query': 'recipe', 'diet': diet_string, 'type': 'main course',
-               'number': 60, 'intolerances': intolerance_string, 'excludeIngredients': avoid_string}
+               'number': 100, 'intolerances': intolerance_string, 'excludeIngredients': avoid_string}
     response = requests.get(url, headers=headers, params=payload)
 
     responses = {}
@@ -87,6 +120,7 @@ def spoonacular_request(party_id):
     response = []
 
     for i in range(num_results):
+        recipe_id = spoon['results'][i].get('id')
         image = spoon['results'][i].get('image')
         image_urls = spoon['results'][i].get('imageUrls')
         for image_url in image_urls:
@@ -100,20 +134,52 @@ def spoonacular_request(party_id):
         each_response["title"] = title
         each_response["recipe_url"] = recipe_url
         each_response["image_url"] = image_url
+        each_response["recipe_id"] = recipe_id
         response.append(each_response)
 
     responses["response"] = response
     return responses
 
-# animals = {
-#     'goat': {'number': 6,  'feed': 'everything',   'bites': True},
-#     'pony': {'number': 1,  'feed': 'hay and oats', 'bites': True},
-#     'duck': {'number': 14, 'feed': 'pond muck',    'bites': False},
-# }
-# >>> # do ponies bite?
-# >>> print animals["pony"]["bites"]
-# True
+
+# def spoonacular_recipe_ingredients(recipe_id):
+#     """Assembles an API request to Spoonacular to get a recipes ingredients"""
+
+#     url1 = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/'
+#     url2 = '/information'
+#     url = url1 + str(recipe_id) + url2
+
+#     headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
+#     payload = {'id': recipe_id, 'includeNutrition': False}
+#     response = requests.get(url, headers=headers, params=payload)
+
+#     spoon = response.json()
+#     ingredients = spoon['extendedIngredients']
+#     ingredients_list = []
+#     for each in ingredients:
+#         one = each["originalString"]
+#         ingredients_list.append(one)
+
+#     return ingredients_list
 
 
+# def spoonacular_recipe_instructions(recipe_id):
+#     """Assembles an API request to Spoonacular to get a recipes instructions"""
 
-#  The url for the recipe will be a dash seperated title + dash + _id
+#     url1 = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/'
+#     url2 = '/analyzedInstructions'
+#     url = url1 + str(recipe_id) + url2
+#     headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
+#     payload = {'stepBreakdown': True}
+#     response = requests.get(url, headers=headers, params=payload)
+
+#     spoon = response.json()
+
+    # instructions_list = []
+    # for each in spoon:
+    #     steps = each("steps")
+    #     for each in steps:
+    #         step = each("step")
+    #         instructions_list.append(step)
+
+    # # return instructions_list
+    # return spoon

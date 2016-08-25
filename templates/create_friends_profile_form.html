@@ -1,41 +1,38 @@
+
 {% extends 'base.html' %}
 {% block content %}
 <div class="well spaced">
-<h1>Create a profile for a friend</h1>
+<h1>Friend Profile: {{ newfriend.first_name }} {{ newfriend.last_name }} </h1>
 
-<form action="/friendregistered" method="POST">
-
-    <div class="form-group">
-        <label>
-            <strong>Email address</strong> (required): <input type="text" name="email" value={{ email_address }} class="form-control" required>
-    
-            Friend's first name (optional):
-            <input type="text" name="first_name" class="form-control">
-  
-            Friend's last name (optional):
-            <input type="text" name="last_name" class="form-control">
-
-
-            <h4><strong>Diet your friend prefers to eat (required):</strong></h4>
-            
-            <select name="diet_type">
-                {% for diet in diets %}
-                <option value={{ diet.diet_id }}>{{ diet.diet_type }}</option>
+<ul>
+    <li>Email address: {{ newfriend.email }}</li>
+    <li>Diet: {{ newfriend.diet.diet_type }}</li>
+    <li>Diet Reason: {{ newfriend.diet_reason }}</li>
+    <li>Intolerances:</li>
+        <ul>
+            {% for intolerance in newfriend.intolerances %}    
+            <li>{{ intolerance.intol_name }}</li>
                 {% endfor %}
-            </select><br>
-            Reason they follow this diet (optional):<br>
-            <input type="text" name="diet_reason" class="form-control">
 
-            </label>
-        </div>
+<li><form action="/addfriendintoleranceform" method="POST">
+    <input type="hidden" name="user_id" value={{ newfriend.user_id  }}>
+    <button>Add an intolerance for this friend</button>
+    </form>
+</li></ul>
 
+    <li>Ingredients to avoid:</li>
+        <ul>
+            {% for avoid in newfriend.avoidances %}
+            <li>{{ avoid.ingredient }}</li>
+            <li style="list-style-type:none">Reason: {{ avoid.reason}}</li>
+            {% endfor %}
+            <li><form action="/addingfriendsinredienttoavoid" method="POST">
+            <input type="hidden" name="user_id" value={{ newfriend.user_id  }}>
+            <button>Add an ingredient to avoid for this friend</button>
+            </form>
+        </ul>  
 
-    <div class="form-group">
-        <input type="submit" value="Create friend profile" class="btn">
-    </div>
+<a href="/userprofile">Back to my profile page</a><br>
 
-    <a href="/userprofile">Thanks, I'm done creating friend profiles</a>
-
-</form>
 </div>
 {% endblock %}
