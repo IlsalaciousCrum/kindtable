@@ -12,14 +12,15 @@
                 {% endfor %}
             <li><a href="/addaguest/{{ party.party_id }}">Add more guests</a></li>
         </ul>
-</ul> 
-
-<a href="/userprofile">Back to my profile page</a><br>
-
-<form action="/searchrecipes" method="POST">
-    <input type="hidden" name="party_id" value={{ party.party_id  }}>
-    <button>Show recipe options for this party</button>
-</form>
-
+    <li>Recipes:</li>
+        <ul>
+            {% for recipe in party.recipes %}    
+            <li>{{ recipe.title }}</li>
+                {% endfor %}
+            <li><form action="/searchrecipes" method="POST">
+                    <input type="hidden" name="party_id" value={{ party.party_id  }}>
+                    <button>Find recipe options for this party</button>
+                </form>
+        </ul>
 </div>
 {% endblock %}

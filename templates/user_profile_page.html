@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="well spaced">
-<h1>User Profile</h1>
+<h1>{{ this_user.first_name }} {{ this_user.last_name }}</h1>
 
 <ul>
     <li>Email address: {{ this_user.email }}</li>
-    <li> First name: {{ this_user.first_name }}</li>
-    <li>Last name: {{ this_user.last_name }}</li>
-    <li>Diet: {{ this_users_diet.diet_type }}</li>
+    <li>Diet: {{ this_user.diet.diet_type }}</li>
     <li>Diet Reason: {{ this_user.diet_reason }}</li>
     <li>Intolerances:</li>
         <ul>
@@ -18,7 +16,7 @@
         </ul>
     <li>Ingredients to avoid:</li>
         <ul>
-            {% for avoid in this_users_avoids %}
+            {% for avoid in this_user.avoidances %}
             <li>{{ avoid.ingredient }}</li>
             <li style="list-style-type:none">Reason: {{ avoid.reason}}</li>
             {% endfor %}

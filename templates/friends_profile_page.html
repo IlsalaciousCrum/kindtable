@@ -6,7 +6,7 @@
 
 <ul>
     <li>Email address: {{ newfriend.email }}</li>
-    <li>Diet: {{ newfriend_diet.diet_type }}</li>
+    <li>Diet: {{ newfriend.diet.diet_type }}</li>
     <li>Diet Reason: {{ newfriend.diet_reason }}</li>
     <li>Intolerances:</li>
         <ul>
@@ -22,7 +22,7 @@
 
     <li>Ingredients to avoid:</li>
         <ul>
-            {% for avoid in newfriend_avoids %}
+            {% for avoid in newfriend.avoidances %}
             <li>{{ avoid.ingredient }}</li>
             <li style="list-style-type:none">Reason: {{ avoid.reason}}</li>
             {% endfor %}

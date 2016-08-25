@@ -4,7 +4,7 @@
 
 
     <p>Ingredients to avoid for {{ newfriend.first_name }} {{newfriend.last_name }}:</p>
-    {% for avoid in avoids %}
+    {% for avoid in newfriend.avoidances %}
     {{ avoid.ingredient}}<br>
     {% endfor %}<br><br>
 

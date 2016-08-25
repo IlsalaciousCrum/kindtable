@@ -13,11 +13,9 @@
         <label>
             <h4><strong>Add an intolerances or allergy:</strong></h4>
 
-            <select name="intol_id">
-                 <option disabled selected value> -- select an option -- </option>
-                {% for intolerance in intol_list %}
-                <option value={{ intolerance.intol_id }}>{{ intolerance.intol_name }}</option>
-                {% endfor %}
+            {% for intolerance in intol_list %}  
+            <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>{{ intolerance.intol_name }}
+            {% endfor %}
             </select><br>
 
         </label>

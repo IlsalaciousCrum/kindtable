@@ -3,13 +3,15 @@
 from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, request, flash, redirect, session
-# from flask_debugtoolbar import DebugToolbarExtension
 
-from Model import connect_to_db, db, Diet, UserIntolerance, User, IngToAvoid, Intolerance, Friends, Party, PartyGuest
+from Model import (connect_to_db, db, Diet, User,
+                   Intolerance, Friends, Party, PartyGuest, RecipeBox)
 
 # import os
 
-from spoonacular import guest_diets, guest_intolerances, guest_avoidances, spoonacular_request
+from functions import (guest_diets, guest_intolerances, guest_avoidances,
+                       spoonacular_request, make_user, make_friendship,
+                       make_intolerances, make_avoidance)
 
 
 app = Flask(__name__)
@@ -30,7 +32,7 @@ def index():
 
 
 @app.route('/register', methods=['GET'])
-def register_form():
+def show_register_form():
     """Show form for user signup."""
 
     diets = Diet.query.order_by(Diet.diet_type).all()
@@ -39,7 +41,7 @@ def register_form():
 
 
 @app.route('/registered', methods=['POST'])
-def register_users():
+def add_register_users():
     """Process registration."""
 
     password = request.form.get("password")
@@ -48,34 +50,30 @@ def register_users():
     email = request.form.get("email")
     diet_id = request.form.get("diet_type")
     diet_reason = request.form.get("diet_reason")
+    verified = True
 
-    new_user = User(password=password, first_name=first_name,
-                    last_name=last_name, email=email, diet_id=diet_id, diet_reason=diet_reason, verified=True)
-
-    db.session.add(new_user)
-    db.session.commit()
-
-    newuser = db.session.query(User).filter_by(email=email).first()
-    user_id = newuser.user_id
-
-    session["user_id"] = user_id
+    session["user_id"] = make_user(email, first_name, last_name, diet_id,
+                                   diet_reason, verified, password)
 
     flash("Welcome to Kind Table, %s." % first_name)
     return redirect("/userprofile")
 
 
 @app.route('/createfriendsprofile', methods=['GET'])
-def register_friend_form():
+def show_register_friend_form():
     """Show form for adding a profile for a friend."""
 
-    diets = Diet.query.order_by(Diet.diet_type).all()
-
-    return render_template("create_friends_profile_form.html", diets=diets)
+    check_id = session.get("user_id")
+    if check_id:
+        diets = Diet.query.order_by(Diet.diet_type).all()
+        return render_template("create_friends_profile_form.html", diets=diets)
+    else:
+        return redirect("/login")
 
 
 @app.route('/friendregistered', methods=['POST'])
-def friend_profile_registered():
-    """Instantiate User for friend and make connection on friends table."""
+def add_friend_profile_registered():
+    """Instantiate unverified User and make connection on friends table."""
 
     user_id = session.get("user_id")
     first_name = request.form.get("first_name")
@@ -84,90 +82,68 @@ def friend_profile_registered():
     diet_id = request.form.get("diet_type")
     diet_reason = request.form.get("diet_reason")
 
-    friend_user = User(first_name=first_name,
-                       last_name=last_name, email=email, diet_id=diet_id, diet_reason=diet_reason)
-
-    db.session.add(friend_user)
-    db.session.commit()
-
-    newfriend = db.session.query(User).filter_by(email=email).first()
-
-    add_to_friends = Friends(user_id=user_id, friend_id=newfriend.user_id)
-
-    db.session.add(add_to_friends)
-    db.session.commit()
-
-    newfriend_avoids = db.session.query(IngToAvoid).filter(IngToAvoid.user_id == newfriend.user_id).all()
-
-    newfriend_diet = db.session.query(Diet).filter(newfriend.diet_id == Diet.diet_id).first()
+    friend_id = make_user(email, first_name, last_name, diet_id, diet_reason)
+    make_friendship(user_id, friend_id)
+    newfriend = User.query.get(friend_id)
 
     flash("A profile has been created for your friend: %s." % first_name)
 
     return render_template("/friends_profile_page.html",
-                           newfriend=newfriend,
-                           newfriend_avoids=newfriend_avoids,
-                           newfriend_diet=newfriend_diet)
+                           newfriend=newfriend)
 
 
 @app.route('/friendprofile', methods=['GET'])
 def show_friend_profile():
     """Show logged in user's profile"""
 
-    user_id = request.args.get("friends_id")
-    newfriend = db.session.query(User).filter(User.user_id == user_id).first()
-    newfriend_avoids = db.session.query(IngToAvoid).filter(IngToAvoid.user_id == user_id).all()
-    newfriend_diet = db.session.query(Diet).filter(newfriend.diet_id == Diet.diet_id).first()
-
-    return render_template("/friends_profile_page.html",
-                           newfriend=newfriend,
-                           newfriend_avoids=newfriend_avoids,
-                           newfriend_diet=newfriend_diet)
+    check_id = session.get("user_id")
+    if check_id:
+        user_id = request.args.get("friends_id")
+        newfriend = User.query.get(user_id)
+        return render_template("/friends_profile_page.html",
+                               newfriend=newfriend)
+    else:
+        return redirect("/login")
 
 
 @app.route('/addfriendintoleranceform', methods=['POST'])
-def friends_intolerance():
-    """Get information about a friends intolerance"""
+def show_friends_intolerance():
+    """Show the form to get information about a friends intolerances"""
 
-    user_id = request.form.get("user_id")
-    newfriend = db.session.query(User).filter(User.user_id == user_id).first()
-    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
-
-    flash("Intolerance added.")
-
-    return render_template("/add_friends_food_intolerance.html",
-                           intol_list=intol_list,
-                           user_id=user_id,
-                           newfriend=newfriend)
+    check_id = session.get("user_id")
+    if check_id:
+        user_id = request.form.get("user_id")
+        newfriend = User.query.get(user_id)
+        intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+        return render_template("/add_friends_food_intolerance.html",
+                               intol_list=intol_list,
+                               newfriend=newfriend)
+    else:
+        return redirect("/login")
 
 
 @app.route('/friendintolerance_added', methods=['POST'])
 def add_friends_intolerance():
-    """Add a friend intolerance to the friend profile"""
+    """Add a friend intolerance to the their profile"""
 
     user_id = request.form.get("user_id")
-    intol_id = request.form.get("intol_id")
-    newfriend = db.session.query(User).filter(User.user_id == user_id).first()
-    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
-    new_intol = UserIntolerance(user_id=user_id, intol_id=intol_id)
-    db.session.add(new_intol)
-    db.session.commit()
+    newfriend = User.query.get(user_id)
+    intol_ids = request.form.getlist("intol_ids")
 
-    return render_template("/add_friends_food_intolerance.html",
-                           intol_list=intol_list,
-                           user_id=user_id,
+    make_intolerances(intol_ids, user_id)
+
+    return render_template("/friends_profile_page.html",
                            newfriend=newfriend)
 
 
 @app.route('/addingfriendsinredienttoavoid', methods=['POST'])
-def get_friends_ingredient():
+def show_friends_ingredient():
     """Get a friends ingredient to avoid"""
 
     user_id = request.form.get("user_id")
-    avoids = db.session.query(IngToAvoid).filter(IngToAvoid.user_id == user_id).all()
-    newfriend = db.session.query(User).filter(User.user_id == user_id).first()
+    newfriend = User.query.get(user_id)
 
     return render_template("/add_friends_ingredient_to_avoid.html",
-                           avoids=avoids,
                            newfriend=newfriend)
 
 
@@ -179,35 +155,29 @@ def add_friends_ingredient():
     ingredient = request.form.get("ingredient")
     reason = request.form.get("reason")
 
-    new_avoid = IngToAvoid(user_id=user_id, ingredient=ingredient, reason=reason)
-    db.session.add(new_avoid)
-    db.session.commit()
+    make_avoidance(user_id, ingredient, reason)
 
-    newfriend = db.session.query(User).filter(User.user_id == user_id).first()
+    newfriend = User.query.get(user_id)
 
-    avoids = db.session.query(IngToAvoid).filter(IngToAvoid.user_id == user_id).all()
     flash("Ingredient added.")
 
     return render_template("/add_friends_ingredient_to_avoid.html",
-                           avoids=avoids,
                            newfriend=newfriend)
 
 
 @app.route('/addintoleranceform', methods=['GET'])
-def get_an_intolerance():
+def show_an_intolerance():
     """Get information about a user intolerance"""
 
     user_id = session.get("user_id")
-
-    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
-    this_user = User.query.get(user_id)
-
-    flash("Intolerance added.")
-
-    return render_template("/add_food_intolerance.html",
-                           intol_list=intol_list,
-                           user_id=user_id,
-                           this_user=this_user)
+    if user_id:
+        intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+        this_user = User.query.get(user_id)
+        return render_template("/add_food_intolerance.html",
+                               intol_list=intol_list,
+                               this_user=this_user)
+    else:
+        return redirect("/login")
 
 
 @app.route('/intolerance_added', methods=['POST'])
@@ -215,27 +185,23 @@ def add_an_intolerance():
     """Add a user intolerance to the user profile"""
 
     user_id = session.get("user_id")
-    intol_id = request.form.get("intol_id")
+    intol_ids = request.form.getlist("intol_ids")
+    make_intolerances(intol_ids, user_id)
 
-    new_intol = UserIntolerance(user_id=user_id, intol_id=intol_id)
-    db.session.add(new_intol)
-    db.session.commit()
-
-    return redirect("/addintoleranceform")
+    return redirect("/userprofile")
 
 
 @app.route('/addingredienttoavoid', methods=['GET'])
-def get_an_ingredient():
+def show_an_ingredient():
     """Get a user's ingredient to avoid"""
 
     user_id = session.get("user_id")
-    this_user = User.query.get(user_id)
-    avoids = db.session.query(IngToAvoid).filter(IngToAvoid.user_id == user_id).all()
-
-    return render_template("/add_ingredient_to_avoid.html",
-                           user_id=user_id,
-                           avoids=avoids,
-                           this_user=this_user)
+    if user_id:
+        this_user = User.query.get(user_id)
+        return render_template("/add_ingredient_to_avoid.html",
+                               this_user=this_user)
+    else:
+        return redirect("/login")
 
 
 @app.route('/ingredientadded', methods=['POST'])
@@ -243,13 +209,10 @@ def add_an_ingredient():
     """Add an user's ingredient to avoid to the user profile"""
 
     user_id = session.get("user_id")
-
     ingredient = request.form.get("ingredient")
     reason = request.form.get("reason")
 
-    new_avoid = IngToAvoid(user_id=user_id, ingredient=ingredient, reason=reason)
-    db.session.add(new_avoid)
-    db.session.commit()
+    make_avoidance(user_id, ingredient, reason)
 
     flash("Ingredient added.")
 
@@ -257,14 +220,14 @@ def add_an_ingredient():
 
 
 @app.route('/login', methods=['GET'])
-def login_form():
+def show_login_form():
     """Show login form."""
 
     return render_template("login_form.html")
 
 
 @app.route('/loggedin', methods=['POST'])
-def login_process():
+def add_login_process():
     """Process login."""
 
     # Get form variables
@@ -287,12 +250,16 @@ def login_process():
 
 
 @app.route('/logout')
-def logout():
+def add_logout():
     """Log out."""
 
-    del session["user_id"]
-    flash("Logged Out.")
-    return redirect("/")
+    check_id = session.get("user_id")
+    if check_id:
+        del session["user_id"]
+        flash("Logged Out.")
+        return redirect("/")
+    else:
+        return redirect("/login")
 
 
 @app.route('/userprofile', methods=['GET'])
@@ -300,29 +267,27 @@ def show_user_profile():
     """Show logged in user's profile"""
 
     user_id = session.get("user_id")
-    this_user = db.session.query(User).filter(User.user_id == user_id).first()
-    this_users_avoids = db.session.query(IngToAvoid).filter(IngToAvoid.user_id == user_id).all()
-    this_users_diet = db.session.query(Diet).filter(this_user.diet_id == Diet.diet_id).first()
-    this_users_parties = db.session.query(Party).filter(this_user.user_id == Party.host_id).all()
-
-    return render_template("/user_profile_page.html",
-                           user_id=user_id,
-                           this_user=this_user,
-                           this_users_avoids=this_users_avoids,
-                           this_users_diet=this_users_diet,
-                           this_users_parties=this_users_parties)
+    if user_id:
+        this_user = User.query.get(user_id)
+        this_users_parties = db.session.query(Party).filter(this_user.user_id == Party.host_id).all()
+        return render_template("/user_profile_page.html",
+                               this_user=this_user,
+                               this_users_parties=this_users_parties)
+    else:
+        return redirect("/login")
 
 
 @app.route('/findafriend', methods=['GET'])
-def get_a_friend():
+def show_get_a_friend():
     """Find a friend to add to the friends table"""
 
     user_id = session.get("user_id")
-    this_user = User.query.get(user_id)
-
-    return render_template("find_a_friend.html",
-                           user_id=user_id,
-                           this_user=this_user)
+    if user_id:
+        this_user = User.query.get(user_id)
+        return render_template("find_a_friend.html",
+                               this_user=this_user)
+    else:
+        return redirect("/login")
 
 
 @app.route('/addafriend', methods=['POST'])
@@ -358,13 +323,15 @@ def add_a_friend():
 def show_party_form():
     """Show the dinner party form"""
 
-    user_id = session.get("user_id")
-
-    return render_template("/add_a_party.html", user_id=user_id)
+    check_id = session.get("user_id")
+    if check_id:
+        return render_template("/add_a_party.html")
+    else:
+        return redirect("/login")
 
 
 @app.route('/party_added', methods=['POST'])
-def party_added():
+def add_party():
     """Add a new dinner party to the dinner party table"""
 
     user_id = session.get("user_id")
@@ -377,61 +344,118 @@ def party_added():
     return render_template("/party_profile.html", party=party)
 
 
+@app.route('/addaguest/<int:party_id>')
+def show_register_guest(party_id):
+    """Show form for adding a guest to a dinner party"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        this_user = User.query.get(user_id)
+        party = Party.query.get(party_id)
+        party_guests = party.users
+
+        return render_template("/add_a_guest.html",
+                               party=party,
+                               this_user=this_user,
+                               party_guests=party_guests)
+    else:
+        return redirect("/login")
+
+
+@app.route('/guest_added', methods=['POST'])
+def add_guest():
+    """Add a guest to a diner party"""
+
+    party_id = request.form.get("party_id")
+    guests = request.form.getlist("guests")
+    for guest in guests:
+        new_guest = PartyGuest(party_id=party_id, user_id=guest)
+        db.session.add(new_guest)
+        db.session.commit()
+
+    return redirect('/addaguest/' + party_id)
+
+
 @app.route('/party_profile/<int:party_id>')
 def show_party_profile(party_id):
     """Show the party profile"""
 
     user_id = session.get("user_id")
-    party = Party.query.get(party_id)
-
-    return render_template("/party_profile.html", user_id=user_id,
-                           party=party)
-
-
-@app.route('/addaguest/<int:party_id>')
-def register_guest(party_id):
-    """Show form for adding a guest to a dinner party"""
-
-    user_id = session.get("user_id")
-    this_user = User.query.get(user_id)
-    party = Party.query.get(party_id)
-    party_guests = party.users
-
-    return render_template("/add_a_guest.html",
-                           party=party,
-                           this_user=this_user,
-                           party_guests=party_guests)
-
-
-@app.route('/guest_added', methods=['POST'])
-def guest_added():
-    """Add a guest to a diner party"""
-
-    party_id = request.form.get("party_id")
-    guest = request.form.get("guest")
-    new_guest = PartyGuest(party_id=party_id, user_id=guest)
-    db.session.add(new_guest)
-    db.session.commit()
-
-    return redirect('/addaguest/' + party_id)
+    if user_id:
+        party = Party.query.get(party_id)
+        return render_template("/party_profile.html", user_id=user_id,
+                               party=party)
+    else:
+        return redirect("/login")
 
 
 @app.route('/searchrecipes', methods=['POST'])
-def search_spoonacular():
+def show_search_spoonacular():
     """Collate party information, query spoonacular and show results."""
 
-    party_id = request.form.get("party_id")
-    party = Party.query.get(party_id)
-    responses = spoonacular_request(party_id)
-    get_diets = guest_diets(party_id)
-    get_avoid = guest_avoidances(party_id)
-    get_intolerance = guest_intolerances(party_id)
+    user_id = session.get("user_id")
+    if user_id:
+        party_id = request.form.get("party_id")
+        party = Party.query.get(party_id)
+        responses = spoonacular_request(party_id)
+        get_diets = guest_diets(party_id)
+        get_avoid = guest_avoidances(party_id)
+        get_intolerance = guest_intolerances(party_id)
 
-    return render_template("recipe_search_page.html", party=party,
-                           responses=responses,
-                           get_diets=get_diets,
-                           get_avoid=get_avoid,
-                           get_intolerance=get_intolerance)
+        return render_template("recipe_search_page.html", party=party,
+                               responses=responses,
+                               get_diets=get_diets,
+                               get_avoid=get_avoid,
+                               get_intolerance=get_intolerance)
+    else:
+        return redirect("/login")
+
+
+@app.route('/see_recipe', methods=['POST'])
+def show_recipe():
+    """Show a recipe to the recipe box"""
+
+    check_id = session.get("user_id")
+    if check_id:
+        party_id = request.form.get("party_id")
+        recipe_id = request.form.get("recipe_id")
+        title = request.form.get("title")
+        recipe_image_url = request.form.get("recipe_image_url")
+        recipe_url = request.form.get("recipe_url")
+
+        return render_template("view_recipe.html",
+                               recipe_id=recipe_id,
+                               party_id=party_id,
+                               title=title,
+                               recipe_image_url=recipe_image_url,
+                               recipe_url=recipe_url)
+    else:
+        return redirect("/login")
+
+
+@app.route('/addtorecipebox', methods=['POST'])
+def add_recipe_box():
+    """Add a recipe to the recipe box"""
+
+    check_id = session.get("user_id")
+
+    if check_id:
+        party_id = request.form.get("party_id")
+        recipe_id = request.form.get("recipe_id")
+        title = request.form.get("title")
+        recipe_image_url = request.form.get("recipe_image_url")
+        recipe_url = request.form.get("recipe_url")
+        new_recipe = RecipeBox(party_id=party_id,
+                               recipe_id=recipe_id,
+                               title=title,
+                               recipe_image_url=recipe_image_url,
+                               recipe_url=recipe_url)
+        db.session.add(new_recipe)
+        db.session.commit()
+        flash("Recipe added for this party.")
+        return redirect("/userprofile")
+    else:
+        return redirect("/login")
 
 
 if __name__ == "__main__":

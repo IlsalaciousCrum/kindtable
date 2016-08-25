@@ -2,7 +2,42 @@
 {% extends 'base.html' %}
 {% block content %}
 <div>
-<h1>{{ responses.get('number', None) }} Recipes found for <a href="/party_profile/<int:party_id>">{{ party.title }}</a></h1>
+<h1>{{ responses.get('number', None) }} Recipes found for <a href="/party_profile/<int:{{ party.party_id  }}>">{{ party.title }}</a></h1>
+
+    <div class="container">
+        <div id="recipe-list" class="row">
+            {% for i in range(responses.get('number', None)) %}
+                <div class="col-md-4">
+                    <h4>{{ responses['response'][i].get('title') }}</h4>
+                        <form action="/see_recipe" method="POST">
+                        <input type="hidden" name="party_id" value="{{ party.party_id  }}">
+                        <input type="hidden" name="recipe_id" value="{{ responses['response'][i].get('recipe_id') }}">
+                        <input type="hidden" name="title" value="{{ responses['response'][i].get('title') }}">
+                        <input type="hidden" name="recipe_image_url" value="{{ responses['response'][i].get('image_url') }}">
+                        <input type="hidden" name="recipe_url" value="{{ responses['response'][i].get('recipe_url') }}">
+                        <button>View recipe</button>
+                        </form>
+                    
+                    <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle" width="280" height="280">
+              
+                </div>
+            {% endfor %}
+        </div>
+      
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+--------
+
+
+
+
+
+
 
 <!-- <ul>
     <li>Guests:</li>
@@ -34,25 +69,4 @@ get_avoid=get_avoid,
 get_intolerance=get_intolerance)
  -->
 
-
-    <div class="container">
-        <div id="recipe-list" class="row">
-            {% for i in range(responses.get('number', None)) %}
-                <div class="col-md-4">
-                    <h4><a href="{{ responses['response'][i].get('recipe_url') }}">{{ responses['response'][i].get('title') }}</a></h4>
-                    <a href="{{ responses['response'][i].get('recipe_url') }}">
-                    <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle" width="280" height="280">
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-      
-    </div>
-          
-</div>
-
-{% endblock %}
-
-
---------
 
