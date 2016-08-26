@@ -37,7 +37,7 @@ def make_intolerances(intol_ids, user_id):
         new_intol = UserIntolerance(user_id=user_id, intol_id=intol_id)
         db.session.add(new_intol)
         db.session.commit()
-        return
+    return
 
 
 def make_avoidance(user_id, ingredient, reason):
@@ -45,7 +45,7 @@ def make_avoidance(user_id, ingredient, reason):
 
     new_avoid = IngToAvoid(user_id=user_id, ingredient=ingredient, reason=reason)
     db.session.add(new_avoid)
-    db.session.commit
+    db.session.commit()
     return
 
 
@@ -127,7 +127,8 @@ def spoonacular_request(party_id):
             image_url = image_url
         title = spoon['results'][i].get('title')
         recipe_url_base = "http://spoonacular.com/recipes/"
-        recipe_url = image.rstrip(".jpg")
+        if image is not None:
+            recipe_url = image[:-4]
         recipe_url = recipe_url_base + recipe_url
         image_url = base_url + image_url
         each_response = {}

@@ -59,6 +59,121 @@ def add_register_users():
     return redirect("/userprofile")
 
 
+@app.route('/userprofile', methods=['GET'])
+def show_user_profile():
+    """Show logged in user's profile"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        this_user = User.query.get(user_id)
+        this_users_parties = db.session.query(Party).filter(this_user.user_id == Party.host_id).all()
+        return render_template("/user_profile_page.html",
+                               this_user=this_user,
+                               this_users_parties=this_users_parties)
+    else:
+        return redirect("/login")
+
+
+@app.route('/addintoleranceform', methods=['GET'])
+def show_an_intolerance():
+    """Get information about a user intolerance"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+        this_user = User.query.get(user_id)
+        return render_template("/add_food_intolerance.html",
+                               intol_list=intol_list,
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+
+@app.route('/intolerance_added', methods=['POST'])
+def add_an_intolerance():
+    """Add a user intolerance to the user profile"""
+
+    user_id = session.get("user_id")
+    intol_ids = request.form.getlist("intol_ids")
+    make_intolerances(intol_ids, user_id)
+
+    return redirect("/userprofile")
+
+
+@app.route('/addingredienttoavoid', methods=['GET'])
+def show_an_ingredient():
+    """Get a user's ingredient to avoid"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        this_user = User.query.get(user_id)
+        return render_template("add_ingredient_to_avoid.html",
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+
+@app.route('/ingredientadded', methods=['POST'])
+def add_an_ingredient():
+    """Add an user's ingredient to avoid to the user profile"""
+
+    user_id = session.get("user_id")
+    ingredient = request.form.get("ingredient")
+    reason = request.form.get("reason")
+
+    print ingredient
+    print reason
+    print user_id
+
+    make_avoidance(user_id, ingredient, reason)
+
+    flash("Ingredient added.")
+
+    return redirect("/addingredienttoavoid")
+
+
+@app.route('/findafriend', methods=['GET'])
+def show_get_a_friend():
+    """Find a friend to add to the friends table"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        this_user = User.query.get(user_id)
+        return render_template("find_a_friend.html",
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+
+@app.route('/addafriend', methods=['POST'])
+def add_a_friend():
+    """Add a friend connections to the friends table"""
+
+    user_id = session.get("user_id")
+    email_address = request.form.get("email_address")
+
+    in_database = db.session.query(User).filter(User.email == email_address).first()
+
+    if in_database is not None:
+        check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
+        if check_for_friend:
+            flash("This person is already one of your friends. Would you like to add someone else?")
+            return redirect("/findafriend")
+        else:
+            friend_id = in_database.user_id
+            newfriend = Friends(user_id=user_id, friend_id=friend_id)
+            db.session.add(newfriend)
+            db.session.commit()
+            flash("Friend added.")
+            return redirect("/findafriend")
+    else:
+        diets = Diet.query.order_by(Diet.diet_type).all()
+        flash("Looks like there is no profile yet for your friend. Would you like to create one?")
+        return render_template("create_friends_profile_form.html",
+                               email_address=email_address,
+                               diets=diets)
+
+
 @app.route('/createfriendsprofile', methods=['GET'])
 def show_register_friend_form():
     """Show form for adding a profile for a friend."""
@@ -165,160 +280,6 @@ def add_friends_ingredient():
                            newfriend=newfriend)
 
 
-@app.route('/addintoleranceform', methods=['GET'])
-def show_an_intolerance():
-    """Get information about a user intolerance"""
-
-    user_id = session.get("user_id")
-    if user_id:
-        intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
-        this_user = User.query.get(user_id)
-        return render_template("/add_food_intolerance.html",
-                               intol_list=intol_list,
-                               this_user=this_user)
-    else:
-        return redirect("/login")
-
-
-@app.route('/intolerance_added', methods=['POST'])
-def add_an_intolerance():
-    """Add a user intolerance to the user profile"""
-
-    user_id = session.get("user_id")
-    intol_ids = request.form.getlist("intol_ids")
-    make_intolerances(intol_ids, user_id)
-
-    return redirect("/userprofile")
-
-
-@app.route('/addingredienttoavoid', methods=['GET'])
-def show_an_ingredient():
-    """Get a user's ingredient to avoid"""
-
-    user_id = session.get("user_id")
-    if user_id:
-        this_user = User.query.get(user_id)
-        return render_template("/add_ingredient_to_avoid.html",
-                               this_user=this_user)
-    else:
-        return redirect("/login")
-
-
-@app.route('/ingredientadded', methods=['POST'])
-def add_an_ingredient():
-    """Add an user's ingredient to avoid to the user profile"""
-
-    user_id = session.get("user_id")
-    ingredient = request.form.get("ingredient")
-    reason = request.form.get("reason")
-
-    make_avoidance(user_id, ingredient, reason)
-
-    flash("Ingredient added.")
-
-    return redirect("/addingredienttoavoid")
-
-
-@app.route('/login', methods=['GET'])
-def show_login_form():
-    """Show login form."""
-
-    return render_template("login_form.html")
-
-
-@app.route('/loggedin', methods=['POST'])
-def add_login_process():
-    """Process login."""
-
-    # Get form variables
-    email = request.form["email"]
-    password = request.form["password"]
-
-    user = User.query.filter_by(email=email).first()
-
-    if user:
-        if user.password != password:
-            flash("Incorrect password")
-            return redirect("/login")
-        elif user.password == password:
-            session["user_id"] = user.user_id
-            flash("Logged in")
-            return redirect("/userprofile")
-    elif not user:
-        flash("You seem to be new here. Would you like to register? If not, please check your email address")
-        return redirect("/register")
-
-
-@app.route('/logout')
-def add_logout():
-    """Log out."""
-
-    check_id = session.get("user_id")
-    if check_id:
-        del session["user_id"]
-        flash("Logged Out.")
-        return redirect("/")
-    else:
-        return redirect("/login")
-
-
-@app.route('/userprofile', methods=['GET'])
-def show_user_profile():
-    """Show logged in user's profile"""
-
-    user_id = session.get("user_id")
-    if user_id:
-        this_user = User.query.get(user_id)
-        this_users_parties = db.session.query(Party).filter(this_user.user_id == Party.host_id).all()
-        return render_template("/user_profile_page.html",
-                               this_user=this_user,
-                               this_users_parties=this_users_parties)
-    else:
-        return redirect("/login")
-
-
-@app.route('/findafriend', methods=['GET'])
-def show_get_a_friend():
-    """Find a friend to add to the friends table"""
-
-    user_id = session.get("user_id")
-    if user_id:
-        this_user = User.query.get(user_id)
-        return render_template("find_a_friend.html",
-                               this_user=this_user)
-    else:
-        return redirect("/login")
-
-
-@app.route('/addafriend', methods=['POST'])
-def add_a_friend():
-    """Add a friend connections to the friends table"""
-
-    user_id = session.get("user_id")
-    email_address = request.form.get("email_address")
-
-    in_database = db.session.query(User).filter(User.email == email_address).first()
-
-    if in_database is not None:
-        check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
-        if check_for_friend:
-            flash("This person is already one of your friends. Would you like to add someone else?")
-            return redirect("/findafriend")
-        else:
-            friend_id = in_database.user_id
-            newfriend = Friends(user_id=user_id, friend_id=friend_id)
-            db.session.add(newfriend)
-            db.session.commit()
-            flash("Friend added.")
-            return redirect("/findafriend")
-    else:
-        diets = Diet.query.order_by(Diet.diet_type).all()
-        flash("Looks like there is no profile yet for your friend. Would you like to create one?")
-        return render_template("create_friends_profile_form.html",
-                               email_address=email_address,
-                               diets=diets)
-
-
 @app.route('/addaparty', methods=['GET'])
 def show_party_form():
     """Show the dinner party form"""
@@ -342,6 +303,19 @@ def add_party():
     party = db.session.query(Party).filter(Party.title == title).first()
 
     return render_template("/party_profile.html", party=party)
+
+
+@app.route('/party_profile/<int:party_id>')
+def show_party_profile(party_id):
+    """Show the party profile"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        party = Party.query.get(party_id)
+        return render_template("/party_profile.html", user_id=user_id,
+                               party=party)
+    else:
+        return redirect("/login")
 
 
 @app.route('/addaguest/<int:party_id>')
@@ -374,19 +348,6 @@ def add_guest():
         db.session.commit()
 
     return redirect('/addaguest/' + party_id)
-
-
-@app.route('/party_profile/<int:party_id>')
-def show_party_profile(party_id):
-    """Show the party profile"""
-
-    user_id = session.get("user_id")
-    if user_id:
-        party = Party.query.get(party_id)
-        return render_template("/party_profile.html", user_id=user_id,
-                               party=party)
-    else:
-        return redirect("/login")
 
 
 @app.route('/searchrecipes', methods=['POST'])
@@ -454,6 +415,49 @@ def add_recipe_box():
         db.session.commit()
         flash("Recipe added for this party.")
         return redirect("/userprofile")
+    else:
+        return redirect("/login")
+
+
+@app.route('/login', methods=['GET'])
+def show_login_form():
+    """Show login form."""
+
+    return render_template("login_form.html")
+
+
+@app.route('/loggedin', methods=['POST'])
+def add_login_process():
+    """Process login."""
+
+    # Get form variables
+    email = request.form["email"]
+    password = request.form["password"]
+
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        if user.password != password:
+            flash("Incorrect password")
+            return redirect("/login")
+        elif user.password == password:
+            session["user_id"] = user.user_id
+            flash("Logged in")
+            return redirect("/userprofile")
+    elif not user:
+        flash("You seem to be new here. Would you like to register? If not, please check your email address")
+        return redirect("/register")
+
+
+@app.route('/logout')
+def add_logout():
+    """Log out."""
+
+    check_id = session.get("user_id")
+    if check_id:
+        del session["user_id"]
+        flash("Logged Out.")
+        return redirect("/")
     else:
         return redirect("/login")
 
