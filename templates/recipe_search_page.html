@@ -48,7 +48,9 @@
             <li><a href="/addaguest/{{ party.party_id }}">Add more guests</a></li>
         </ul>
 </ul> 
+
 <a href="/userprofile">Back to my profile page</a><br>
+
 <form action="/searchrecipes" method="POST">
     <input type="hidden" name="party_id" value={{ party.party_id  }}>
     <button>Show recipe options for this party</button>
@@ -58,6 +60,8 @@
 <!--         each_response["title"] = title
         each_response["recipe_url"] = recipe_url
         each_response["image_url"] = image_url
+
+
 party=party,
 call_spoon=call_spoon,
 get_diets=get_diets,

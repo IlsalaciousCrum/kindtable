@@ -31,7 +31,7 @@
         </ul>
     </li>    
     <li>Parties:</li>
-        <ul>{% for party in this_users_parties %}
+        <ul>{% for party in this_user.parties %}
                     <li><a href="/party_profile/{{ party.party_id }}">
                 {{ party.title }}</a> 
                 {% endfor %}</li>

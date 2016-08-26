@@ -24,11 +24,114 @@ app.secret_key = "ABC"
 app.jinja_env.undefined = StrictUndefined
 
 
+#  The main profile pages are now appearing first due to ease of programming
+
+@app.route('/userprofile', methods=['GET'])
+def show_user_profile():
+    """Show logged in user's profile"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        this_user = User.query.get(user_id)
+        return render_template("/user_profile_page.html",
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+
+@app.route('/friendprofile', methods=['GET'])
+def show_friend_profile():
+    """Show logged in user's friends profile"""
+
+    check_id = session.get("user_id")
+    if check_id:
+        this_user = User.query.get(check_id)
+        user_id = request.args.get("friends_id")
+        newfriend = User.query.get(user_id)
+        return render_template("/friends_profile_page.html",
+                               newfriend=newfriend,
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+
+@app.route('/party_profile/<int:party_id>')
+def show_party_profile(party_id):
+    """Show the party profile"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        session["party_id"] = party_id
+        this_user = User.query.get(user_id)
+        party = Party.query.get(party_id)
+        return render_template("/party_profile.html", user_id=user_id,
+                               party=party,
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+
+@app.route('/searchrecipes', methods=['POST'])
+def show_search_spoonacular():
+    """Collate party information, query spoonacular and show results."""
+
+    user_id = session.get("user_id")
+    if user_id:
+        this_user = User.query.get(user_id)
+        party_id = session.get("party_id")
+        party = Party.query.get(party_id)
+        responses = spoonacular_request(party_id)
+        get_diets = guest_diets(party_id)
+        get_avoid = guest_avoidances(party_id)
+        get_intolerance = guest_intolerances(party_id)
+
+        return render_template("recipe_search_page.html", party=party,
+                               responses=responses,
+                               get_diets=get_diets,
+                               get_avoid=get_avoid,
+                               get_intolerance=get_intolerance,
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+
+@app.route('/see_recipe', methods=['POST'])
+def show_recipe():
+    """Show a recipe to the recipe box"""
+
+    check_id = session.get("user_id")
+    if check_id:
+        this_user = User.query.get(check_id)
+        party_id = session.get("party_id")
+        recipe_id = request.form.get("recipe_id")
+        title = request.form.get("title")
+        recipe_image_url = request.form.get("recipe_image_url")
+        recipe_url = request.form.get("recipe_url")
+
+        return render_template("view_recipe.html",
+                               recipe_id=recipe_id,
+                               party_id=party_id,
+                               title=title,
+                               recipe_image_url=recipe_image_url,
+                               recipe_url=recipe_url,
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+# ----------------
+
+# User routes
+
+
 @app.route('/')
 def index():
     """Homepage."""
 
-    return render_template("homepage.html")
+    user_id = session.get("user_id")
+    if user_id:
+        return redirect("/userprofile")
+    else:
+        return render_template("homepage.html")
 
 
 @app.route('/register', methods=['GET'])
@@ -59,20 +162,52 @@ def add_register_users():
     return redirect("/userprofile")
 
 
-@app.route('/userprofile', methods=['GET'])
-def show_user_profile():
-    """Show logged in user's profile"""
+@app.route('/login', methods=['GET'])
+def show_login_form():
+    """Show login form."""
 
-    user_id = session.get("user_id")
-    if user_id:
-        this_user = User.query.get(user_id)
-        this_users_parties = db.session.query(Party).filter(this_user.user_id == Party.host_id).all()
-        return render_template("/user_profile_page.html",
-                               this_user=this_user,
-                               this_users_parties=this_users_parties)
+    return render_template("login_form.html")
+
+
+@app.route('/loggedin', methods=['POST'])
+def add_login_process():
+    """Process login."""
+
+    # Get form variables
+    email = request.form["email"]
+    password = request.form["password"]
+
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        if user.password != password:
+            flash("Incorrect password")
+            return redirect("/login")
+        elif user.password == password:
+            session["user_id"] = user.user_id
+            flash("Logged in")
+            return redirect("/userprofile")
+    elif not user:
+        flash("You seem to be new here. Would you like to register? If not, please check your email address")
+        return redirect("/register")
+
+
+@app.route('/logout')
+def add_logout():
+    """Log out."""
+
+    check_id = session.get("user_id")
+    if check_id:
+        del session["user_id"]
+        flash("Logged Out.")
+        return redirect("/")
     else:
         return redirect("/login")
 
+# ------------------------------
+
+
+# These will be AJAX calls
 
 @app.route('/addintoleranceform', methods=['GET'])
 def show_an_intolerance():
@@ -207,20 +342,6 @@ def add_friend_profile_registered():
                            newfriend=newfriend)
 
 
-@app.route('/friendprofile', methods=['GET'])
-def show_friend_profile():
-    """Show logged in user's profile"""
-
-    check_id = session.get("user_id")
-    if check_id:
-        user_id = request.args.get("friends_id")
-        newfriend = User.query.get(user_id)
-        return render_template("/friends_profile_page.html",
-                               newfriend=newfriend)
-    else:
-        return redirect("/login")
-
-
 @app.route('/addfriendintoleranceform', methods=['POST'])
 def show_friends_intolerance():
     """Show the form to get information about a friends intolerances"""
@@ -305,19 +426,6 @@ def add_party():
     return render_template("/party_profile.html", party=party)
 
 
-@app.route('/party_profile/<int:party_id>')
-def show_party_profile(party_id):
-    """Show the party profile"""
-
-    user_id = session.get("user_id")
-    if user_id:
-        party = Party.query.get(party_id)
-        return render_template("/party_profile.html", user_id=user_id,
-                               party=party)
-    else:
-        return redirect("/login")
-
-
 @app.route('/addaguest/<int:party_id>')
 def show_register_guest(party_id):
     """Show form for adding a guest to a dinner party"""
@@ -350,50 +458,6 @@ def add_guest():
     return redirect('/addaguest/' + party_id)
 
 
-@app.route('/searchrecipes', methods=['POST'])
-def show_search_spoonacular():
-    """Collate party information, query spoonacular and show results."""
-
-    user_id = session.get("user_id")
-    if user_id:
-        party_id = request.form.get("party_id")
-        party = Party.query.get(party_id)
-        responses = spoonacular_request(party_id)
-        get_diets = guest_diets(party_id)
-        get_avoid = guest_avoidances(party_id)
-        get_intolerance = guest_intolerances(party_id)
-
-        return render_template("recipe_search_page.html", party=party,
-                               responses=responses,
-                               get_diets=get_diets,
-                               get_avoid=get_avoid,
-                               get_intolerance=get_intolerance)
-    else:
-        return redirect("/login")
-
-
-@app.route('/see_recipe', methods=['POST'])
-def show_recipe():
-    """Show a recipe to the recipe box"""
-
-    check_id = session.get("user_id")
-    if check_id:
-        party_id = request.form.get("party_id")
-        recipe_id = request.form.get("recipe_id")
-        title = request.form.get("title")
-        recipe_image_url = request.form.get("recipe_image_url")
-        recipe_url = request.form.get("recipe_url")
-
-        return render_template("view_recipe.html",
-                               recipe_id=recipe_id,
-                               party_id=party_id,
-                               title=title,
-                               recipe_image_url=recipe_image_url,
-                               recipe_url=recipe_url)
-    else:
-        return redirect("/login")
-
-
 @app.route('/addtorecipebox', methods=['POST'])
 def add_recipe_box():
     """Add a recipe to the recipe box"""
@@ -415,49 +479,6 @@ def add_recipe_box():
         db.session.commit()
         flash("Recipe added for this party.")
         return redirect("/userprofile")
-    else:
-        return redirect("/login")
-
-
-@app.route('/login', methods=['GET'])
-def show_login_form():
-    """Show login form."""
-
-    return render_template("login_form.html")
-
-
-@app.route('/loggedin', methods=['POST'])
-def add_login_process():
-    """Process login."""
-
-    # Get form variables
-    email = request.form["email"]
-    password = request.form["password"]
-
-    user = User.query.filter_by(email=email).first()
-
-    if user:
-        if user.password != password:
-            flash("Incorrect password")
-            return redirect("/login")
-        elif user.password == password:
-            session["user_id"] = user.user_id
-            flash("Logged in")
-            return redirect("/userprofile")
-    elif not user:
-        flash("You seem to be new here. Would you like to register? If not, please check your email address")
-        return redirect("/register")
-
-
-@app.route('/logout')
-def add_logout():
-    """Log out."""
-
-    check_id = session.get("user_id")
-    if check_id:
-        del session["user_id"]
-        flash("Logged Out.")
-        return redirect("/")
     else:
         return redirect("/login")
 
