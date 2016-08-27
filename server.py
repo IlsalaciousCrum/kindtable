@@ -61,7 +61,7 @@ def show_party_profile(party_id):
 
     user_id = session.get("user_id")
     if user_id:
-        session["party_id"] = party_id
+        session['party_id'] = party_id
         this_user = User.query.get(user_id)
         party = Party.query.get(party_id)
         return render_template("/party_profile.html", user_id=user_id,
@@ -71,7 +71,7 @@ def show_party_profile(party_id):
         return redirect("/login")
 
 
-@app.route('/searchrecipes', methods=['POST'])
+@app.route('/searchrecipes')
 def show_search_spoonacular():
     """Collate party information, query spoonacular and show results."""
 
@@ -407,7 +407,8 @@ def show_party_form():
 
     check_id = session.get("user_id")
     if check_id:
-        return render_template("/add_a_party.html")
+        this_user = User.query.get(check_id)
+        return render_template("/add_a_party.html", this_user=this_user)
     else:
         return redirect("/login")
 
@@ -417,13 +418,18 @@ def add_party():
     """Add a new dinner party to the dinner party table"""
 
     user_id = session.get("user_id")
+    this_user = User.query.get(user_id)
     title = request.form.get("title")
     new_party = Party(host_id=user_id, title=title)
     db.session.add(new_party)
     db.session.commit()
     party = db.session.query(Party).filter(Party.title == title).first()
+    new_guest = PartyGuest(party_id=party.party_id, user_id=user_id)
+    db.session.add(new_guest)
+    db.session.commit()
 
-    return render_template("/party_profile.html", party=party)
+    return render_template("/party_profile.html", party=party,
+                           this_user=this_user)
 
 
 @app.route('/addaguest/<int:party_id>')
@@ -465,20 +471,26 @@ def add_recipe_box():
     check_id = session.get("user_id")
 
     if check_id:
-        party_id = request.form.get("party_id")
         recipe_id = request.form.get("recipe_id")
-        title = request.form.get("title")
-        recipe_image_url = request.form.get("recipe_image_url")
-        recipe_url = request.form.get("recipe_url")
-        new_recipe = RecipeBox(party_id=party_id,
-                               recipe_id=recipe_id,
-                               title=title,
-                               recipe_image_url=recipe_image_url,
-                               recipe_url=recipe_url)
-        db.session.add(new_recipe)
-        db.session.commit()
-        flash("Recipe added for this party.")
-        return redirect("/userprofile")
+        this_recipe = RecipeBox.query.filter_by(recipe_id=recipe_id).first()
+        if this_recipe:
+            flash("This recipe is already saved to your Recipe Box.")
+            return redirect("/searchrecipes")
+        else:
+            party_id = request.form.get("party_id")
+            title = request.form.get("title")
+            recipe_image_url = request.form.get("recipe_image_url")
+            recipe_url = request.form.get("recipe_url")
+            raise Exception
+            new_recipe = RecipeBox(party_id=party_id,
+                                   recipe_id=recipe_id,
+                                   title=title,
+                                   recipe_image_url=recipe_image_url,
+                                   recipe_url=recipe_url)
+            db.session.add(new_recipe)
+            db.session.commit()
+            flash("The recipe for %s has been saved to your recipe box." % title)
+            return redirect("/searchrecipes")
     else:
         return redirect("/login")
 

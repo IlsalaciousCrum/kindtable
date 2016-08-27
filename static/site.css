@@ -4,3 +4,8 @@
     width:  33%;
     height: 33%;
  }
+
+ .flashed {
+    color: #DC143C;
+    font-weight: 900;
+}

@@ -28,16 +28,21 @@
             <li><a href="/userprofile">My profile</a></li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Parties<span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                      {% for party in this_user.parties %}
-                        <li><a href="/party_profile/{{ party.party_id }}">{{  party.title  }}</a></li>
-                      {% endfor %}
-                    </ul>
+                                <ul class="dropdown-menu">
+                                  {% for party in this_user.parties %}
+                                    <li><a href="/party_profile/{{ party.party_id }}">{{  party.title  }}</a></li>
+                                  {% endfor %}
+                                </ul>
+                                              
                 </li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a href="/logout">Log out</a></li>
-        </ul>
+                <li><a href="/logout">Log out</a></li>
+                </ul>
+                        <ul class="nav navbar-nav navbar-right">
+                          {% for flash in get_flashed_messages() %}
+            <li><h4><span class="label label-danger">{{  flash  }}</h4></span></li>
+            {% endfor %}
+
+         </ul>
     </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>

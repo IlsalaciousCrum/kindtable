@@ -17,10 +17,7 @@
             {% for recipe in party.recipes %}    
             <li>{{ recipe.title }}</li>
                 {% endfor %}
-            <li><form action="/searchrecipes" method="POST">
-                    <input type="hidden" name="party_id" value={{ party.party_id  }}>
-                    <button>Find recipe options for this party</button>
-                </form>
+            <li><a href="/searchrecipes">Find recipes for this party</a></li>
         </ul>
 </div>
 {% endblock %}
