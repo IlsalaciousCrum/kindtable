@@ -147,6 +147,7 @@ def show_register_form():
 def add_register_users():
     """Process registration."""
 
+
     password = request.form.get("password")
     first_name = request.form.get("first_name")
     last_name = request.form.get("last_name")
@@ -154,12 +155,16 @@ def add_register_users():
     diet_id = request.form.get("diet_type")
     diet_reason = request.form.get("diet_reason")
     verified = True
-
-    session["user_id"] = make_user(email, first_name, last_name, diet_id,
+    user = User.query.filter_by(email=email).first()
+    if user:
+        flash("You are already registered here, please log in.")
+        return redirect("/login")
+    else:
+        session["user_id"] = make_user(email, first_name, last_name, diet_id,
                                    diet_reason, verified, password)
 
-    flash("Welcome to Kind Table, %s." % first_name)
-    return redirect("/userprofile")
+        flash("Welcome to Kind Table, %s." % first_name)
+        return redirect("/userprofile")
 
 
 @app.route('/login', methods=['GET'])
