@@ -31,9 +31,10 @@ def make_friendship(user_id, friend_id):
     return
 
 
-def make_intolerances(intol_ids, user_id):
+def make_intolerances(user_id, intol_ids):
     """Instantiates new intolerances on the intolerances table"""
     for intol_id in intol_ids:
+        intol_id = int(intol_id)
         new_intol = UserIntolerance(user_id=user_id, intol_id=intol_id)
         db.session.add(new_intol)
         db.session.commit()
@@ -128,8 +129,15 @@ def spoonacular_request(party_id):
         title = spoon['results'][i].get('title')
         recipe_url_base = "http://spoonacular.com/recipes/"
         if image is not None:
-            recipe_url = image[:-4]
+            recipe_url = ""
+            for letter in image:
+                if letter != ".":
+                    recipe_url = recipe_url + letter
+                else:
+                    break
+        print recipe_url
         recipe_url = recipe_url_base + recipe_url
+        print recipe_url
         image_url = base_url + image_url
         each_response = {}
         each_response["title"] = title

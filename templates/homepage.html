@@ -18,7 +18,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">K(i)nd Table</a>
+          <a class="navbar-brand" href="/">Kind Table</a>
         </div>
 
 
@@ -29,17 +29,22 @@
             <li><a href="/login">Log in</a></li>
 
         </ul>
-                        <ul class="nav navbar-nav navbar-right">
-                          {% for flash in get_flashed_messages() %}
-            <li><h4><span class="label label-danger">{{  flash  }}</h4></span></li>
-            {% endfor %}
-          </ul>
+
+
     </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
 
 <div class="container-fluid">
 
+                              {% with messages = get_flashed_messages(with_categories=true) %}
+                          {% if messages %}
+                        {% for category, message in messages %}
+                          <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                        </ul>
+                          {% endif %}
+                        {% endwith %}
 <div id="extending">
 
 {% block content %}

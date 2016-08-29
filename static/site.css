@@ -9,3 +9,12 @@
     color: #DC143C;
     font-weight: 900;
 }
+
+.instr {
+    color: navy;
+    font-weight: bold
+}
+
+.form-group{
+    display: inline-block;
+}

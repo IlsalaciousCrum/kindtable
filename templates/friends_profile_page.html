@@ -10,32 +10,131 @@
     <li>Diet Reason: {{ newfriend.diet_reason }}</li>
     <li>Intolerances:</li>
         <ul>
-            {% for intolerance in newfriend.intolerances %}    
-            <li>{{ intolerance.intol_name }}</li>
-                {% endfor %}
+            <div id="userIntolerances">
+                <li>{% for intolerance in newfriend.intolerances %}
+                    {{ intolerance.intol_name }}
+                    {% if not loop.last %}
+                        ,
+                    {% endif %}
+                    {% endfor %}</li>
+                
+            </div>
 
-<li><form action="/addfriendintoleranceform" method="POST">
-    <input type="hidden" name="user_id" value={{ newfriend.user_id  }}>
-    <button>Add an intolerance for this friend</button>
-    </form>
-</li></ul>
+            <li style="list-style-type:none">
 
+    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#Intols">Add an intolerance/allergies</button>
+
+    <!-- Modal -->
+    <div id="Intols" class="modal fade" role="dialog">
+         <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add intolerances/allergies</h4>
+                </div>
+                      <div class="modal-body">
+                        <form action="/friendintolerance_added" method="POST">
+                            <div class="form-group">
+                                <label>
+                                    <input type="hidden" name="user_id" value="{{ newfriend.user_id  }}">
+                                    <p>Select all that apply:</p>
+                                            {% for intolerance in intol_list %}  
+                                        <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}  
+                                            {% endfor %}
+                                        <br>
+
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" value="Done" class="btn" id="intolDone">
+                            </div>
+                        </form>
+                      </div>
+
+            </div>
+
+        </div>
+    </div>
+</li>
+
+
+
+
+
+        </ul>
     <li>Ingredients to avoid:</li>
         <ul>
-            {% for avoid in newfriend.avoidances %}
-            <li>{{ avoid.ingredient }}</li>
-            <li style="list-style-type:none">Reason: {{ avoid.reason}}</li>
-            {% endfor %}
-            <li><form action="/addingfriendsinredienttoavoid" method="POST">
-            <input type="hidden" name="user_id" value={{ newfriend.user_id  }}>
-            <button>Add an ingredient to avoid for this friend</button>
-            </form>
-        </ul>  
+                {% for avoid in newfriend.avoidances %}
+            <li>{{ avoid.ingredient }} (<i>{{ avoid.reason}}</i>)</li>
+                {% endfor %}
+            
+            <li style="list-style-type:none">
+
+    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#IngToAvoid">Add ingredients your friend would like to avoid</button>
+
+    <!-- Modal -->
+    <div id="IngToAvoid" class="modal fade" role="dialog">
+         <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add ingredients your friend would like to avoid</h4>
+                </div>
+                      <div class="modal-body">
+                    <form action="/friendingredientadded" method="POST">
+                        <div class="form-group">
+                            <label>
+                                <input type="hidden" name="user_id" value="{{ newfriend.user_id  }}">
+                                <p>Ingredient to avoid:</p>
+                                    <input type="text" name="ingredient" class="form-control">
+                                <p>Reason you would like to avoid this ingredient (optional):</p>
+                                    <input type="text" name="reason" class="form-control">
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Done" class="btn" id="avoidDone">
+                        </div>
+                    </form>
+                      </div>
+
+            </div>
+
+        </div>
+    </div>
+</li>
 
 
+
+
+
+
+        </ul> 
+    <li>Parties invited to:</li>
+    <ul>
+        {% for party in parties %}
+        <li><a href="/partyprofile/{{ party.party_id}}">{{  party.title  }}</li>
+        {% endfor %}
+    </ul>
+
 </div>
-<div>
-    <p><a href="/userprofile">Back to my profile page</a></p><br>
-</div>
+<script>
+"use strict";
+    $("#addIntol").click(function(){
+            $("#addIntol").hide();
+            $("#addIntolForm").toggle();
+            console.log("show form");
+    });
+
+    $("#addIngred").click(function(){
+            $("#addIngred").hide();
+            $("#addAvoidForm").toggle();
+            console.log("show form");
+    });
+
+</script>
 
 {% endblock %}

@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="well spaced">
-<h1>Party Profile: {{ party.title }}</h1>
+<h1>Party Profile: {{  party.title  }}</h1>
 
 <ul>
     <li>Guests:</li>
@@ -10,14 +10,97 @@
             {% for guest in party.users %}    
             <li>{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }})</li>
                 {% endfor %}
-            <li><a href="/addaguest/{{ party.party_id }}">Add more guests</a></li>
+                                <li style="list-style-type:none">
+
+    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#AddGuests">Add guests</button>
+
+    <!-- Modal -->
+    <div id="AddGuests" class="modal fade" role="dialog">
+         <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add guests</h4>
+                </div>
+                      <div class="modal-body">
+                    <form action="/guest_added" method="POST">
+                        <div class="form-group">
+                            <label>
+                                    <p>Add guests:</p>
+                                    {% for person in this_user.friends %}
+                                    <li><input type="checkbox" name="guests" value={{ person.friends.user_id }}> {{ person.friends.first_name}} {{ person.friends.last_name }} ({{ person.friends.email }})</li>
+                                    {% endfor %}  
+                                   <br>           
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" name="party_id" value="{{ party.party_id }}">
+                            <input type="submit" value="Add guest" class="btn">
+                        </div>
+                    </form>
+                      </div>
+
+            </div>
+
+        </div>
+    </div>
+</li>
+
+
+
+
+
+
+
+
+
+
+
+                        <li style="list-style-type:none"><button type="button" id="addNewFriend" title="You will have to come back to this page after to add guest">Add a guest that is not yet a friend</button></li>
+                            <div class="well spaced" id="addFriendForm" hidden>
+                                <li style="list-style-type:none">
+                                        <form action="/addafriend" method="POST">
+                                            <div class="form-group">
+                                                <label>
+                                                    <p>Email address:</p>
+                                                    <input type="text" name="email_address" class="form-control">
+                                                </label>
+                                            </div>
+
+                                            <div class="form-group">
+
+                                                <input type="submit" value="Add Friend" class="btn">
+                                            </div>
+                                        <form>
+                                </li>
+                            </div>
         </ul>
     <li>Recipes:</li>
         <ul>
             {% for recipe in party.recipes %}    
-            <li>{{ recipe.title }}</li>
+            <li><a href="/show_recipe/{{  recipe.record_id  }}" target="_blank">{{ recipe.title }}</li>
                 {% endfor %}
-            <li><a href="/searchrecipes">Find recipes for this party</a></li>
+        </ul>    
+    <li><a href="/searchrecipes">Find recipes for this party</a></li>
         </ul>
 </div>
+
+
+<script>
+"use strict";
+    $("#addGuest").click(function(){
+            $("#addGuest").hide();
+            $("#addGuestForm").toggle();
+            console.log("show form");
+    });
+
+    $("#addNewFriend").click(function(){
+            $("#addNewFriend").hide();
+            $("#addFriendForm").toggle();
+            console.log("show form");
+    });
+
+</script>
 {% endblock %}

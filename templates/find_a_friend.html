@@ -5,8 +5,8 @@
 <form action="/addafriend" method="POST">
     <div class="form-group">
         <label>
-            <h4><strong>Friend to add:</strong></h4>
-            <input type="text" name="email_address" class="form-control">
+            <h4>New friend to add:</h4>
+            <p>Email address: <input type="text" name="email_address" class="form-control"><p>
         </label>
     </div>
 
@@ -14,15 +14,13 @@
 
         <input type="submit" value="Add Friend" class="btn">
     </div>
-    </div>
+<form>
 
-<a href="/userprofile">Thanks, I'm done adding friends</a>
-
-</form>
-    <p>Your friends:</p>
+<p>Your friends:
+    <ul>
         {% for person in this_user.friends %}    
-                {{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }}<br>
-                {% endfor %}
-
+            <li><a href="/friendprofile/{{ person.friends.user_id }}">{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</a></li>
+        {% endfor %}   
+    </ul>
 </div>
 {% endblock %}
