@@ -23,6 +23,44 @@ def make_user(email, first_name, last_name, diet_id, diet_reason, verified=False
     return user_id
 
 
+def user_change(user_id, email, first_name, last_name, diet_id, diet_reason):
+    """Change information in the user table"""
+
+    #  this should be refactored, if working
+
+    this_user = User.query.get(user_id)
+
+    if this_user.email != email:
+        this_user.email = email
+        db.session.commit()
+    else:
+        pass
+
+    if this_user.first_name != first_name:
+        this_user.first_name = first_name
+        db.session.commit()
+    else:
+        pass
+
+    if this_user.last_name != last_name:
+        this_user.last_name = last_name
+        db.session.commit()
+    else:
+        pass
+
+    if this_user.diet_id != diet_id:
+        this_user.diet_id = diet_id
+        db.session.commit()
+    else:
+        pass
+
+    if this_user.diet_reason != diet_reason:
+        this_user.diet_reason = diet_reason
+        db.session.commit()
+    else:
+        pass
+
+
 def make_friendship(user_id, friend_id):
     """Instantiates a new friendship on the friend table"""
     add_to_friends = Friends(user_id=user_id, friend_id=friend_id)

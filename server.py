@@ -11,7 +11,7 @@ from Model import (connect_to_db, db, Diet, User,
 
 from functions import (guest_diets, guest_intolerances, guest_avoidances,
                        spoonacular_request, make_user, make_friendship,
-                       make_intolerances, make_avoidance)
+                       make_intolerances, make_avoidance, change_user)
 
 
 app = Flask(__name__)
@@ -86,6 +86,32 @@ def show_user_profile():
         return redirect("/login")
 
 
+@app.route('/findfriend', methods=['GET'])
+def show_get_a_friend():
+    """Create a profile for a friend"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        this_user = User.query.get(user_id)
+        return render_template("find_a_friend.html",
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+
+# @app.route('/createfriendsprofile', methods=['GET'])
+# def show_register_friend_form():
+#     """Show form for adding a profile for a friend."""
+
+#     check_id = session.get("user_id")
+#     if check_id:
+#         this_user = User.query.get(check_id)
+#         diets = Diet.query.order_by(Diet.diet_type).all()
+#         return render_template("create_friends_profile_form.html", diets=diets, this_user=this_user)
+#     else:
+#         return redirect("/login")
+
+
 @app.route('/friendprofile/<int:friend_id>', methods=['GET'])
 def show_friend_profile(friend_id):
     """Show logged in user's friends profile"""
@@ -103,6 +129,66 @@ def show_friend_profile(friend_id):
                                parties=parties)
     else:
         return redirect("/login")
+
+
+@app.route('/addafriend', methods=['POST'])
+def add_a_friend():
+    """Add a friend connections to the friends table"""
+
+    user_id = session.get("user_id")
+    email_address = request.form.get("email_address")
+
+    in_database = db.session.query(User).filter(User.email == email_address).first()
+
+    if in_database is not None:
+        check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
+        if check_for_friend:
+            diets = Diet.query.order_by(Diet.diet_type).all()
+            this_user = User.query.get(user_id)
+            flash("%s is already one of your friends. Would you like to add someone else?" % email_address, "neutral")
+            return redirect("/findfriend")
+        else:
+            friend_id = in_database.user_id
+            newfriend = Friends(user_id=user_id, friend_id=friend_id)
+            db.session.add(newfriend)
+            db.session.commit()
+            flash("%s is now in your friend's list" % email_address, "success")
+            return redirect("/findfriend")
+    else:
+        diets = Diet.query.order_by(Diet.diet_type).all()
+        this_user = User.query.get(user_id)
+        make_user(email_address, diet_id=6)
+        newfriend = db.session.query(User).filter(User.email == email_address).first()
+        make_friendship(user_id, newfriend.user_id)
+        flash("Looks like there is no profile yet for your friend. Would you like to create one?", "neutral")
+        friend = User.query.get(newfriend.user_id)
+        diets = Diet.query.order_by(Diet.diet_type).all()
+        return render_template("create_friends_profile_form.html",
+                               friend=friend,
+                               diets=diets,
+                               this_user=this_user)
+
+
+@app.route('/friendregistered', methods=['POST'])
+def add_friend_profile_registered():
+    """Instantiate unverified User and make connection on friends table."""
+
+    user_id = session.get("user_id")
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    email = request.form.get("email")
+    diet_id = request.form.get("diet_type")
+    diet_reason = request.form.get("diet_reason")
+
+    change_user(user_id, email, first_name, last_name, diet_id, diet_reason)
+    newfriend = db.session.query(User).filter(User.email == email).first()
+    make_friendship(user_id, newfriend.user_id)
+
+    flash("A profile has been created for your friend: %s." % email, "success")
+
+    return redirect("/friendprofile/%s" % friend_id)
+
+
 
 
 @app.route('/party_profile/<int:party_id>')
@@ -157,17 +243,7 @@ def show_search_spoonacular():
         return redirect("/login")
 
 
-@app.route('/createfriendsprofile', methods=['GET'])
-def show_register_friend_form():
-    """Show form for adding a profile for a friend."""
 
-    check_id = session.get("user_id")
-    if check_id:
-        this_user = User.query.get(check_id)
-        diets = Diet.query.order_by(Diet.diet_type).all()
-        return render_template("create_friends_profile_form.html", diets=diets, this_user=this_user)
-    else:
-        return redirect("/login")
 
 
 @app.route('/show_recipe/<int:record_id>')
@@ -193,17 +269,7 @@ def show_saved_recipe(record_id):
                                intolerances=intolerances)
 
 
-@app.route('/findfriend', methods=['GET'])
-def show_get_a_friend():
-    """Create a profile for a friend"""
 
-    user_id = session.get("user_id")
-    if user_id:
-        this_user = User.query.get(user_id)
-        return render_template("find_a_friend.html",
-                               this_user=this_user)
-    else:
-        return redirect("/login")
 
 # ----------- Begin Post Routes ------------------
 
@@ -306,58 +372,7 @@ def add_an_ingredient():
     return redirect("/userprofile")
 
 
-@app.route('/addafriend', methods=['POST'])
-def add_a_friend():
-    """Add a friend connections to the friends table"""
 
-    user_id = session.get("user_id")
-    email_address = request.form.get("email_address")
-
-    in_database = db.session.query(User).filter(User.email == email_address).first()
-
-    if in_database is not None:
-        check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
-        if check_for_friend:
-            diets = Diet.query.order_by(Diet.diet_type).all()
-            this_user = User.query.get(user_id)
-            flash("%s is already one of your friends. Would you like to add someone else?" % email_address, "neutral")
-            return redirect("/findfriend")
-        else:
-            friend_id = in_database.user_id
-            newfriend = Friends(user_id=user_id, friend_id=friend_id)
-            db.session.add(newfriend)
-            db.session.commit()
-            flash("%s is now in your friend's list" % email_address, "success")
-            return redirect("/findfriend")
-    else:
-        diets = Diet.query.order_by(Diet.diet_type).all()
-        this_user = User.query.get(user_id)
-        flash("Looks like there is no profile yet for your friend. Would you like to create one?", "neutral")
-        return render_template("create_friends_profile_form.html",
-                               email_address=email_address,
-                               diets=diets,
-                               this_user=this_user)
-
-
-@app.route('/friendregistered', methods=['POST'])
-def add_friend_profile_registered():
-    """Instantiate unverified User and make connection on friends table."""
-
-    user_id = session.get("user_id")
-    first_name = request.form.get("first_name")
-    last_name = request.form.get("last_name")
-    email = request.form.get("email")
-    diet_id = request.form.get("diet_type")
-    diet_reason = request.form.get("diet_reason")
-
-    make_user(email, first_name, last_name, diet_id, diet_reason)
-    newfriend = db.session.query(User).filter(User.email == email).first()
-    friend_id = newfriend.user_id
-    make_friendship(user_id, friend_id)
-
-    flash("A profile has been created for your friend: %s." % email, "success")
-
-    return redirect("/friendprofile/%s" % friend_id)
 
 
 @app.route('/friendintolerance_added', methods=['POST'])
