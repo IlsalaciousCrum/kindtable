@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-4">
+                      
+        <div class="row display_guest">
+            <div class="guest_name">
+                        <h3>{{ responses.get('number', None) }} Recipes<br>found<br>for<br> <a href="/party_profile/<int:{{ party.party_id  }}>">{{ party.title }}</a></h3>  
+            </div>             
+        </div>
+                <div class="row">
+                    <p>Would you like to see more variety?
+
+                    <p>Search does not work like I thought. It takes one value. Either have to rework everything or rank the diets in terms of most restrictive to less restrictive and use one. :( and then the user has to redo it.)
+                    <p>*Dropdown for course type*</p>
+                    <p>*Dropdown for cuisine type</p>
+                    <p>check boxes for each diet with the user who eats and their reason</p>
+                    <p>check boxes for each intolerance with the user who doesn't eat it next to it</p>
+                    <p>check boxes for each avoid with the user who doesn't eat it next to it and their reason</p>
+                    <p>Submit button</p>
+                    <p>New tables for cuisine type and course type and seed files</p>
+                    <p>route to process running this new API call</p>
+
+                </div>
+                
+    </div>
+
+    <div class="col-md-8 recipe_results">
+                {% for i in range(responses.get('number', None)) %}
+    <div class="col-md-6 recipe">
+        <h4>{{ responses['response'][i].get('title') }}</h4>
+            <form action="/see_recipe" method="POST">
+            <input type="hidden" name="party_id" value="{{ party.party_id  }}">
+            <input type="hidden" name="recipe_id" value="{{ responses['response'][i].get('recipe_id') }}">
+            <input type="hidden" name="title" value="{{ responses['response'][i].get('title') }}">
+            <input type="hidden" name="recipe_image_url" value="{{ responses['response'][i].get('image_url') }}">
+            <input type="hidden" name="recipe_url" value="{{ responses['response'][i].get('recipe_url') }}">
+            <button>View recipe</button>
+            </form>
+        
+        <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle displayed" width="280" height="280">
+                        
+    </div>
+                    {% endfor %}
+
+
+</div>
+
+{% endblock %}

@@ -10,7 +10,7 @@ import os
 import json
 
 
-def make_user(email, first_name, last_name, diet_id, diet_reason, verified=False, password=None):
+def make_user(email, diet_id, first_name=None, last_name=None, diet_reason=None, verified=False, password=None):
     """Instantiates a new user and returns that user's user_id"""
 
     new_user = User(password=password, first_name=first_name,

@@ -49,19 +49,10 @@
 </li>
 
 
-
-
-
-
-
-
-
-
-
-                        <li style="list-style-type:none"><button type="button" id="addNewFriend" title="You will have to come back to this page after to add guest">Add a guest that is not yet a friend</button></li>
+                        <li style="list-style-type:none"><button type="button" class="btn btn-info btn-sm" id="addNewFriend">Add a guest that is not yet a friend</button></li>
                             <div class="well spaced" id="addFriendForm" hidden>
                                 <li style="list-style-type:none">
-                                        <form action="/addafriend" method="POST">
+                                        <form action="/addafriendasguest" method="POST">
                                             <div class="form-group">
                                                 <label>
                                                     <p>Email address:</p>
@@ -83,7 +74,7 @@
             <li><a href="/show_recipe/{{  recipe.record_id  }}" target="_blank">{{ recipe.title }}</li>
                 {% endfor %}
         </ul>    
-    <li><a href="/searchrecipes">Find recipes for this party</a></li>
+    <li><a href="/searchrecipes" class="btn btn-info btn-lg">Find recipes for this party</a></li>
         </ul>
 </div>
 

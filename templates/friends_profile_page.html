@@ -2,12 +2,90 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="well spaced">
-<h1>Friend Profile: {{ newfriend.first_name }} {{ newfriend.last_name }} </h1>
+<h1>Friend Profile: 
+
+      {% if newfriend.first_name is not none %}
+            {{ newfriend.first_name }}
+                      {% else %}
+                    {{  newfriend.email  }}
+                         {%endif %}
+
+         {% if newfriend.last_name is not none %}
+            {{ newfriend.last_name }}
+                      {% else %}
+                    
+                         {%endif %}
+
+ <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#userchange">update</button></h1>
+
+    
+
+    <!-- Modal -->
+    <div id="userchange" class="modal fade" role="dialog">
+         <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Update Basic Profile Information</h4>
+                </div>
+                      <div class="modal-body">
+                        <form action="/changefrienduserinfo" method="POST">
+
+    <div class="form-group">
+        <label>
+            <strong>Email address</strong> (required): <input type="text" name="email" value="{{ newfriend.email }}" class="form-control" required>
+        
+                Friend's first name (optional):
+                <input type="text" name="first_name" class="form-control" value="{% if newfriend.first_name is not none %}{{ newfriend.first_name }}
+                      {% else %}
+                    
+                         {%endif %}">
+      
+                Friend's last name (optional):
+                <input type="text" name="last_name" class="form-control" value="{% if newfriend.last_name is not none %}{{ newfriend.last_name }}
+                      {% else %}
+                    
+                         {%endif %}">
+
+
+                <p>Diet your friend prefers to eat (required):</p>
+                
+                <select name="diet_type">
+                    {% for diet in diets %}
+                    <option value={{ diet.diet_id }}>{{ diet.diet_type }}</option>
+                    {% endfor %}
+                </select><br>
+                Reason they follow this diet (optional):<br>
+                <input type="text" name="diet_reason" class="form-control" value="{% if newfriend.diet_reason is not none %}{{ newfriend.diet_reason }}
+                      {% else %}
+                    
+                         {%endif %}">
+
+                  
+            </div><br>
+            <div class="form-group">
+                <input type="submit" value="update friend profile" class="btn">
+            </div>
+        </label>
+    </div>
+</form>
+                      </div>
+
+            </div>
+
+        </div>
+    </div>
+</li>
+
 
 <ul>
-    <li>Email address: {{ newfriend.email }}</li>
-    <li>Diet: {{ newfriend.diet.diet_type }}</li>
-    <li>Diet Reason: {{ newfriend.diet_reason }}</li>
+    <li>First name: {{ newfriend.first_name }} 
+    <li>Last name: {{ newfriend.last_name }} 
+    <li>Email address: {{ newfriend.email }} 
+    <li>Diet: {{ newfriend.diet.diet_type }}
+    <li>Diet Reason: {{ newfriend.diet_reason }}
     <li>Intolerances:</li>
         <ul>
             <div id="userIntolerances">
@@ -22,7 +100,7 @@
 
             <li style="list-style-type:none">
 
-    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#Intols">Add an intolerance/allergies</button>
+    <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#Intols">Add an intolerance/allergies</button>
 
     <!-- Modal -->
     <div id="Intols" class="modal fade" role="dialog">
@@ -72,7 +150,7 @@
             
             <li style="list-style-type:none">
 
-    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#IngToAvoid">Add ingredients your friend would like to avoid</button>
+    <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#IngToAvoid">Add ingredients your friend would like to avoid</button>
 
     <!-- Modal -->
     <div id="IngToAvoid" class="modal fade" role="dialog">
@@ -106,11 +184,6 @@
         </div>
     </div>
 </li>
-
-
-
-
-
 
         </ul> 
     <li>Parties invited to:</li>

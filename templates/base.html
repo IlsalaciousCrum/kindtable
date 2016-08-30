@@ -38,12 +38,25 @@
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                   {% for friend in this_user.friends %}
-                                    <li><a href="/friendprofile/{{ friend.friends.user_id }}">{{ friend.friends.first_name }} {{ friend.friends.last_name }} ({{ friend.friends.email }})</a></li>
-                                  {% endfor %}
-                                </ul>
+                                    <li><a href="/friendprofile/{{ friend.friends.user_id }}">
+                                        {% if friend.friends.first_name is not none %}   
+                                              {{ friend.friends.first_name }}
+                                          {% else %}
+                                              
+                                          {%endif %}
+
+                                           {{ friend.friends.first_name if friend.friends.first_name is not none else '' }} 
+
+                                        {% if friend.friends.first_name is not none %}   
+                                              {{ friend.friends.last_name }}
+                                          {% else %}
+                                              
+                                          {%endif %}
+                                     ({{ friend.friends.email }})</a></li>
+                                     {% endfor %}</a>
+                                    </ul>
                                               
                 </li>
-
 
 
                 <li class="dropdown">
