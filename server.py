@@ -5,13 +5,14 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session
 
 from Model import (connect_to_db, db, Diet, User,
-                   Intolerance, Friends, Party, PartyGuest, RecipeBox)
+                   Intolerance, Friends, Party, PartyGuest, RecipeBox, Course, Cuisine)
 
 # import os
 
-from functions import (guest_diets, guest_intolerances, guest_avoidances,
+from functions import (guest_diet, guest_intolerances, guest_avoidances,
                        spoonacular_request, make_user, make_friendship,
-                       make_intolerances, make_avoidance, user_change)
+                       make_intolerances, make_avoidance, user_change,
+                       spoonacular_recipe_instructions, all_guest_diets)
 
 
 app = Flask(__name__)
@@ -78,10 +79,12 @@ def show_user_profile():
     user_id = session.get("user_id")
     if user_id:
         this_user = User.query.get(user_id)
+        diets = Diet.query.order_by(Diet.diet_type).all()
         intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
         return render_template("/user_profile_page.html",
                                this_user=this_user,
-                               intol_list=intol_list)
+                               intol_list=intol_list,
+                               diets=diets)
     else:
         return redirect("/login")
 
@@ -128,26 +131,30 @@ def add_a_friend():
     user_id = session.get("user_id")
     email_address = request.form.get("email_address")
 
-    in_database = db.session.query(User).filter(User.email == email_address).first()
+    if email_address:
+        in_database = db.session.query(User).filter(User.email == email_address).first()
 
-    if in_database is not None:
-        check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
-        if check_for_friend:
-            flash("%s is already one of your friends. Would you like to add someone else?" % email_address, "info")
-            return redirect("/findfriend")
+        if in_database is not None:
+            check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
+            if check_for_friend:
+                flash("%s is already one of your friends. Would you like to add someone else?" % email_address, "info")
+                return redirect("/findfriend")
+            else:
+                friend_id = in_database.user_id
+                newfriend = Friends(user_id=user_id, friend_id=friend_id)
+                db.session.add(newfriend)
+                db.session.commit()
+                flash("%s is now in your friend's list" % email_address, "success")
+                return redirect("/friendprofile/%s" % newfriend.user_id)
         else:
-            friend_id = in_database.user_id
-            newfriend = Friends(user_id=user_id, friend_id=friend_id)
-            db.session.add(newfriend)
-            db.session.commit()
-            flash("%s is now in your friend's list" % email_address, "success")
+            make_user(email_address, diet_id=6)
+            newfriend = db.session.query(User).filter(User.email == email_address).first()
+            make_friendship(user_id, newfriend.user_id)
+            flash("This person is not yet in our system. Would you like to update their profile?", "info")
             return redirect("/friendprofile/%s" % newfriend.user_id)
     else:
-        make_user(email_address, diet_id=6)
-        newfriend = db.session.query(User).filter(User.email == email_address).first()
-        make_friendship(user_id, newfriend.user_id)
-        flash("This person is not yet in our system. Would you like to update their profile?", "info")
-        return redirect("/friendprofile/%s" % newfriend.user_id)
+        flash("You need to enter a valid email address", "warning")
+        return redirect("/findfriend")
 
 
 @app.route('/addafriendasguest', methods=['POST'])
@@ -187,10 +194,68 @@ def add_a_friend_as_guest():
             new_guest = PartyGuest(party_id=party_id, user_id=newfriend.user_id)
             db.session.add(new_guest)
             db.session.commit()
-            flash("Success! Don't forget to go to add food preferrence information for this friend in their friend profile ", "success", )
+            flash("Success! Please add any dietary restrictions by clicking the info button. You can also update any information about your guests by finding them in My Friends from the menu above", "success", )
             return redirect('/party_profile/%s' % party_id)
     else:
             return redirect('/party_profile/%s' % party_id)
+
+
+@app.route('/update_user_from_party_profile', methods=['POST'])
+def change_friend_at_party():
+    """Update the friend basic profile at party"""
+
+    party_id = session.get("party_id")
+    friend_id = request.form.get("friend_id")
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    email = request.form.get("email")
+    diet_id = request.form.get("diet_type")
+    diet_reason = request.form.get("diet_reason")
+    user_change(friend_id, email, first_name, last_name, diet_id, diet_reason)
+    flash("Information updated", "success")
+    return redirect('/party_profile/%s' % party_id)
+
+
+@app.route('/update_user', methods=['POST'])
+def change_user_basic_info():
+    """Update the current users basic profile at party"""
+
+    user_id = session.get("user_id")
+    first_name = request.form.get("first_name")
+    last_name = request.form.get("last_name")
+    email = request.form.get("email")
+    diet_id = request.form.get("diet_type")
+    diet_reason = request.form.get("diet_reason")
+    user_change(user_id, email, first_name, last_name, diet_id, diet_reason)
+    flash("Information updated", "success")
+    return redirect('/userprofile')
+
+
+@app.route('/partyfriendintol', methods=['POST'])
+def add_friends_intolerance_from_party():
+    """Add a friend intolerance to the their profile from the party page"""
+
+    friend_id = request.form.get("friend_id")
+    party_id = session.get("party_id")
+    intol_ids = request.form.getlist("intol_ids")
+    if intol_ids:
+        make_intolerances(friend_id, intol_ids)
+
+    return redirect("/party_profile/%s" % party_id)
+
+
+@app.route('/partyfriendingredientadded', methods=['POST'])
+def add_friends_ingredient_from_party():
+    """Add an user's ingredient to avoid to the user profile from the party page"""
+
+    friend_id = request.form.get("user_id")
+    party_id = session.get("party_id")
+    ingredient = request.form.get("ingredient")
+    if ingredient:
+        reason = request.form.get("reason")
+        make_avoidance(friend_id, ingredient, reason)
+
+    return redirect("/party_profile/%s" % party_id)
 
 
 @app.route('/changefrienduserinfo', methods=['POST'])
@@ -217,11 +282,16 @@ def show_party_profile(party_id):
     user_id = session.get("user_id")
     if user_id:
         session['party_id'] = party_id
+        diets = Diet.query.order_by(Diet.diet_type).all()
         this_user = User.query.get(user_id)
         party = Party.query.get(party_id)
+        intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+
         return render_template("/party_profile.html", user_id=user_id,
                                party=party,
-                               this_user=this_user)
+                               this_user=this_user,
+                               diets=diets,
+                               intol_list=intol_list)
     else:
         return redirect("/login")
 
@@ -248,16 +318,16 @@ def show_search_spoonacular():
         party_id = session.get("party_id")
         party = Party.query.get(party_id)
         responses = spoonacular_request(party_id)
-        get_diets = guest_diets(party_id)
         get_avoid = guest_avoidances(party_id)
         get_intolerance = guest_intolerances(party_id)
+        party_diets = all_guest_diets(party_id)
 
         return render_template("Final_search_template.html", party=party,
                                responses=responses,
-                               get_diets=get_diets,
-                               get_avoid=get_avoid,
-                               get_intolerance=get_intolerance,
-                               this_user=this_user)
+                               avoids=get_avoid,
+                               intolerances=get_intolerance,
+                               this_user=this_user,
+                               party_diets=party_diets)
     else:
         return redirect("/login")
 
@@ -272,7 +342,7 @@ def show_saved_recipe(record_id):
         this_recipe = RecipeBox.query.get(record_id)
         party = Party.query.get(this_recipe.party_id)
 
-        diets = guest_diets(party.party_id)
+        diets = all_guest_diets(party.party_id)
         avoid = guest_avoidances(party.party_id)
         intolerances = guest_intolerances(party.party_id)
 
@@ -285,10 +355,7 @@ def show_saved_recipe(record_id):
                                intolerances=intolerances)
 
 
-
-
 # ----------- Begin Post Routes ------------------
-
 
 @app.route('/see_recipe', methods=['POST'])
 def show_recipe():
@@ -330,8 +397,12 @@ def add_register_users():
         flash("You are already registered here, please log in.", "info")
         return redirect("/login")
     else:
-        session["user_id"] = make_user(email, diet_id, first_name, last_name,
-                                       diet_reason, verified, password)
+        make_user(email, diet_id, first_name, last_name,
+                  diet_reason, verified, password)
+
+        user = User.query.filter_by(email=email).first()
+        user_id = user.user_id
+        session["user_id"] = user_id
 
         flash("Welcome to Kind Table, %s." % first_name, "success")
         return redirect("/userprofile")
@@ -388,32 +459,29 @@ def add_an_ingredient():
     return redirect("/userprofile")
 
 
-
-
-
 @app.route('/friendintolerance_added', methods=['POST'])
 def add_friends_intolerance():
     """Add a friend intolerance to the their profile"""
 
-    user_id = request.form.get("user_id")
+    friend_id = request.form.get("friend_id")
     intol_ids = request.form.getlist("intol_ids")
     if intol_ids:
-        make_intolerances(user_id, intol_ids)
+        make_intolerances(friend_id, intol_ids)
 
-    return redirect("friendprofile/%s" % user_id)
+    return redirect("friendprofile/%s" % friend_id)
 
 
 @app.route('/friendingredientadded', methods=['POST'])
 def add_friends_ingredient():
     """Add an user's ingredient to avoid to the user profile"""
 
-    user_id = request.form.get("user_id")
+    friend_id = request.form.get("friend_id")
     ingredient = request.form.get("ingredient")
     if ingredient:
         reason = request.form.get("reason")
-        make_avoidance(user_id, ingredient, reason)
+        make_avoidance(friend_id, ingredient, reason)
 
-    return redirect("friendprofile/%s" % user_id)
+    return redirect("friendprofile/%s" % friend_id)
 
 
 @app.route('/party_added', methods=['POST'])
@@ -421,18 +489,19 @@ def add_party():
     """Add a new dinner party to the dinner party table"""
 
     user_id = session.get("user_id")
-    this_user = User.query.get(user_id)
     title = request.form.get("title")
-    new_party = Party(host_id=user_id, title=title)
-    db.session.add(new_party)
-    db.session.commit()
-    party = db.session.query(Party).filter(Party.title == title).first()
-    new_guest = PartyGuest(party_id=party.party_id, user_id=user_id)
-    db.session.add(new_guest)
-    db.session.commit()
-
-    return render_template("/party_profile.html", party=party,
-                           this_user=this_user)
+    if title:
+        new_party = Party(host_id=user_id, title=title)
+        db.session.add(new_party)
+        db.session.commit()
+        party = db.session.query(Party).filter(Party.title == title).first()
+        new_guest = PartyGuest(party_id=party.party_id, user_id=user_id)
+        db.session.add(new_guest)
+        db.session.commit()
+        return redirect("/party_profile/%s" % party.party_id)
+    else:
+        flash("You need to enter a party name", "warning")
+        return redirect("/addaparty")
 
 
 @app.route('/guest_added', methods=['POST'])

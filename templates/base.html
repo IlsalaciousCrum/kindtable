@@ -45,8 +45,6 @@
                                               
                                           {%endif %}
 
-                                           {{ friend.friends.first_name if friend.friends.first_name is not none else '' }} 
-
                                         {% if friend.friends.first_name is not none %}   
                                               {{ friend.friends.last_name }}
                                           {% else %}

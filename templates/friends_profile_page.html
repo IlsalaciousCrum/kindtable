@@ -32,22 +32,19 @@
                 </div>
                       <div class="modal-body">
                         <form action="/changefrienduserinfo" method="POST">
+                            <input type="hidden" name="friend_id" value="{{ newfriend.user_id  }}">
+
 
     <div class="form-group">
         <label>
+
             <strong>Email address</strong> (required): <input type="text" name="email" value="{{ newfriend.email }}" class="form-control" required>
         
                 Friend's first name (optional):
-                <input type="text" name="first_name" class="form-control" value="{% if newfriend.first_name is not none %}{{ newfriend.first_name }}
-                      {% else %}
-                    
-                         {%endif %}">
+                <input type="text" name="first_name" class="form-control" value="{% if newfriend.first_name is not none %}{{ newfriend.first_name }}{% else %}{%endif %}">
       
                 Friend's last name (optional):
-                <input type="text" name="last_name" class="form-control" value="{% if newfriend.last_name is not none %}{{ newfriend.last_name }}
-                      {% else %}
-                    
-                         {%endif %}">
+                <input type="text" name="last_name" class="form-control" value="{% if newfriend.last_name is not none %}{{ newfriend.last_name }}{% else %}{%endif %}">
 
 
                 <p>Diet your friend prefers to eat (required):</p>
@@ -58,10 +55,7 @@
                     {% endfor %}
                 </select><br>
                 Reason they follow this diet (optional):<br>
-                <input type="text" name="diet_reason" class="form-control" value="{% if newfriend.diet_reason is not none %}{{ newfriend.diet_reason }}
-                      {% else %}
-                    
-                         {%endif %}">
+                <input type="text" name="diet_reason" class="form-control" value="{% if newfriend.diet_reason is not none %}{{ newfriend.diet_reason }}{% else %}{%endif %}">
 
                   
             </div><br>
@@ -116,7 +110,7 @@
                         <form action="/friendintolerance_added" method="POST">
                             <div class="form-group">
                                 <label>
-                                    <input type="hidden" name="user_id" value="{{ newfriend.user_id  }}">
+                                    <input type="hidden" name="friend_id" value="{{ newfriend.user_id  }}">
                                     <p>Select all that apply:</p>
                                             {% for intolerance in intol_list %}  
                                         <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}  
@@ -166,7 +160,7 @@
                     <form action="/friendingredientadded" method="POST">
                         <div class="form-group">
                             <label>
-                                <input type="hidden" name="user_id" value="{{ newfriend.user_id  }}">
+                                <input type="hidden" name="friend_id" value="{{ newfriend.user_id  }}">
                                 <p>Ingredient to avoid:</p>
                                     <input type="text" name="ingredient" class="form-control">
                                 <p>Reason you would like to avoid this ingredient (optional):</p>

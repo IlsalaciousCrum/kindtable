@@ -88,7 +88,26 @@ def make_avoidance(user_id, ingredient, reason):
     return
 
 
-def guest_diets(partyid):
+def guest_diet(partyid):
+    """Query that gets the diet of each guest coming to the party and figures out the most limiting"""
+
+    diet_ranking = []
+    hostparty = Party.query.get(partyid)
+    party_guests = hostparty.users
+
+    for guest in party_guests:
+        diet_rank = guest.diet.ranking
+        diet_ranking.append(diet_rank)
+
+    diet_ranking = sorted(diet_ranking)
+    most_limiting = diet_ranking[0]
+    diet_string = Diet.query.filter_by(ranking=most_limiting).first()
+    diet_string = diet_string.diet_type
+
+    return diet_string
+
+
+def all_guest_diets(partyid):
     """Query that gets the diet of each guest coming to the party"""
 
     diet_string = set()
@@ -99,9 +118,9 @@ def guest_diets(partyid):
         diet = guest.diet
         diet_string.add(diet.diet_type)
 
-    ', '.join(diet_string)
+    party_diets = list(diet_string)
 
-    return diet_string
+    return party_diets
 
 
 def guest_avoidances(partyid):
@@ -140,7 +159,7 @@ def guest_intolerances(partyid):
 def spoonacular_request(party_id):
     """Assembles an API request to Spoonacular"""
 
-    diet_string = guest_diets(party_id)
+    diet_string = guest_diet(party_id)
     intolerance_string = guest_intolerances(party_id)
     avoid_string = guest_avoidances(party_id)
 
@@ -209,17 +228,17 @@ def spoonacular_request(party_id):
 #     return ingredients_list
 
 
-# def spoonacular_recipe_instructions(recipe_id):
-#     """Assembles an API request to Spoonacular to get a recipes instructions"""
+def spoonacular_recipe_instructions(recipe_id):
+    """Assembles an API request to Spoonacular to get a recipes instructions"""
 
-#     url1 = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/'
-#     url2 = '/analyzedInstructions'
-#     url = url1 + str(recipe_id) + url2
-#     headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
-#     payload = {'stepBreakdown': True}
-#     response = requests.get(url, headers=headers, params=payload)
+    url1 = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/'
+    url2 = '/analyzedInstructions'
+    url = url1 + str(recipe_id) + url2
+    headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
+    payload = {'stepBreakdown': True}
+    response = requests.get(url, headers=headers, params=payload)
 
-#     spoon = response.json()
+    spoon = response.json()
 
     # instructions_list = []
     # for each in spoon:
@@ -228,5 +247,5 @@ def spoonacular_request(party_id):
     #         step = each("step")
     #         instructions_list.append(step)
 
-    # # return instructions_list
-    # return spoon
+    # return instructions_list
+    return spoon

@@ -89,11 +89,40 @@ class Diet(db.Model):
     diet_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     diet_type = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(120), nullable=False)
+    ranking = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<Diet diet_id=%s diet_type=%s description=%s>" % (self.diet_id, self.diet_type, self.description)
+
+
+class Cuisine(db.Model):
+    """Spoonacular cuisine types."""
+
+    __tablename__ = "cuisine"
+
+    cuisine_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    cuisine_name = db.Column(db.String(64), nullable=False)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Cuisine cuisine_id=%s cuisine_name=%s>" % (self.cuisine_id, self.cuisine_name)
+
+
+class Course(db.Model):
+    """Spoonacular course types"""
+
+    __tablename__ = "courses"
+
+    course_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    course_name = db.Column(db.String(64), nullable=False)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Course course_id=%s course_name=%s>" % (self.course_id, self.course_name)
 
 
 class IngToAvoid(db.Model):
@@ -157,6 +186,9 @@ class RecipeBox(db.Model):
     title = db.Column(db.String(120), nullable=False)
     recipe_image_url = db.Column(db.String(300), nullable=False)
     recipe_url = db.Column(db.String(300), nullable=False)
+    works_for = db.Column(db.String(1000), nullable=False)
+    ingredients = db.Column(db.String(2000), nullable=True)
+    instructions = db.Column(db.String(2000), nullable=True)
 
 
 ##############################################################################

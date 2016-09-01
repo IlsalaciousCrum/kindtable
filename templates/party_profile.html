@@ -8,74 +8,234 @@
     <li>Guests:</li>
         <ul>
             {% for guest in party.users %}    
-            <li>{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }})</li>
-                {% endfor %}
-                                <li style="list-style-type:none">
-
-    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#AddGuests">Add guests</button>
-
-    <!-- Modal -->
-    <div id="AddGuests" class="modal fade" role="dialog">
-         <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add guests</h4>
-                </div>
-                      <div class="modal-body">
-                    <form action="/guest_added" method="POST">
-                        <div class="form-group">
-                            <label>
-                                    <p>Add guests:</p>
-                                    {% for person in this_user.friends %}
-                                    <li><input type="checkbox" name="guests" value={{ person.friends.user_id }}> {{ person.friends.first_name}} {{ person.friends.last_name }} ({{ person.friends.email }})</li>
-                                    {% endfor %}  
-                                   <br>           
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <input type="hidden" name="party_id" value="{{ party.party_id }}">
-                            <input type="submit" value="Add guest" class="btn">
-                        </div>
-                    </form>
-                      </div>
-
-            </div>
-
-        </div>
-    </div>
-</li>
+            <li>{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }})
+        <button type="button" class="btn btn-info btn-xs" id="friend_info{{  guest.user_id  }}">info</button>
+            <div class="change_buttons{{  guest.user_id  }}" hidden>
+            <button type="button" class="btn btn-info btn-xs" id="update_friend_at_party{{  guest.user_id  }}">update basic info</button>
+            <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#Intols{{  guest.user_id  }}">update intolerance/allergies</button>
+        <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#avoids{{ guest.user_id  }}">update ingredients to avoid</button>
+        </div></li>
+                    
 
 
-                        <li style="list-style-type:none"><button type="button" class="btn btn-info btn-sm" id="addNewFriend">Add a guest that is not yet a friend</button></li>
-                            <div class="well spaced" id="addFriendForm" hidden>
-                                <li style="list-style-type:none">
-                                        <form action="/addafriendasguest" method="POST">
-                                            <div class="form-group">
-                                                <label>
-                                                    <p>Email address:</p>
-                                                    <input type="text" name="email_address" class="form-control">
-                                                </label>
+                                        <div class="friend_info{{  guest.user_id  }}" style="border: 1px dotted gray;" hidden>
+
+
+
+
+                                                            <ul>
+                                                                <li>First name: {{ guest.first_name }} 
+                                                                <li>Last name: {{ guest.last_name }} 
+                                                                <li>Email address: {{ guest.email }} 
+                                                                <li>Diet: {{ guest.diet.diet_type }}
+                                                                <li>Diet Reason: {{ guest.diet_reason }}
+                                                                
+
+                                                                            
+                                                                                <li>Intolerances/Allergies:</li>
+                                                                                    <ul>
+                                                                                         <li>{% for intolerance in guest.intolerances %}
+                                                                                        {{ intolerance.intol_name }}
+                                                                                        {% if not loop.last %}
+                                                                                            ,
+                                                                                        {% endif %}
+                                                                                        {% endfor %}</li>
+                                
+                                                                                    </ul>
+                                                                          
+                                                            
+                                                                           
+                                                                            <li>Ingredients to avoid:</li>
+                                                                                    <ul>
+                                                                                        {% for avoid in guest.avoidances %}
+                                                                                    <li>{{ avoid.ingredient }} (<i>{{ avoid.reason}}</i>)</li>
+                                                                                        {% endfor %}
+                                                                                    </ul>
+                                                                            
+                                                           </ul>
+
+
+                            
+                                                <!-- hidden form -->    
+                                                    <li style="list-style-type:none">
+                                                        <div class="update_friend_at_party{{ guest.user_id }}" hidden>
+                                                            <form action="/update_user_from_party_profile" method="POST">
+                                                                <div class="form-group">
+                                                                    <label>
+                                                                        <input type="hidden" name="friend_id" value="{{ guest.user_id  }}">
+                                                                        <strong>Email address</strong> (required): <input type="email" name="email" value="{{ guest.email }}" class="form-control" required>
+                                                                    
+                                                                            Friend's first name (optional):
+                                                                            <input type="text" name="first_name" class="form-control" value="{% if guest.first_name is not none %}{{ guest.first_name }}{% else %}{%endif %}">
+                                                                  
+                                                                            Friend's last name (optional):
+                                                                            <input type="text" name="last_name" class="form-control" value="{% if guest.last_name is not none %}{{ guest.last_name }}{% else %}{%endif %}">
+
+
+                                                                            <p>Diet your friend prefers to eat (required):</p>
+                                                                            
+                                                                            <select name="diet_type">
+                                                                                {% for diet in diets %}
+                                                                                <option value={{ diet.diet_id }}>{{ diet.diet_type }}</option>
+                                                                                {% endfor %}
+                                                                            </select><br>
+                                                                            Reason they follow this diet (optional):<br>
+                                                                            <input type="text" name="diet_reason" class="form-control" value="{% if guest.diet_reason is not none %}{{ guest.diet_reason }}{% else %}{%endif %}">
+
+
+                                                                            <input type="submit" value="update friend profile" class="btn">
+                                                                            <button type="button" class="btn btn-warning btn-xs" id="close{{  guest.user_id  }}">X</button>
+                                                                    </label>
+                                                                </div>
+                                                            </form>
+                                                       </li>
+
+                                                        
+                                                            
+
+
+
+                                    <!-- Modal -->
+                                    <div id="Intols{{  guest.user_id  }}" class="modal fade" role="dialog">
+                                         <div class="modal-dialog">
+
+                                            <!-- Modal content-->
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                        <h4 class="modal-title">Add intolerances/allergies for {{  guest.email  }}</h4>
+                                                </div>
+                                                      <div class="modal-body">
+                                                        <form action="/partyfriendintol" method="POST">
+                                                            <input type="hidden" name="friend_id" value="{{ guest.user_id  }}">
+                                                            <div class="form-group">
+                                                                <label>
+                                                                    <input type="hidden" name="user_id" value="{{ guest.user_id  }}">
+                                                                    <p>Select all that apply:</p>
+                                                                            {% for intolerance in intol_list %}  
+                                                                        <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}  
+                                                                            {% endfor %}
+                                                                        <br>
+
+                                                                </label>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <input type="submit" value="Done" class="btn" id="intolDone">
+                                                            </div>
+                                                        </form>
+                                                      </div>
+
                                             </div>
 
-                                            <div class="form-group">
+                                        </div>
+                                    </div>
 
-                                                <input type="submit" value="Add Friend" class="btn">
+                                    <!-- Modal -->
+                                    <div id="avoids{{  guest.user_id  }}" class="modal fade" role="dialog">
+                                         <div class="modal-dialog">
+
+                                            <!-- Modal content-->
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                        <h4 class="modal-title">Add ingredients {{  guest.email  }}would like to avoid</h4>
+                                                </div>
+                                                      <div class="modal-body">
+                                                    <form action="/partyfriendingredientadded" method="POST">
+                                                        <div class="form-group">
+                                                            <label>
+                                                                <input type="hidden" name="friend_id" value="{{ guest.user_id  }}">
+                                                                <p>Ingredient to avoid:</p>
+                                                                    <input type="text" name="ingredient" class="form-control">
+                                                                <p>Reason you would like to avoid this ingredient (optional):</p>
+                                                                    <input type="text" name="reason" class="form-control">
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <input type="submit" value="Done" class="btn" id="avoidDone">
+                                                        </div>
+                                                    </form>
+                                                      </div>
+
                                             </div>
-                                        <form>
-                                </li>
-                            </div>
-        </ul>
-    <li>Recipes:</li>
-        <ul>
-            {% for recipe in party.recipes %}    
-            <li><a href="/show_recipe/{{  recipe.record_id  }}" target="_blank">{{ recipe.title }}</li>
-                {% endfor %}
-        </ul>    
-    <li><a href="/searchrecipes" class="btn btn-info btn-lg">Find recipes for this party</a></li>
-        </ul>
+
+                                        </div>
+                                    </div>
+</ul><ul>
+      
+{% endfor %}
+
+
+
+
+
+
+                                            <li style="list-style-type:none">
+
+                                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#AddGuests">Add guests</button>
+
+                                                <!-- Modal -->
+                                                <div id="AddGuests" class="modal fade" role="dialog">
+                                                     <div class="modal-dialog">
+
+                                                        <!-- Modal content-->
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                    <h4 class="modal-title">Add guests</h4>
+                                                            </div>
+                                                                  <div class="modal-body">
+                                                                <form action="/guest_added" method="POST">
+                                                                    <div class="form-group">
+                                                                        <label>
+                                                                                <p>Add guests:</p>
+                                                                                {% for person in this_user.friends %}
+                                                                                <li><input type="checkbox" name="guests" value={{ person.friends.user_id }}> {{ person.friends.first_name}} {{ person.friends.last_name }} ({{ person.friends.email }})</li>
+                                                                                {% endfor %}  
+                                                                               <br>           
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <input type="hidden" name="party_id" value="{{ party.party_id }}">
+                                                                        <input type="submit" value="Add guest" class="btn">
+                                                                    </div>
+                                                                </form>
+                                                                  </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </li>
+
+
+                                            <li style="list-style-type:none"><button type="button" class="btn btn-primary btn-sm" id="addNewFriend">Add a guest that is not yet a friend</button></li>
+                                                <div class="well spaced" id="addFriendForm" hidden>
+                                                    <li style="list-style-type:none">
+                                                            <form action="/addafriendasguest" method="POST">
+                                                                <div class="form-group">
+                                                                    <label>
+                                                                        <p>Email address:</p>
+                                                                        <input type="email" name="email_address" class="form-control">
+                                                                    </label>
+                                                                </div>
+
+                                                                <div class="form-group">
+
+                                                                    <input type="submit" value="Add Friend" class="btn">
+                                                                </div>
+                                                            <form>
+                                                    </li>
+                                                </div>
+                            </ul>
+                        <li>Recipes:</li>
+                            <ul>
+                                {% for recipe in party.recipes %}    
+                                <li><a href="/show_recipe/{{  recipe.record_id  }}" target="_blank">{{ recipe.title }}</li>
+                                    {% endfor %}
+                            </ul>    
+                        <li><a href="/searchrecipes" class="btn btn-success btn-lg">Find recipes for this party</a></li>
+</ul>
 </div>
 
 
@@ -93,5 +253,27 @@
             console.log("show form");
     });
 
+    {% for guest in party.users %}
+    $("#update_friend_at_party{{  guest.user_id  }}").click(function(){
+            $("#update_friend_at_party{{  guest.user_id  }}").hide();
+            $(".intols{{  guest.user_id  }}").toggle();
+            $(".avoids{{  guest.user_id  }}").toggle();
+            console.log("show form");
+    });
+
+    $("#friend_info{{  guest.user_id  }}").click(function(){
+            $(".change_buttons{{  guest.user_id  }}").toggle();
+            $(".friend_info{{  guest.user_id  }}").toggle();
+            console.log("show form");
+    });
+        
+        $("#close{{  guest.user_id  }}").click(function(){
+            $("#update_friend_at_party{{  guest.user_id  }}").show();
+            $(".update_friend_at_party{{  guest.user_id  }}").toggle();
+            console.log("show form");
+    });
+
+    
+    {% endfor %}
 </script>
 {% endblock %}

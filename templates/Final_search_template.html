@@ -10,18 +10,57 @@
             </div>             
         </div>
                 <div class="row">
-                    <p>Would you like to see more variety?
+                    <p>These recipes will work for:
+                        <ul>
+                            <li>Diets: {% for diet in party_diets %}{{  diet  }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}</li>
+                            <li>Intolerances/Allergies: {% for intol in intolerances %}{{  intol  }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}</li>
+                            <li>Ingredients to avoid: {% for avoid in avoids %}{{  avoid  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
 
-                    <p>Search does not work like I thought. It takes one value. Either have to rework everything or rank the diets in terms of most restrictive to less restrictive and use one. :( and then the user has to redo it.)
-                    <p>*Dropdown for course type*</p>
-                    <p>*Dropdown for cuisine type</p>
-                    <p>check boxes for each diet with the user who eats and their reason</p>
-                    <p>check boxes for each intolerance with the user who doesn't eat it next to it</p>
-                    <p>check boxes for each avoid with the user who doesn't eat it next to it and their reason</p>
-                    <p>Submit button</p>
-                    <p>New tables for cuisine type and course type and seed files</p>
-                    <p>route to process running this new API call</p>
+                            
+                        <h4>Would you like to see more variety?</h4>
 
+                   
+                        <div class="form-group">
+                            <label>
+                                <form action="/reloadsearchrecipes">
+                                    Pick a cuisine:
+                                    <select>
+                                        {% for cuisine in cuisines %}
+                                      <option value="{{ cuisine.cuisine_id  }}">{{ cuisine.cuisine_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    Pick a course:
+                                    <select>
+                                        {% for course in course %}
+                                    <option value="{{ course.course_id  }}">{{ course.course_name }}</option>
+                                        {% endfor %}
+                                     </select>
+                                    
+                                    {% for guest in party.users %}
+                                    <img src="/static/knife_fork.png" alt="knife and fork" height="70" width="70">
+                                    <ul>
+                                        <li>{{% if guest.first_name is not none %}{{  guest.first_name  }}{{  guest.last_name  }}{% else %}{{  guest.email}}{%endif %}</li>
+
+                                            <div class="checkbox">
+                                              <label><input type="checkbox" value="{{ guest.diet_id }}">Diet</label>
+                                            </div>
+
+                                            {%for intolerance in guest.intolerance}
+
+
+                                            <div class="checkbox">
+                                              <label><input type="checkbox" value="">Option 2</label>
+                                            </div>
+                                            <div class="checkbox disabled">
+                                              <label><input type="checkbox" value="" disabled>Option 3</label>
+                                            </div>
+
+
+
+
+                    
                 </div>
                 
     </div>
