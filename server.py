@@ -332,6 +332,31 @@ def show_search_spoonacular():
         return redirect("/login")
 
 
+@app.route('/reloadsearchrecipes')
+def show_search_spoonacular():
+    """Collate party information, query spoonacular and show results."""
+
+    user_id = session.get("user_id")
+    if user_id:
+        this_user = User.query.get(user_id)
+        party_id = session.get("party_id")
+        party = Party.query.get(party_id)
+        responses = spoonacular_request(party_id)
+        get_avoid = guest_avoidances(party_id)
+        get_intolerance = guest_intolerances(party_id)
+        party_diets = all_guest_diets(party_id)
+        cuisine_list = Cuisine.query.order_by(Cuisine.intol_name).all()
+
+        return render_template("Final_search_template.html", party=party,
+                               responses=responses,
+                               avoids=get_avoid,
+                               intolerances=get_intolerance,
+                               this_user=this_user,
+                               party_diets=party_diets)
+    else:
+        return redirect("/login")
+
+
 @app.route('/show_recipe/<int:record_id>')
 def show_saved_recipe(record_id):
     """Show a recipe in the RecipeBox"""
