@@ -23,10 +23,10 @@
 
             <strong>Email address</strong> (required): <input type="text" name="email" value="{{ this_user.email }}" class="form-control" required>
         
-                Friend's first name (optional):
+                First name (optional):
                 <input type="text" name="first_name" class="form-control" value="{% if this_user.first_name is not none %}{{ this_user.first_name }}{% else %}{%endif %}">
       
-                Friend's last name (optional):
+                Last name (optional):
                 <input type="text" name="last_name" class="form-control" value="{% if this_user.last_name is not none %}{{ this_user.last_name }}{% else %}{%endif %}">
 
 

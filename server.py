@@ -319,21 +319,27 @@ def show_search_spoonacular():
         party = Party.query.get(party_id)
         responses = spoonacular_request(party_id)
         get_avoid = guest_avoidances(party_id)
-        get_intolerance = guest_intolerances(party_id)
+        get_intolerance = list(guest_intolerances(party_id))
         party_diets = all_guest_diets(party_id)
+        cuisine_list = Cuisine.query.order_by(Cuisine.cuisine_name).all()
+        course_list = Course.query.order_by(Course.course_name).all()
 
         return render_template("Final_search_template.html", party=party,
                                responses=responses,
                                avoids=get_avoid,
                                intolerances=get_intolerance,
                                this_user=this_user,
-                               party_diets=party_diets)
+                               party_diets=party_diets,
+                               cuisine_list=cuisine_list,
+                               course_list=course_list,
+                               party_avoids=get_avoid,
+                               party_intols=get_intolerance)
     else:
         return redirect("/login")
 
 
-@app.route('/reloadsearchrecipes')
-def show_search_spoonacular():
+@app.route('/reloadsearchrecipes.JSON', methods="POST")
+def show_re_search_spoonacular():
     """Collate party information, query spoonacular and show results."""
 
     user_id = session.get("user_id")
@@ -341,18 +347,33 @@ def show_search_spoonacular():
         this_user = User.query.get(user_id)
         party_id = session.get("party_id")
         party = Party.query.get(party_id)
+        # -------------
+        # These need to be different on this search
+        cuisine = request.form.get("cuisine")
+        course = request.form.get("course")
+        newdiets = request.form.getlist("diets")
+        newintols = request.form.getlist("intols")
+        newavoids = request.form.getlist("avoids")
+
+
         responses = spoonacular_request(party_id)
         get_avoid = guest_avoidances(party_id)
-        get_intolerance = guest_intolerances(party_id)
+        get_intolerance = list(guest_intolerances(party_id))
         party_diets = all_guest_diets(party_id)
-        cuisine_list = Cuisine.query.order_by(Cuisine.intol_name).all()
+        # ---------------
+        cuisine_list = Cuisine.query.order_by(Cuisine.cuisine_name).all()
+        course_list = Course.query.order_by(Course.course_name).all()
 
         return render_template("Final_search_template.html", party=party,
                                responses=responses,
                                avoids=get_avoid,
                                intolerances=get_intolerance,
                                this_user=this_user,
-                               party_diets=party_diets)
+                               party_diets=party_diets,
+                               cuisine_list=cuisine_list,
+                               course_list=course_list,
+                               party_avoids=get_avoid,
+                               party_intols=get_intolerance)
     else:
         return redirect("/login")
 

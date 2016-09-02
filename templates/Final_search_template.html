@@ -1,71 +1,132 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<div class="recipe_page"
 <div class="row">
     <div class="col-md-4">
-                      
         <div class="row display_guest">
             <div class="guest_name">
-                        <h3>{{ responses.get('number', None) }} Recipes<br>found<br>for<br> <a href="/party_profile/<int:{{ party.party_id  }}>">{{ party.title }}</a></h3>  
-            </div>             
-        </div>
-                <div class="row">
-                    <p>These recipes will work for:
+                <h3>{{ responses.get('number', None) }} Recipes<br>found<br>for<br> <a href="/party_profile/<int:{{ party.party_id  }}>">{{ party.title }}</a></h3>  
+            </div>
+        </div>   
+
+        <div class="row">
+            <div class="well=spaced">
+            <p>These recipes will work for:
                         <ul>
                             <li>Diets: {% for diet in party_diets %}{{  diet  }}{% if not loop.last %}, {% endif %}
                             {% endfor %}</li>
                             <li>Intolerances/Allergies: {% for intol in intolerances %}{{  intol  }}{% if not loop.last %}, {% endif %}
                             {% endfor %}</li>
                             <li>Ingredients to avoid: {% for avoid in avoids %}{{  avoid  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-
-                            
-                        <h4>Would you like to see more variety?</h4>
-
-                   
-                        <div class="form-group">
-                            <label>
-                                <form action="/reloadsearchrecipes">
-                                    Pick a cuisine:
-                                    <select>
-                                        {% for cuisine in cuisines %}
-                                      <option value="{{ cuisine.cuisine_id  }}">{{ cuisine.cuisine_name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                    Pick a course:
-                                    <select>
-                                        {% for course in course %}
-                                    <option value="{{ course.course_id  }}">{{ course.course_name }}</option>
-                                        {% endfor %}
-                                     </select>
-                                    
-                                    {% for guest in party.users %}
-                                    <img src="/static/knife_fork.png" alt="knife and fork" height="70" width="70">
-                                    <ul>
-                                        <li>{{% if guest.first_name is not none %}{{  guest.first_name  }}{{  guest.last_name  }}{% else %}{{  guest.email}}{%endif %}</li>
-
-                                            <div class="checkbox">
-                                              <label><input type="checkbox" value="{{ guest.diet_id }}">Diet</label>
-                                            </div>
-
-                                            {%for intolerance in guest.intolerance}
+                        </ul>
+            </div>
+        </div>
 
 
-                                            <div class="checkbox">
-                                              <label><input type="checkbox" value="">Option 2</label>
-                                            </div>
-                                            <div class="checkbox disabled">
-                                              <label><input type="checkbox" value="" disabled>Option 3</label>
-                                            </div>
+        <div class="row">
+            <h4>Choose a new cuisine or course:</h4>
+        </div>
 
+        <!-- End of recipe search information -->
+<div class="row">                            
+        
 
-
-
+    <form class="horizontal" action="/reloadsearchrecipes" method="POST">
                     
-                </div>
-                
+    <div class="form-group">
+        <label>Pick a different cuisine:
+            <select class="form-control">
+                <option value="None" name="cuisine" selected>Any</option>
+                {% for cuisine in cuisine_list %}
+                <option value="{{ cuisine.cuisine_id  }}" name="cuisine">{{  cuisine.cuisine_name  }}</option>
+                {% endfor %}        
+            </select></label>   
+    </div> 
+    <div>
+        <label>Pick a different course:
+        <select class="form-control">
+            {% for course in course_list %}
+        <option value="{{ course.course_id  }}"{% if course.course_id==1 %} selected="selected"{% endif %} name="course">{{  course.course_name  }}</option>
+            {% endfor %}
+         </select></label>
     </div>
+<hr>
+            <h4>Deselect a food preference:</h4>
+            <p><i>You may need to make more dishes to make sure everyone eats.</i></p>
+        <h4 class="form-control-static">Diets:</h4>
+        <div class="checkbox">
+        {% for diet in party_diets %}                 
+            <label>
+                <input type="checkbox" name="diets" value="{{  diet }}" checked><label><strong>{{  diet|capitalize  }}</strong><br>
+                {% for guest in party.users %}
+                     {% if guest.diet.diet_type == diet %}
+                    
+                        {{  guest.first_name  }} {{  guest.last_name  }}{% if not loop.last %}, {% endif %}
+                    
+                    {% else %}{% endif %}
+                {% endfor %}
+                </label>
+            
+            </label>
+        {% endfor %}
+
+        </div>
+
+        <h4 class="form-control-static">Intolerances/Allergies:</h4>
+        <div class="checkbox">
+        {% for intol in party_intols %}                 
+            <label>
+                <input type="checkbox" name="intols" value="{{  intol }}" checked><label><strong>{{  intol|capitalize  }}</strong><br>
+                {% for guest in party.users %}
+                    {% for intolerance in guest.intolerances %}
+                    
+                     {% if intolerance.intol_name == intol %}
+                    
+                        {{  guest.first_name  }} {{  guest.last_name  }}{% if not loop.last %}, {% endif %}
+                    
+                    {% else %}{% endif %}
+                {% endfor %}    
+                {% endfor %}
+                </label>
+            
+            </label><br>
+        {% endfor %}
+
+        </div>
+
+
+        <h4 class="form-control-static">Ingredients to omit:</h4>
+        <div class="checkbox">
+        {% for avoid in party_avoids %}                 
+            <label>
+                <input type="checkbox" name="avoids" value="{{  avoid }}" checked><label><strong>{{  avoid|capitalize  }}</strong><br>
+                {% for guest in party.users %}
+                    {% for guestavoid in guest.avoidances %}
+                    
+                     {% if guestavoid.ingredient == avoid %}
+                    
+                        {{  guest.first_name  }} {{  guest.last_name  }}{% if not loop.last %}, {% endif %}
+                    
+                    {% else %}{% endif %}
+                {% endfor %}    
+                {% endfor %}
+                </label>
+            
+            </label><br>
+        {% endfor %}
+
+        </div>
+
+                      
+                   <input type="submit" id="recipe-form-submit"value="Click for more variety" class="btn btn-success btn-lg btn-block">                              
+                </form>
+           
+        </div>    
+    </div> <!-- end of left column -->
 
     <div class="col-md-8 recipe_results">
+
                 {% for i in range(responses.get('number', None)) %}
     <div class="col-md-6 recipe">
         <h4>{{ responses['response'][i].get('title') }}</h4>
@@ -78,7 +139,7 @@
             <button>View recipe</button>
             </form>
         
-        <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle displayed" width="280" height="280">
+        <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle displayed" width="250" height="250">
                         
     </div>
                     {% endfor %}
@@ -86,4 +147,5 @@
 
 </div>
 
+</div>
 {% endblock %}

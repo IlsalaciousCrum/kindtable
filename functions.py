@@ -206,6 +206,65 @@ def spoonacular_request(party_id):
     responses["response"] = response
     return responses
 
+    def new_spoonacular_request(diets, intols, avoids, cuisine, course):
+        """Assembles a new API request with new variables, to Spoonacular"""
+
+        diets.sort()
+        diet_id = diets[0]
+        diet = Diet.query.get(diet_id)
+        diet_name = diet.diet_type
+
+        intols = ', '.join(intols)
+
+
+
+    intolerance_string = guest_intolerances(party_id)
+    avoid_string = guest_avoidances(party_id)
+
+    url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
+    headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
+    payload = {'query': 'recipe', 'diet': diet_name, 'type': 'main course',
+               'number': 100, 'intolerances': intolerance_string, 'excludeIngredients': avoid_string}
+    response = requests.get(url, headers=headers, params=payload)
+
+    responses = {}
+
+    spoon = response.json()
+    num_results = spoon['number']
+    base_url = spoon.get('baseUri')
+    responses["number"] = num_results
+    response = []
+
+    for i in range(num_results):
+        recipe_id = spoon['results'][i].get('id')
+        image = spoon['results'][i].get('image')
+        image_urls = spoon['results'][i].get('imageUrls')
+        for image_url in image_urls:
+            image_url = image_url
+        title = spoon['results'][i].get('title')
+        recipe_url_base = "http://spoonacular.com/recipes/"
+        if image is not None:
+            recipe_url = ""
+            for letter in image:
+                if letter != ".":
+                    recipe_url = recipe_url + letter
+                else:
+                    break
+        print recipe_url
+        recipe_url = recipe_url_base + recipe_url
+        print recipe_url
+        image_url = base_url + image_url
+        each_response = {}
+        each_response["title"] = title
+        each_response["recipe_url"] = recipe_url
+        each_response["image_url"] = image_url
+        each_response["recipe_id"] = recipe_id
+        response.append(each_response)
+
+    responses["response"] = response
+    return responses
+
+
 
 # def spoonacular_recipe_ingredients(recipe_id):
 #     """Assembles an API request to Spoonacular to get a recipes ingredients"""
