@@ -1,15 +1,32 @@
 
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
 <h1>{{  title  }}</h1>
+
+
+<p>Safe for:</p>
+<ul>
+    <li>Diets: {{  party_diets }}</li>
+    <li>Intolerances: {{  party_intols  }}</li>
+    <li>Avoids: {{  party_avoids  }}</li>
+   
+</ul>
+
+<ul><li>{% for ingredient in ingredients %}
+    {{  ingredients  }}
+    {% endfor %}<li>
+
+</ul>
 
 <div>
     <form action="/addtorecipebox" method="POST">
-        <input type="hidden" name="recipe_id" value="{{ recipe_id }}">
+        <input type="hidden" name="party_diets" value="{{  party_diets  }}">
+        <input type="hidden" name="party_avoids" value="{{  party_avoids  }}">
+        <input type="hidden" name="party_intols" value="{{  party_intols  }}">
+        <input type="hidden" name="recipe_id" value="{{  recipe_id }}">
         <input type="hidden" name="title" value="{{  title  }}">
         <input type="hidden" name="recipe_image_url" value="{{  recipe_image_url  }}">
-        <input type="hidden" name="recipe_url" value="{{ recipe_url }}">
+        <input type="hidden" name="recipe_url" value="{{  recipe_url }}">
         <button>Save this recipe</button>
     </form>
 </div>

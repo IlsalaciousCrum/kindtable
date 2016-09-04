@@ -67,11 +67,7 @@
         <ul>
             <div id="userIntolerances">
                 <li>{% for intolerance in this_user.intolerances %}
-                    {{ intolerance.intol_name }}
-                    {% if not loop.last %}
-                        ,
-                    {% endif %}
-                    {% endfor %}<li>
+                    {{ intolerance.intol_name }}{% if not loop.last %}, {% endif %}{% endfor %}<li>
                 
             </div>
 

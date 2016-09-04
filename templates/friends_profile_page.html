@@ -92,7 +92,7 @@
                 
             </div>
 
-            <li style="list-style-type:none">
+           
 
     <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#Intols">Add an intolerance/allergies</button>
 
@@ -163,7 +163,7 @@
                                 <input type="hidden" name="friend_id" value="{{ newfriend.user_id  }}">
                                 <p>Ingredient to avoid:</p>
                                     <input type="text" name="ingredient" class="form-control">
-                                <p>Reason you would like to avoid this ingredient (optional):</p>
+                                <p>Reason they would like to avoid this ingredient (optional):</p>
                                     <input type="text" name="reason" class="form-control">
                             </label>
                         </div>
@@ -183,7 +183,7 @@
     <li>Parties invited to:</li>
     <ul>
         {% for party in parties %}
-        <li><a href="/partyprofile/{{ party.party_id}}">{{  party.title  }}</li>
+        <li><a href="/party_profile/{{ party.party_id}}">{{  party.title  }}</li>
         {% endfor %}
     </ul>
 

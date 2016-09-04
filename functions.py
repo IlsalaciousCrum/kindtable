@@ -1,6 +1,6 @@
 # # from sqlalchemy import func
 
-from Model import connect_to_db, db, User, UserIntolerance, Intolerance, Diet, IngToAvoid, PartyGuest, Party, Friends
+from Model import connect_to_db, db, User, UserIntolerance, Intolerance, Diet, IngToAvoid, PartyGuest, Party, Friends, Cuisine, Course
 # from server import app
 
 from flask import Flask, render_template, request, flash, redirect, session, jsonify
@@ -88,6 +88,22 @@ def make_avoidance(user_id, ingredient, reason):
     return
 
 
+def all_guest_diets(partyid):
+    """Query that gets the diet of each guest coming to the party"""
+
+    diet_set = set()
+    hostparty = Party.query.get(partyid)
+    party_guests = hostparty.users
+
+    for guest in party_guests:
+        diet = str(guest.diet.diet_type)
+        diet_set.add(diet)
+
+    diet_string = ', '.join(diet_set)
+
+    return diet_string
+
+
 def guest_diet(partyid):
     """Query that gets the diet of each guest coming to the party and figures out the most limiting"""
 
@@ -102,57 +118,40 @@ def guest_diet(partyid):
     diet_ranking = sorted(diet_ranking)
     most_limiting = diet_ranking[0]
     diet_string = Diet.query.filter_by(ranking=most_limiting).first()
-    diet_string = diet_string.diet_type
+    diet_string = str(diet_string.diet_type)
 
     return diet_string
-
-
-def all_guest_diets(partyid):
-    """Query that gets the diet of each guest coming to the party"""
-
-    diet_string = set()
-    hostparty = Party.query.get(partyid)
-    party_guests = hostparty.users
-
-    for guest in party_guests:
-        diet = guest.diet
-        diet_string.add(diet.diet_type)
-
-    party_diets = list(diet_string)
-
-    return party_diets
 
 
 def guest_avoidances(partyid):
     """Query that gets the avoidances of each guest coming to the party"""
 
-    avoidance_string = set()
+    avoidance_set = set()
     hostparty = Party.query.get(partyid)
     party_guests = hostparty.users
 
     for guest in party_guests:
         avoids = guest.avoidances
         for each in avoids:
-            avoidance_string.add(each.ingredient)
+                avoidance_set.add(str(each.ingredient))
 
-    ', '.join(avoidance_string)
+    avoidance_string = ', '.join(avoidance_set)
     return avoidance_string
 
 
 def guest_intolerances(partyid):
     """Query that gets the avoidances of each guest coming to the party"""
 
-    intolerance_string = set()
+    intolerance_set = set()
     hostparty = Party.query.get(partyid)
     party_guests = hostparty.users
 
     for guest in party_guests:
-        f = guest.user_id
-        person = User.query.get(f)
-        person_intolerances = person.intolerances  # this is where it goes awry
-        for each in person_intolerances:
-            intolerance_string.add(each.intol_name)
-        ', '.join(intolerance_string)
+        intols = guest.intolerances
+        for each in intols:
+                intolerance_set.add(str(each.intol_name))
+    intolerance_string = ', '.join(intolerance_set)
+
     return intolerance_string
 
 
@@ -166,13 +165,15 @@ def spoonacular_request(party_id):
     url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
     headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
     payload = {'query': 'recipe', 'diet': diet_string, 'type': 'main course',
-               'number': 100, 'intolerances': intolerance_string, 'excludeIngredients': avoid_string}
+               'number': 300, 'intolerances': intolerance_string, 'excludeIngredients': avoid_string}
     response = requests.get(url, headers=headers, params=payload)
+
+    print payload
 
     responses = {}
 
     spoon = response.json()
-    num_results = spoon['number']
+    num_results = spoon['totalResults']
     base_url = spoon.get('baseUri')
     responses["number"] = num_results
     response = []
@@ -206,31 +207,50 @@ def spoonacular_request(party_id):
     responses["response"] = response
     return responses
 
-    def new_spoonacular_request(diets, intols, avoids, cuisine, course):
-        """Assembles a new API request with new variables, to Spoonacular"""
 
-        diets.sort()
-        diet_id = diets[0]
-        diet = Diet.query.get(diet_id)
-        diet_name = diet.diet_type
+def new_guest_diet(diets):
+    """Query that takes the diets from the form and determines the most limiting"""
 
-        intols = ', '.join(intols)
+    diet_ranking = []
+
+    for each_diet in diets:
+        this_diet = db.session.query(Diet).filter(Diet.diet_type == each_diet).first()
+        this_diet_rank = this_diet.ranking
+        diet_ranking.append(this_diet_rank)
+
+    diet_ranking = sorted(diet_ranking)
+    most_limiting = diet_ranking[0]
+    diet_string = Diet.query.filter_by(ranking=most_limiting).first()
+    diet_string = str(diet_string.diet_type)
+
+    return diet_string
 
 
+def new_spoonacular_request(diet, intols, avoids, cuisine, course):
+    """Assembles a new API request with new variables, to Spoonacular"""
 
-    intolerance_string = guest_intolerances(party_id)
-    avoid_string = guest_avoidances(party_id)
+    avoid_string = ', '.join(avoids)
+    intolerance_string = ', '.join(intols)
+    cuisine = (Cuisine.query.get(cuisine))
+    cuisine = (cuisine.cuisine_name)
+    cuisine = str(cuisine)
+    course = Course.query.get(course)
+    course = course.course_name
+    course = str(course)
 
     url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
     headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
-    payload = {'query': 'recipe', 'diet': diet_name, 'type': 'main course',
-               'number': 100, 'intolerances': intolerance_string, 'excludeIngredients': avoid_string}
+    payload = {'query': 'recipe', 'diet': diet, 'type': course, 'cuisine': cuisine,
+               'number': 300, 'intolerances': intolerance_string, 'excludeIngredients': avoid_string}
     response = requests.get(url, headers=headers, params=payload)
+
+    print payload
 
     responses = {}
 
     spoon = response.json()
-    num_results = spoon['number']
+    print spoon
+    num_results = spoon['totalResults']
     base_url = spoon.get('baseUri')
     responses["number"] = num_results
     response = []
@@ -250,9 +270,9 @@ def spoonacular_request(party_id):
                     recipe_url = recipe_url + letter
                 else:
                     break
-        print recipe_url
+        # print recipe_url
         recipe_url = recipe_url_base + recipe_url
-        print recipe_url
+        # print recipe_url
         image_url = base_url + image_url
         each_response = {}
         each_response["title"] = title
@@ -265,26 +285,27 @@ def spoonacular_request(party_id):
     return responses
 
 
+def spoonacular_recipe_ingredients(recipe_id):
+    """Assembles an API request to Spoonacular to get a recipes ingredients"""
 
-# def spoonacular_recipe_ingredients(recipe_id):
-#     """Assembles an API request to Spoonacular to get a recipes ingredients"""
+    url1 = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/'
+    url2 = '/information'
+    url = url1 + str(recipe_id) + url2
 
-#     url1 = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/'
-#     url2 = '/information'
-#     url = url1 + str(recipe_id) + url2
+    headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
+    payload = {'id': recipe_id, 'includeNutrition': False}
+    response = requests.get(url, headers=headers, params=payload)
 
-#     headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
-#     payload = {'id': recipe_id, 'includeNutrition': False}
-#     response = requests.get(url, headers=headers, params=payload)
-
-#     spoon = response.json()
-#     ingredients = spoon['extendedIngredients']
-#     ingredients_list = []
-#     for each in ingredients:
-#         one = each["originalString"]
-#         ingredients_list.append(one)
-
-#     return ingredients_list
+    spoon = response.json()
+    ingredients = spoon['extendedIngredients']
+    ingredients_list = []
+    for each in ingredients:
+        print each
+        one = each["originalString"]
+        print one
+        ingredients_list.append(str(one))
+    print ingredients_list
+    return ingredients_list
 
 
 def spoonacular_recipe_instructions(recipe_id):

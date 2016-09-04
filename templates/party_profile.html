@@ -19,45 +19,7 @@
 
 
                                         <div class="friend_info{{  guest.user_id  }}" style="border: 1px dotted gray;" hidden>
-
-
-                                                                                     
-
-
-                                                            <ul>
-                                                                <li>First name: {{ guest.first_name }} 
-                                                                <li>Last name: {{ guest.last_name }} 
-                                                                <li>Email address: {{ guest.email }} 
-                                                                <li>Diet: {{ guest.diet.diet_type }}
-                                                                <li>Diet Reason: {{ guest.diet_reason }}
-                                                                
-
-                                                                            
-                                                                                <li>Intolerances/Allergies:</li>
-                                                                                    <ul>
-                                                                                         <li>{% for intolerance in guest.intolerances %}
-                                                                                        {{ intolerance.intol_name }}
-                                                                                        {% if not loop.last %}
-                                                                                            ,
-                                                                                        {% endif %}
-                                                                                        {% endfor %}</li>
-                                
-                                                                                    </ul>
-                                                                          
-                                                            
-                                                                           
-                                                                            <li>Ingredients to avoid:</li>
-                                                                                    <ul>
-                                                                                        {% for avoid in guest.avoidances %}
-                                                                                    <li>{{ avoid.ingredient }} (<i>{{ avoid.reason}}</i>)</li>
-                                                                                        {% endfor %}
-                                                                                    </ul>
-                                                                            
-                                                           </ul>
-
-
-                            
-                                                <!-- hidden form -->    
+               <!-- hidden form -->    
                                                     <li style="list-style-type:none">
                                                         <div class="update_friend_at_party{{ guest.user_id }}" hidden>
                                                             <form action="/update_user_from_party_profile" method="POST">
@@ -90,6 +52,43 @@
                                                                 </div>
                                                             </form>
                                                        </li>
+
+                                                                                     
+
+
+                                                            <ul>
+                                                                <li>First name: {{ guest.first_name }} 
+                                                                <li>Last name: {{ guest.last_name }} 
+                                                                <li>Email address: {{ guest.email }} 
+                                                                <li>Diet: {{ guest.diet.diet_type }}
+                                                                <li>Diet Reason: {{ guest.diet_reason }}
+                                                                
+
+                                                                            
+                                                                                <li>Intolerances/Allergies:</li>
+                                                                                    <ul>
+                                                                                         <li>{% for intolerance in guest.intolerances %}
+                                                                                        {{ intolerance.intol_name }}
+                                                                                        {% if not loop.last %}
+                                                                                            ,
+                                                                                        {% endif %}{% endfor %}</li>
+                                
+                                                                                    </ul>
+                                                                          
+                                                            
+                                                                           
+                                                                            <li>Ingredients to avoid:</li>
+                                                                                    <ul>
+                                                                                        {% for avoid in guest.avoidances %}
+                                                                                    <li>{{ avoid.ingredient }} (<i>{{ avoid.reason}}</i>)</li>
+                                                                                        {% endfor %}
+                                                                                    </ul>
+                                                                            
+                                                           </ul>
+
+
+                            
+                                 
 
                                                         
                                                             
@@ -232,10 +231,44 @@
                         <li>Recipes:</li>
                             <ul>
                                 {% for recipe in party.recipes %}    
-                                <li><a href="/show_recipe/{{  recipe.record_id  }}" target="_blank">{{ recipe.title }}</li>
-                                    {% endfor %}
+                                <li><a href="/show_recipe/{{  recipe.record_id  }}" target="_blank">{{ recipe.title }}</a>
+
+
+                                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#SeeRecipe{{ recipe.record_id  }}">see recipe</button></li>
+
+                                                <!-- Modal -->
+                                                <div id="SeeRecipe{{ recipe.record_id  }}" class="modal fade" role="dialog">
+                                                     <div class="modal-dialog">
+
+                                                        <!-- Modal content-->
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                    <h4 class="modal-title">{{  recipe.title  }}</h4>
+                                                            </div>
+                                                                  <div class="modal-body">
+                                                                <p><a href="{{ recipe.recipe_url}}" target="_blank">View recipe at Spoonacular</a>
+
+    
+<div>
+<iframe sandbox="allow-same-origin allow-scripts" src="/show_recipe/{{  recipe.record_id  }}" width=100% height=500></iframe>
+</div>
+                                                                  </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </li>{% endfor %}
+
+
+
+
+
+
                             </ul>    
-                        <li><a href="/searchrecipes" class="btn btn-success btn-lg">Find recipes for this party</a></li>
+                        <a href="/searchrecipes" class="btn btn-success btn-lg">Find recipes for this party</a></li>
+
 </ul>
 </div>
 
@@ -256,7 +289,7 @@
 
     {% for guest in party.users %}
     $("#update_friend_at_party{{  guest.user_id  }}").click(function(){
-            $("#update_friend_at_party{{  guest.user_id  }}").hide();
+            $(".update_friend_at_party{{  guest.user_id  }}").toggle();
             $(".intols{{  guest.user_id  }}").toggle();
             $(".avoids{{  guest.user_id  }}").toggle();
             console.log("show form");

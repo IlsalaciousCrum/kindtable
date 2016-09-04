@@ -186,7 +186,7 @@ class RecipeBox(db.Model):
     title = db.Column(db.String(120), nullable=False)
     recipe_image_url = db.Column(db.String(300), nullable=False)
     recipe_url = db.Column(db.String(300), nullable=False)
-    works_for = db.Column(db.String(1000), nullable=False)
+    works_for = db.Column(db.String(1000), nullable=True)
     ingredients = db.Column(db.String(2000), nullable=True)
     instructions = db.Column(db.String(2000), nullable=True)
 
