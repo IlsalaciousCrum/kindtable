@@ -442,8 +442,7 @@ def show_recipe():
         recipe_image_url = request.form.get("recipe_image_url")
         recipe_url = request.form.get("recipe_url")
         ingredients = spoonacular_recipe_ingredients(recipe_id)
-
-        spoonacular_recipe_ingredients(recipe_id)
+        instructions = spoonacular_recipe_instructions(recipe_id)
 
         return render_template("view_recipe.html",
                                recipe_id=recipe_id,
@@ -455,7 +454,8 @@ def show_recipe():
                                party_diets=party_diets,
                                party_intols=party_intols,
                                party_avoids=party_avoids,
-                               ingredients=ingredients)
+                               ingredients=ingredients,
+                               instructions=instructions)
     else:
         return redirect("/login")
 

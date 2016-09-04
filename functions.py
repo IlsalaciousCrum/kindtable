@@ -319,13 +319,13 @@ def spoonacular_recipe_instructions(recipe_id):
     response = requests.get(url, headers=headers, params=payload)
 
     spoon = response.json()
+    print "spoon:"
+    print spoon
 
-    # instructions_list = []
-    # for each in spoon:
-    #     steps = each("steps")
-    #     for each in steps:
-    #         step = each("step")
-    #         instructions_list.append(step)
+    instructions_list = []
+    for i in spoon:
+        for each in i["steps"]:
+            step = each["step"]
+            instructions_list.append(step)
 
-    # return instructions_list
-    return spoon
+    return instructions_list

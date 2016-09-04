@@ -12,11 +12,24 @@
    
 </ul>
 
-<ul><li>{% for ingredient in ingredients %}
-    {{  ingredients  }}
-    {% endfor %}<li>
+<ul>
+    <li><strong>Ingredients</strong></li>
+    <ul>{% for each in ingredients %}
+    <li>{{  each  }}</li>
+    {% endfor %}</ul>
 
 </ul>
+
+<ul>
+    <li><strong>Instructions</strong></li>
+    <ul>{% for each in instructions %}
+    <li>{{  each  }}</li>
+    {% endfor %}</ul>
+
+</ul>
+
+
+
 
 <div>
     <form action="/addtorecipebox" method="POST">
