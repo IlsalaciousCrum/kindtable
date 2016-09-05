@@ -15,7 +15,6 @@ from functions import (guest_diet, guest_intolerances, guest_avoidances,
                        spoonacular_recipe_instructions, all_guest_diets,
                        new_guest_diet, new_spoonacular_request, spoonacular_recipe_ingredients)
 
-
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
@@ -324,6 +323,10 @@ def show_search_spoonacular():
         cuisine_list = Cuisine.query.order_by(Cuisine.cuisine_name).all()
         course_list = Course.query.order_by(Course.course_name).all()
         party_diets = (all_guest_diets(party_id)).split(", ")
+        session["diets"] = party_diets
+        session["intols"] = get_intolerance
+        session["avoids"] = get_avoid
+
         # print party_diets
         # print get_avoid
         # print get_intolerance
@@ -333,13 +336,16 @@ def show_search_spoonacular():
         return render_template("Final_search_template.html", party=party,
                                responses=responses,
                                avoids=get_avoid,
-                               intolerances=get_intolerance,
+                               intols=get_intolerance,
                                this_user=this_user,
                                party_diets=party_diets,
                                cuisine_list=cuisine_list,
                                course_list=course_list,
                                party_avoids=get_avoid,
-                               party_intols=get_intolerance)
+                               party_intols=get_intolerance,
+                               cuisine=25,
+                               course=1,
+                               newdiets=party_diets)
     else:
         return redirect("/login")
 
@@ -354,24 +360,26 @@ def show_re_search_spoonacular():
         party_id = session.get("party_id")
         party = Party.query.get(party_id)
         cuisine = request.form.get("cuisine")
-        print cuisine
+        session["cuisine"] = cuisine
         course = request.form.get("course")
-        print course
+        session["course"] = course
         newdiets = request.form.getlist("diets")
         diets = []
         for each in newdiets:
             diets.append(str(each))
-
+        session["diets"] = diets
         newintols = request.form.getlist("intols")
         intols = []
         for each in newintols:
             intols.append(str(each))
+        session["intols"] = intols
 
         newavoids = request.form.getlist("avoids")
         avoids = []
 
         for each in newavoids:
             avoids.append(str(each))
+        session["avoids"] = avoids
 
         new_diet = new_guest_diet(newdiets)
 
@@ -384,16 +392,20 @@ def show_re_search_spoonacular():
         cuisine_list = Cuisine.query.order_by(Cuisine.cuisine_name).all()
         course_list = Course.query.order_by(Course.course_name).all()
 
+
         return render_template("Final_search_template.html", party=party,
                                responses=responses,
-                               avoids=get_avoid,
-                               intolerances=get_intolerance,
                                this_user=this_user,
                                party_diets=party_diets,
                                cuisine_list=cuisine_list,
                                course_list=course_list,
                                party_avoids=get_avoid,
-                               party_intols=get_intolerance)
+                               party_intols=get_intolerance,
+                               avoids=avoids,
+                               intols=intols,
+                               cuisine=cuisine,
+                               course=course,
+                               newdiets=diets)
 
     else:
         return redirect("/login")
@@ -407,7 +419,10 @@ def show_saved_recipe(record_id):
     if check_id:
         this_user = User.query.get(check_id)
         this_recipe = RecipeBox.query.get(record_id)
+        recipe_id = this_recipe.recipe_id
         works_for = json.loads(this_recipe.works_for)
+        ingredients = spoonacular_recipe_ingredients(recipe_id)
+        instructions = spoonacular_recipe_instructions(recipe_id)
         party = Party.query.get(this_recipe.party_id)
 
         avoid = guest_avoidances(party.party_id)
@@ -419,10 +434,13 @@ def show_saved_recipe(record_id):
                                party=party,
                                avoid=avoid,
                                intolerances=intolerances,
-                               works_for=works_for)
-
+                               works_for=works_for,
+                               ingredients=ingredients,
+                               instructions=instructions,
+                               )
 
 # ----------- Begin Post Routes ------------------
+
 
 @app.route('/see_recipe', methods=['POST'])
 def show_recipe():
@@ -433,11 +451,11 @@ def show_recipe():
         this_user = User.query.get(check_id)
         party_id = session.get("party_id")
         recipe_id = request.form.get("recipe_id")
-
-        party_diets = request.form.get("party_diets")
-        party_intols = request.form.get("party_intols")
-        party_avoids = request.form.get("party_avoids")
-
+        avoids = session.get("avoids")
+        intols = session.get("intols")
+        cuisine = request.form.get("cuisine")
+        course = request.form.get("course")
+        newdiets = session.get("diets")
         title = request.form.get("title")
         recipe_image_url = request.form.get("recipe_image_url")
         recipe_url = request.form.get("recipe_url")
@@ -451,11 +469,13 @@ def show_recipe():
                                recipe_image_url=recipe_image_url,
                                recipe_url=recipe_url,
                                this_user=this_user,
-                               party_diets=party_diets,
-                               party_intols=party_intols,
-                               party_avoids=party_avoids,
                                ingredients=ingredients,
-                               instructions=instructions)
+                               instructions=instructions,
+                               avoids=avoids,
+                               intols=intols,
+                               cuisine=cuisine,
+                               course=course,
+                               newdiets=newdiets)
     else:
         return redirect("/login")
 
@@ -614,9 +634,22 @@ def add_recipe_box():
             title = request.form.get("title")
             recipe_image_url = request.form.get("recipe_image_url")
             recipe_url = request.form.get("recipe_url")
-            party_diets = request.form.get("party_diets")
-            party_intols = request.form.get("party_intols")
-            party_avoids = request.form.get("party_avoids")
+            party_diets = session.get("diets")
+            party_intols = session.get("intols")
+            party_avoids = session.get("avoids")
+            # instruction_listA = request.form.get("instructions")
+            # instruction_list = []
+            # for each in instruction_listA:
+            #     instruction_list.append(each)
+            # ingredient_listA = request.form.get("ingredients")
+            # ingredient_list = []
+            # for each in ingredient_listA:
+            #     instruction_list.append(each)
+
+            # instructions = {}
+            # instructions["Instructions"] = instruction_list
+            # ingredients = {}
+            # ingredients["Ingredients"] = ingredient_list
 
             food_dict = {}
             food_dict["Diets"] = party_diets
@@ -624,6 +657,9 @@ def add_recipe_box():
             food_dict["Ingredients to omit"] = party_avoids
 
             food_dump = (json.dumps(food_dict))
+            # ingredient_dump = (json.dumps(ingredient_list))
+            # instruction_dump = (json.dumps(instruction_list))
+
             new_recipe = RecipeBox(party_id=party_id,
                                    recipe_id=recipe_id,
                                    title=title,

@@ -279,6 +279,11 @@ def new_spoonacular_request(diet, intols, avoids, cuisine, course):
         each_response["recipe_url"] = recipe_url
         each_response["image_url"] = image_url
         each_response["recipe_id"] = recipe_id
+        each_response["avoids"] = avoid_string
+        each_response["intols"] = intolerance_string
+        each_response["cuisine"] = cuisine
+        each_response["course"] = course
+
         response.append(each_response)
 
     responses["response"] = response
@@ -302,8 +307,7 @@ def spoonacular_recipe_ingredients(recipe_id):
     for each in ingredients:
         print each
         one = each["originalString"]
-        print one
-        ingredients_list.append(str(one))
+        ingredients_list.append(one.encode('utf-8'))
     print ingredients_list
     return ingredients_list
 
@@ -326,6 +330,6 @@ def spoonacular_recipe_instructions(recipe_id):
     for i in spoon:
         for each in i["steps"]:
             step = each["step"]
-            instructions_list.append(step)
+            instructions_list.append(step.encode('utf-8'))
 
     return instructions_list

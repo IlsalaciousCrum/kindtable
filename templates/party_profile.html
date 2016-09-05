@@ -14,6 +14,7 @@
             <button type="button" class="btn btn-info btn-xs" id="update_friend_at_party{{  guest.user_id  }}">update basic info</button>
             <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#Intols{{  guest.user_id  }}">update intolerance/allergies</button>
         <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#avoids{{ guest.user_id  }}">update ingredients to avoid</button>
+         <button type="button" class="btn btn-danger btn-xs" id="close2{{  guest.user_id  }}">x</button>
         </div></li>
                     
 
@@ -46,8 +47,8 @@
                                                                             <input type="text" name="diet_reason" class="form-control" value="{% if guest.diet_reason is not none %}{{ guest.diet_reason }}{% else %}{%endif %}">
 
 
-                                                                            <input type="submit" value="update friend profile" class="btn">
-                                                                            <button type="button" class="btn btn-warning btn-xs" id="close{{  guest.user_id  }}">X</button>
+                                                                            <input type="submit" value="update friend profile" class="btn btn-success btn-xs">
+                                                                            <button type="button" class="btn btn-danger btn-xs" id="close{{  guest.user_id  }}">X</button>
                                                                     </label>
                                                                 </div>
                                                             </form>
@@ -172,7 +173,7 @@
 
                                             <li style="list-style-type:none">
 
-                                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#AddGuests">Add guests</button>
+                                               
 
                                                 <!-- Modal -->
                                                 <div id="AddGuests" class="modal fade" role="dialog">
@@ -188,7 +189,7 @@
                                                                 <form action="/guest_added" method="POST">
                                                                     <div class="form-group">
                                                                         <label>
-                                                                                <p>Add guests:</p>
+                                                                                <p>Select friends:</p>
                                                                                 {% for person in this_user.friends %}
                                                                                 <li><input type="checkbox" name="guests" value={{ person.friends.user_id }}> {{ person.friends.first_name}} {{ person.friends.last_name }} ({{ person.friends.email }})</li>
                                                                                 {% endfor %}  
@@ -209,32 +210,21 @@
                                             </li>
 
 
-                                            <li style="list-style-type:none"><button type="button" class="btn btn-primary btn-sm" id="addNewFriend">Add a guest that is not yet a friend</button></li>
-                                                <div class="well spaced" id="addFriendForm" hidden>
+                                            <li style="list-style-type:none"></li>
+                                                <div class="addFriendForm" hidden><button type="button" class="btn btn-danger btn-xs" id="close3">X</button>
                                                     <li style="list-style-type:none">
-                                                            <form action="/addafriendasguest" method="POST">
-                                                                <div class="form-group">
-                                                                    <label>
-                                                                        <p>Email address:</p>
-                                                                        <input type="email" name="email_address" class="form-control">
-                                                                    </label>
-                                                                </div>
 
-                                                                <div class="form-group">
-
-                                                                    <input type="submit" value="Add Friend" class="btn">
-                                                                </div>
-                                                            <form>
                                                     </li>
                                                 </div>
                             </ul>
                         <li>Recipes:</li>
                             <ul>
                                 {% for recipe in party.recipes %}    
-                                <li><a href="/show_recipe/{{  recipe.record_id  }}" target="_blank">{{ recipe.title }}</a>
+                                <li>{{ recipe.title }}
 
 
-                                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#SeeRecipe{{ recipe.record_id  }}">see recipe</button></li>
+                                                <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#SeeRecipe{{ recipe.record_id  }}">preview</button>
+                                                <a href="/show_recipe/{{  recipe.record_id  }}" target="_blank" class="btn btn-primary btn-xs">open in new window</a></li>
 
                                                 <!-- Modal -->
                                                 <div id="SeeRecipe{{ recipe.record_id  }}" class="modal fade" role="dialog">
@@ -247,13 +237,8 @@
                                                                     <h4 class="modal-title">{{  recipe.title  }}</h4>
                                                             </div>
                                                                   <div class="modal-body">
-                                                                <p><a href="{{ recipe.recipe_url}}" target="_blank">View recipe at Spoonacular</a>
-
-    
-<div>
-<iframe sandbox="allow-same-origin allow-scripts" src="/show_recipe/{{  recipe.record_id  }}" width=100% height=500></iframe>
-</div>
-                                                                  </div>
+                                                                    <iframe src="/show_recipe/{{ recipe.record_id  }}" style="zoom:0.60" frameborder="0" height="1000" width="99.6%"></iframe>
+                                                               </div>
 
                                                         </div>
 
@@ -268,6 +253,42 @@
 
                             </ul>    
                         <a href="/searchrecipes" class="btn btn-success btn-lg">Find recipes for this party</a></li>
+                         <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#AddGuests">Add guests</button>
+                         <button type="button" class="btn btn-warning btn-lg" data-toggle="modal" data-target="#AddAFriend">Add a friend</button>
+
+                                                <!-- Modal -->
+                                                <div id="AddAFriend" class="modal fade" role="dialog">
+                                                     <div class="modal-dialog">
+
+                                                        <!-- Modal content-->
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                    <h4 class="modal-title">Add a friend</h4>
+                                                            </div>
+                                                                  <div class="modal-body">
+                                                                    <form action="/addafriendasguest" method="POST">
+                                                                     <div class="form-group">
+                                                                    <label>
+                                                                        <p>Email address:</p>
+                                                                        <input type="email" name="email_address" class="form-control">
+                                                                    </label>
+                                                                </div>
+
+                                                                <div class="form-group">
+
+                                                                    <input type="submit" value="Add Friend" class="btn">
+                                                                    
+                                                                    
+                                                                </div>
+                                                            <form>
+                                                               </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </li>
 
 </ul>
 </div>
@@ -282,11 +303,20 @@
     });
 
     $("#addNewFriend").click(function(){
-            $("#addNewFriend").hide();
-            $("#addFriendForm").toggle();
+            $("#addNewFriend").toggle();
+            $(".addFriendForm").show();
             console.log("show form");
     });
 
+
+    $("#close3").click(function(){
+            $("#addNewFriend").toggle();
+            $("#close3").toggle();
+            $(".addFriendForm").hide();
+
+            console.log("show form");
+    });
+  
     {% for guest in party.users %}
     $("#update_friend_at_party{{  guest.user_id  }}").click(function(){
             $(".update_friend_at_party{{  guest.user_id  }}").toggle();
@@ -297,9 +327,21 @@
 
     $("#friend_info{{  guest.user_id  }}").click(function(){
             $(".change_buttons{{  guest.user_id  }}").toggle();
-            $(".friend_info{{  guest.user_id  }}").toggle();
+            $("#friend_info{{  guest.user_id  }}").toggle();
+
+            
+            $(".friend_info{{  guest.user_id  }}").show();
             console.log("show form");
     });
+    $("#close2{{  guest.user_id  }}").click(function(){
+            $(".change_buttons{{  guest.user_id  }}").toggle();
+            $(".friend_info{{  guest.user_id  }}").hide();
+            $("#friend_info{{  guest.user_id  }}").toggle();
+
+            console.log("show form");
+    });
+
+
         
         $("#close{{  guest.user_id  }}").click(function(){
             $("#update_friend_at_party{{  guest.user_id  }}").show();

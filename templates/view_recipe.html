@@ -1,21 +1,32 @@
 
 {% extends 'base.html' %}
 {% block content %}
-<h1>{{  title  }}</h1>
+<h1>{{  title  }}<div>
+    <form action="/addtorecipebox" method="POST">
+        <input type="hidden" name="party_diets" value="{{  newdiets  }}">
+        <input type="hidden" name="party_avoids" value="{{  avoids  }}">
+        <input type="hidden" name="party_intols" value="{{  intols  }}">
+        <input type="hidden" name="recipe_id" value="{{  recipe_id }}">
+        <input type="hidden" name="title" value="{{  title  }}">
+        <input type="hidden" name="recipe_image_url" value="{{  recipe_image_url  }}">
+        <input type="hidden" name="recipe_url" value="{{  recipe_url }}">
+        <button class="btn btn-success btn-lg">Save this recipe</button>
+    </form>
+</div></h1>
 
 
 <p>Safe for:</p>
 <ul>
-    <li>Diets: {{  party_diets }}</li>
-    <li>Intolerances: {{  party_intols  }}</li>
-    <li>Avoids: {{  party_avoids  }}</li>
+    <li>Diets: {% for diet in newdiets %} {{  diet  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+    <li>Intolerances: {% for intol in intols %}{{  intol  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+    <li>Avoids: {% for avoid in avoids %}{{  avoid  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
    
 </ul>
 
 <ul>
     <li><strong>Ingredients</strong></li>
-    <ul>{% for each in ingredients %}
-    <li>{{  each  }}</li>
+        <ul>{% for each in ingredients %}
+            <li>{{  each.decode('utf-8')  }}</li>
     {% endfor %}</ul>
 
 </ul>
@@ -23,7 +34,7 @@
 <ul>
     <li><strong>Instructions</strong></li>
     <ul>{% for each in instructions %}
-    <li>{{  each  }}</li>
+    <li>{{  each.decode('utf-8') }}</li>
     {% endfor %}</ul>
 
 </ul>
@@ -31,31 +42,21 @@
 
 
 
-<div>
-    <form action="/addtorecipebox" method="POST">
-        <input type="hidden" name="party_diets" value="{{  party_diets  }}">
-        <input type="hidden" name="party_avoids" value="{{  party_avoids  }}">
-        <input type="hidden" name="party_intols" value="{{  party_intols  }}">
-        <input type="hidden" name="recipe_id" value="{{  recipe_id }}">
-        <input type="hidden" name="title" value="{{  title  }}">
-        <input type="hidden" name="recipe_image_url" value="{{  recipe_image_url  }}">
-        <input type="hidden" name="recipe_url" value="{{  recipe_url }}">
-        <button>Save this recipe</button>
-    </form>
+
+
+
+
+    <img src="{{  recipe_image_url  }}" alt="{{  title  }}" ><br><br><br>
+<a href="/searchrecipes" class="btn btn-primary btn-lg">Back to recipe search page</a></li>
 </div>
 
-<br><br>
-<div>
-<a href="/searchrecipes">Back to recipe search page</a>
-</div>
-
-<div>
+<!-- <div>
 <a href="/party_profile/{{ party_id  }}">Back to party profile</a>
-</div>
+</div> -->
 
-<div>
+<!-- <div>
 <iframe sandbox="allow-same-origin allow-scripts" src="{{ recipe_url}}" width=100% height=500></iframe>
-</div>
+</div> -->
 
 </div>
 {% endblock %}

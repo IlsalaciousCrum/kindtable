@@ -104,9 +104,11 @@
     <div class="col-md-6 recipe">
         <h4>{{ responses['response'][i].get('title') }}</h4>
             <form action="/see_recipe" method="POST">
-            <input type="hidden" name="party_diets" value="{{ party_diets|join(', ')  }}">
-            <input type="hidden" name="party_avoids" value="{{ party_avoids|join(', ')  }}">
-            <input type="hidden" name="party_intols" value="{{ party_intols|join(', ')  }}">
+            <input type="hidden" name="intols" value="{{  intols  }}">
+            <input type="hidden" name="cuisine" value="{{  cuisine  }}">
+            <input type="hidden" name="course" value="{{  course  }}">
+             <input type="hidden" name="newdiets" value="{{  newdiets  }}">
+             <input type="hidden" name="avoids" value="{{  avoids  }}">
             <input type="hidden" name="recipe_id" value="{{ responses['response'][i].get('recipe_id') }}">
             <input type="hidden" name="title" value="{{ responses['response'][i].get('title') }}">
             <input type="hidden" name="recipe_image_url" value="{{ responses['response'][i].get('image_url') }}">
