@@ -392,7 +392,6 @@ def show_re_search_spoonacular():
         cuisine_list = Cuisine.query.order_by(Cuisine.cuisine_name).all()
         course_list = Course.query.order_by(Course.course_name).all()
 
-
         return render_template("Final_search_template.html", party=party,
                                responses=responses,
                                this_user=this_user,

@@ -66,12 +66,9 @@
     <li>Intolerances:</li>
         <ul>
             <div id="userIntolerances">
-                <li>{% for intolerance in this_user.intolerances %}
-                    {{ intolerance.intol_name }}{% if not loop.last %}, {% endif %}{% endfor %}<li>
+                <li>{% for intolerance in this_user.intolerances %}{{ intolerance.intol_name }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
                 
             </div>
-
-            <li style="list-style-type:none">
 
     <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#Intols">Add an intolerance/allergies</button>
 
