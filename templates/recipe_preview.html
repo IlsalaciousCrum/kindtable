@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kind Table</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/site.css">
+    <script src="http://code.jquery.com/jquery.js"></script>
+</head>
+
+
+<div class="container-fluid">
+    <h1>{{  this_recipe.title  }}</h1>
+
+            <b>Safe for:</b>
+            <ul>
+                {% for key, value in works_for.iteritems() %}
+                <b>{{  key  }}:</b> {% for each in value %}{{  each  }}{% if not loop.last %}, {% endif %}{% endfor %}<br>{% endfor %}</li>
+            </ul>
+            <div>
+
+                <ul>
+                    <li><b>Ingredients</b></li>
+                    <ul>{% for each in ingredients %}
+                        <li>{{  each.decode('utf-8')  }}</li>
+                        {% endfor %}</ul>
+
+                    </ul>
+
+                    <ul>
+                        <li><b>Instructions</b></li>
+                        <ul>{% for each in instructions %}
+                            <li>{{  each.decode('utf-8') }}</li>
+                            {% endfor %}</ul>
+                        </ul>
+                        <div>
+                            
+                            <div>
+                                <img src="{{  this_recipe.recipe_image_url  }}" alt="{{  this_recipe.title  }}" class="img-fluid center" >
+                            </div>
+
+
+
+                            <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+                        </div>
+                    </body>
+                    </html>
