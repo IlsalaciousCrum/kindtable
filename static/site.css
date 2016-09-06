@@ -132,7 +132,8 @@ h1  {
 }
 
 b  {
-    font-weight: bold
+    font-weight: bold;
+    font-size: 120%;
 }
 
 .side_column {

@@ -2,14 +2,14 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="row well-spaced" style="padding-top: 3em">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-6 col-md-offset-3">
 
 
         <div class = "row round_div" style="padding-top: 2em">
             <h1>Friend Profile: {% if newfriend.first_name is not none %}{{ newfriend.first_name }}{% else %}{{  newfriend.email  }}{%endif %} {% if newfriend.last_name is not none %}{{ newfriend.last_name }}{%endif %}</h1><br>
     
-        <div class="col-md-3">
-            <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#userchange">update<br>basic<br>info</button>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#userchange">update</button>
         </div>
         <div class="col-md-8">
             <b>First name:</b> {{ newfriend.first_name }}<br>
@@ -22,8 +22,8 @@
 
 
     <div class = "row round_div" style="padding-top: 2em">
-        <div class="col-md-3">
-            <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#Intols">add an<br>intolerance/<br>allergy</button>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#Intols">add</button>
         </div>
         <div class="col-md-8">
             <b>Intolerances:</b>
@@ -34,8 +34,8 @@
     </div>
                          
     <div class = "row round_div" style="padding-top: 2em">
-        <div class="col-md-3">
-            <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#IngToAvoid">add<br>ingredients<br>to avoid</button>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#IngToAvoid">add</button>
         </div>
         <div class="col-md-8">
             <b>Ingredients to avoid:</b>
@@ -48,7 +48,7 @@
     </div>  
                             
     <div class = "row round_div" style="padding-top: 2em">
-        <div class="col-md-8 col-md-offset-3">
+        <div class="col-md-8 col-md-offset-2">
             <b>Parties invited to:</b>
               
                     {% for party in parties %}

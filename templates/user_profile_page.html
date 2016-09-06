@@ -2,12 +2,12 @@
 {% block content %}
 
 <div class="row well-spaced" style="padding-top: 3em">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-6 col-md-offset-3">
         
         <div class = "row round_div" style="padding-top: 2em">
             <h1>User Profile: {{  this_user.first_name  }} {{  this_user.last_name  }}</h1><br>
-            <div class="col-md-3">
-                <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#userchange" style="width: 100%">update<br>basic<br>info</button></h1>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#userchange">update</button></h1>
             </div>
             <div class="col-md-8">
                 <b>First name:</b> {{ this_user.first_name }}<br>
@@ -19,8 +19,8 @@
         </div>    
                             
         <div class = "row round_div" style="padding-top: 2em">
-            <div class="col-md-3">
-                <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#Intols" style="width: 100%">add an<br>intolerance/<br>allergy</button>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#Intols">add</button>
             </div>
             <div class="col-md-8">
             <b>Intolerances:</b>
@@ -31,8 +31,8 @@
             </div>
         </div>
         <div class = "row round_div" style="padding-top: 2em">
-            <div class="col-md-3">
-                <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#IngToAvoid">add<br>ingredients<br>to avoid</button>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#IngToAvoid">add</button>
             </div>
             <div class="col-md-8">
                 <b>Ingredients to avoid:</b>
@@ -45,8 +45,8 @@
         </div>        
                           
         <div class = "row round_div" style="padding-top: 2em">
-            <div class="col-md-3">
-                <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#AddAFriend">add a<br>new<br>friend</button>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#AddAFriend">add</button>
             </div>
             <div class="col-md-8">
                 <b>Friends:</b>
@@ -59,8 +59,8 @@
             </div>
         </div>
         <div class = "row round_div" style="padding-top: 2em">
-            <div class="col-md-3">
-                 <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#AddAParty">Create a<br>new<br>party</button>
+            <div class="col-md-2">
+                 <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#AddAParty">add</button>
             </div>
             <div class="col-md-8">
                 <b>Parties:</b>

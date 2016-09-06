@@ -454,7 +454,6 @@ def show_saved_recipe(record_id):
 
         avoid = guest_avoidances(party.party_id)
         intolerances = guest_intolerances(party.party_id)
-
         return render_template("recipe_profile.html",
                                this_user=this_user,
                                this_recipe=this_recipe,

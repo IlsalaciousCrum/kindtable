@@ -10,38 +10,41 @@
 
 
 <div class="container-fluid">
+    <div class="round_hidden_div" style="margin-top: 1em;">
+         <div>
+            <img src="{{  this_recipe.recipe_image_url  }}" alt="{{  this_recipe.title  }}" class="img-circle displayed" width="250" height="250" >
+            </div>
     <h1>{{  this_recipe.title  }}</h1>
 
-            <b>Safe for:</b>
-            <ul>
-                {% for key, value in works_for.iteritems() %}
-                <b>{{  key  }}:</b> {% for each in value %}{{  each  }}{% if not loop.last %}, {% endif %}{% endfor %}<br>{% endfor %}</li>
+    <b>Safe for:</b>
+    <ul>
+        {% for key, value in works_for.iteritems() %}
+        <b>{{  key  }}:</b> {% for each in value %}{{  each  }}{% if not loop.last %}, {% endif %}{% endfor %}<br>{% endfor %}</li>
+    </ul>
+    <div>
+
+        <ul>
+            <li><b>Ingredients</b></li>
+            <ul>{% for each in ingredients %}
+                <li>{{  each.decode('utf-8')  }}</li>
+                {% endfor %}</ul>
+
             </ul>
-            <div>
 
-                <ul>
-                    <li><b>Ingredients</b></li>
-                    <ul>{% for each in ingredients %}
-                        <li>{{  each.decode('utf-8')  }}</li>
-                        {% endfor %}</ul>
+            <ul>
+                <li><b>Instructions</b></li>
+                <ul>{% for each in instructions %}
+                    <li>{{  each.decode('utf-8') }}</li>
+                    {% endfor %}</ul>
+                </ul>
+                <div>
 
-                    </ul>
-
-                    <ul>
-                        <li><b>Instructions</b></li>
-                        <ul>{% for each in instructions %}
-                            <li>{{  each.decode('utf-8') }}</li>
-                            {% endfor %}</ul>
-                        </ul>
-                        <div>
-                            
-                            <div>
-                                <img src="{{  this_recipe.recipe_image_url  }}" alt="{{  this_recipe.title  }}" class="img-fluid center" >
-                            </div>
+                   
 
 
 
-                            <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-                        </div>
-                    </body>
-                    </html>
+                    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+                </div>
+            </div>
+            </body>
+            </html>

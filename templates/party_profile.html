@@ -191,11 +191,11 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">{{  recipe.title  }}</h4>
+                                <h4 style="text-align:center" class="modal-title">{{  recipe.title  }}</h4>
                             </div>
                             <div class="modal-body">
                                 <a href="/recipe/{{  recipe.record_id  }}" target="_blank" class="btn btn-success btn-block">Open recipe in new window</a>
-                                <iframe src="/show_recipe/{{ recipe.record_id  }}" style="zoom:0.60" frameborder="0" height="1000" width="99.6%"></iframe>
+                                <iframe src="/show_recipe/{{ recipe.record_id  }}" style="zoom:0.60" frameborder="0" height="1000" width="100%"></iframe>
                             </div>
                         </div>
                     </div>

@@ -1,74 +1,49 @@
 
 {% extends 'base.html' %}
 {% block content %}
-<div class="row">
-<div class="col-md"
-
-<h1>{{  title  }}</h1>
+<div class="row well-spaced" style="padding-top: 3em">
     <div class="col-md-8 col-md-offset-2">
-    <form action="/addtorecipebox" method="POST">
-        <div class="form-group">
-            <input type="hidden" name="party_diets" value="{{  newdiets  }}">
-            <input type="hidden" name="party_avoids" value="{{  avoids  }}">
-            <input type="hidden" name="party_intols" value="{{  intols  }}">
-            <input type="hidden" name="recipe_id" value="{{  recipe_id }}">
-            <input type="hidden" name="title" value="{{  title  }}">
-            <input type="hidden" name="recipe_image_url" value="{{  recipe_image_url  }}">
-            <input type="hidden" name="recipe_url" value="{{  recipe_url }}">
-        </div>
-        <div class="form-group">
-            <input type="submit" value="Save this recipe" class="btn btn-success btn-block">
-        </div>
-    </form>
-    <a href="/searchrecipes" class="btn btn-primary btn-block">Back to recipe search page</a></li>
+        <div class = "row round_div" style="padding-top: 2em">
+            <h1>{{  title  }}</h1>
+            <form action="/addtorecipebox" method="POST">
+                <div class="form-group">
+                    <input type="hidden" name="party_diets" value="{{  newdiets  }}">
+                    <input type="hidden" name="party_avoids" value="{{  avoids  }}">
+                    <input type="hidden" name="party_intols" value="{{  intols  }}">
+                    <input type="hidden" name="recipe_id" value="{{  recipe_id }}">
+                    <input type="hidden" name="title" value="{{  title  }}">
+                    <input type="hidden" name="recipe_image_url" value="{{  recipe_image_url  }}">
+                    <input type="hidden" name="recipe_url" value="{{  recipe_url }}">
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save this recipe" class="btn btn-success" style="width: 100%">
+                </div>
+            </form>
+            <a href="/searchrecipes" class="btn btn-success">Back to recipe search page</a></li>
 
-
-    <br>
-    <b>Safe for:</b>
-    <ul>
-        <li><b>Diets:</b> {% for diet in newdiets %} {{  diet  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-        <li><b>Intolerances:</b> {% for intol in intols %}{{  intol  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-        <li><b>Avoids:</b> {% for avoid in avoids %}{{  avoid  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-        
-    </ul>
-
-    <ul>
-        <li><b>Ingredients</b></li>
-        <ul>{% for each in ingredients %}
-            <li>{{  each.decode('utf-8')  }}</li>
-            {% endfor %}</ul>
-
-        </ul>
-
-        <ul>
-            <li><b>Instructions</b></li>
-            <ul>{% for each in instructions %}
-                <li>{{  each.decode('utf-8') }}</li>
-                {% endfor %}</ul>
-
+            <br>
+            <b>Safe for:</b>
+            <ul>
+                <li><b>Diets:</b> {% for diet in newdiets %} {{  diet  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                <li><b>Intolerances:</b> {% for intol in intols %}{{  intol  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                <li><b>Avoids:</b> {% for avoid in avoids %}{{  avoid  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
             </ul>
 
+           <b>Ingredients</b></li>
+                <ul>{% for each in ingredients %}
+                    <li>{{  each.decode('utf-8')  }}</li>
+                    {% endfor %}
+                </ul>
 
-
-
-
-
-
+            <b>Instructions</b>
+            <ul>{% for each in instructions %}
+                <li>{{  each.decode('utf-8') }}</li>
+                {% endfor %}
+            </ul>
 
             <img class="img-fluid center" src="{{  recipe_image_url  }}" alt="{{  title  }}" ><br><br><br>
-            
         </div>
-
-    <!-- <div>
-    <a href="/party_profile/{{ party_id  }}">Back to party profile</a>
-</div> -->
-
-    <!-- <div>
-    <iframe sandbox="allow-same-origin allow-scripts" src="{{ recipe_url}}" width=100% height=500></iframe>
-</div> -->
-
-</div>
-</div>
+    </div>
 </div>
 {% endblock %}
 
