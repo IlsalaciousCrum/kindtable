@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="recipe_page">
+<div class="recipe_page round_div">
 <div class="row">
     <div class="col-md-4 side_column">
         <div class="row display_guest">
@@ -109,7 +109,7 @@
 
                 {% for i in range(responses.get('number', None)) %}
                 <div class="col-md-6 recipe">
-                    <h4><a href="#" data-toggle="tooltip" title="{{  responses['response'][i].get('title')  }}" >{{  responses['response'][i].get('title')|truncate(34, end=" (...)") }}</a></h4>
+                    <h4><a href="#" data-toggle="tooltip" title="{{  responses['response'][i].get('title')  }}" >{{  responses['response'][i].get('title')|truncate(39, end=" (...)") }}</a></h4>
                     <form action="/see_recipe" method="POST">
                         <input type="hidden" name="intols" value="{{  intols  }}">
                         <input type="hidden" name="cuisine" value="{{  cuisine  }}">

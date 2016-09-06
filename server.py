@@ -40,7 +40,7 @@ def index():
     if user_id:
         return redirect("/userprofile")
     else:
-        return render_template("homepage.html")
+        return render_template("kind_homepage.html")
 
 
 @app.route('/login', methods=['GET'])

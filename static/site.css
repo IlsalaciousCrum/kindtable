@@ -1,3 +1,12 @@
+body {
+  background-image: url(/static/swirl_pattern.png);
+}
+
+.well-spaced {
+    background-color: rgba(245, 245, 245, 0.25);
+}
+
+
 .imgcont {
     position: relative;
     float: left;
@@ -19,6 +28,8 @@
     display: inline-block;
 }
 
+
+
 .background {
 background:url('static/background.jpg')no-repeat;
 background-size:100%;
@@ -28,12 +39,9 @@ padding:0;
 margin:0;
 }
 
-/*.recipe_results {
-    padding: 30px;
-}*/
 
 .recipe {
-  padding: 15px;
+  padding: 2px;
 }
 
 .displayed {
@@ -88,27 +96,36 @@ margin:0;
 
 .round_div {
     border: 2px solid;
-    border-radius: 25px;
-    background: #FFEFD5;
+    border-radius: 5px;
+    background: #f5f5f5;
     padding: 20px;
     margin-bottom: 1em;
-    padding-left: 2em;
-    padding-bottom: 2em;
+    padding-left: 3em;
+    padding-bottom: 3em;
 }
 
 
  .round_hidden_div {
 
     border: 2px solid;
-    border-radius: 25px;
-    background: #00FFFF;
+    border-radius: 5px;
+    background: white;
     padding: 20px;
     margin-bottom: 1em;
-    padding-left: 2em;
+    margin-left: 0;
     padding-bottom: 2em;
     width: 100%;
 }
 
+ .round_recipe_div {
+
+    border: 2px solid;
+    border-radius: 5px;
+    background: white;
+    padding: 8px;
+    margin: 1px;
+    padding-bottom: 2em;
+}
 
 h1  {
     text-align: center;
@@ -120,6 +137,7 @@ b  {
 
 .side_column {
     float:left;
+
     overflow-y: auto;
     max-height:720px;
 

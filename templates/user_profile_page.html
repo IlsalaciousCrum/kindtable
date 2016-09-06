@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="row well spaced" style="padding-top: 3em">
+<div class="row well-spaced" style="padding-top: 3em">
     <div class="col-md-8 col-md-offset-2">
         
         <div class = "row round_div" style="padding-top: 2em">
             <h1>User Profile: {{  this_user.first_name  }} {{  this_user.last_name  }}</h1><br>
             <div class="col-md-3">
-                <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#userchange" style="width: 100%">update<br>basic<br>info</button></h1>
+                <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#userchange" style="width: 100%">update<br>basic<br>info</button></h1>
             </div>
             <div class="col-md-8">
                 <b>First name:</b> {{ this_user.first_name }}<br>
@@ -20,7 +20,7 @@
                             
         <div class = "row round_div" style="padding-top: 2em">
             <div class="col-md-3">
-                <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#Intols" style="width: 100%">add an<br>intolerance/<br>allergy</button>
+                <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#Intols" style="width: 100%">add an<br>intolerance/<br>allergy</button>
             </div>
             <div class="col-md-8">
             <b>Intolerances:</b>
@@ -32,7 +32,7 @@
         </div>
         <div class = "row round_div" style="padding-top: 2em">
             <div class="col-md-3">
-                <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#IngToAvoid">add<br>ingredients<br>to avoid</button>
+                <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#IngToAvoid">add<br>ingredients<br>to avoid</button>
             </div>
             <div class="col-md-8">
                 <b>Ingredients to avoid:</b>
@@ -46,13 +46,13 @@
                           
         <div class = "row round_div" style="padding-top: 2em">
             <div class="col-md-3">
-                <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#AddAFriend">add a<br>new<br>friend</button>
+                <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#AddAFriend">add a<br>new<br>friend</button>
             </div>
             <div class="col-md-8">
                 <b>Friends:</b>
                 
                         {% for person in this_user.friends %}    
-                        <a href="/friendprofile/{{ person.friends.user_id }}" class="btn btn-primary btn-block" style="margin-top:5px">{% if person.friends.first_name is not none %}{{ person.friends.first_name }}{% else %}{%endif %}
+                        <a href="/friendprofile/{{ person.friends.user_id }}" class="btn btn-warning btn-block" style="margin-top:5px">{% if person.friends.first_name is not none %}{{ person.friends.first_name }}{% else %}{%endif %}
                             {% if person.friends.last_name is not none %}{{ person.friends.last_name }}{% else %}{%endif %} ({{ person.friends.email }})</a>
                             {% endfor %}       
                     
@@ -60,14 +60,14 @@
         </div>
         <div class = "row round_div" style="padding-top: 2em">
             <div class="col-md-3">
-                 <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#AddAParty">Create a<br>new<br>party</button>
+                 <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#AddAParty">Create a<br>new<br>party</button>
             </div>
             <div class="col-md-8">
                 <b>Parties:</b>
                 
                     {% for party in this_user.parties %}
                 
-                        <a href="/party_profile/{{ party.party_id }}" class="btn btn-primary btn-block" style="margin-top:5px">{{ party.title }}</a> 
+                        <a href="/party_profile/{{ party.party_id }}" class="btn btn-warning btn-block" style="margin-top:5px">{{ party.title }}</a> 
                 
                     {% endfor %}
             </div>

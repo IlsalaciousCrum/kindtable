@@ -1,15 +1,13 @@
 
 {% extends 'base.html' %}
 {% block content %}
-<div class="row well spaced" style="padding-top: 3em">
+<div class="row well-spaced" style="padding-top: 3em">
     <div class="col-md-8 col-md-offset-2">
-        <div class="row">
-            <h1>Friend Profile: {% if newfriend.first_name is not none %}{{ newfriend.first_name }}{% else %}{{  newfriend.email  }}{%endif %} {% if newfriend.last_name is not none %}{{ newfriend.last_name }}{%endif %}</h1>
-        </div>
+
+
+        <div class = "row round_div" style="padding-top: 2em">
+            <h1>Friend Profile: {% if newfriend.first_name is not none %}{{ newfriend.first_name }}{% else %}{{  newfriend.email  }}{%endif %} {% if newfriend.last_name is not none %}{{ newfriend.last_name }}{%endif %}</h1><br>
     
-
-
-    <div class = "row round_div" style="padding-top: 2em">
         <div class="col-md-3">
             <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#userchange">update<br>basic<br>info</button>
         </div>
@@ -54,7 +52,7 @@
             <b>Parties invited to:</b>
               
                     {% for party in parties %}
-                    <a href="/party_profile/{{ party.party_id}}" class="btn btn-primary btn-block" style="margin-top:5px">{{  party.title  }}</a>
+                    <a href="/party_profile/{{ party.party_id}}" class="btn btn-warning btn-block" style="margin-top:5px">{{  party.title  }}</a>
                     {% endfor %}
               
         </div>
@@ -80,7 +78,7 @@
                                 <p>Reason they would like to avoid this ingredient (optional):</p>
                                 <input type="text" name="reason" class="form-control">
                                 <br>
-                                <input type="submit" value="Done" class="btn-success" id="avoidDone">
+                                <input type="submit" value="Done" class="btn btn-success" id="avoidDone">
                             </label>
                         </div>
                     </form>
@@ -161,8 +159,8 @@
                             {% for intolerance in intol_list %}  
                             <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}  
                             {% endfor %}
-                            <br>
-                        <input type="submit" value="Done" class="btn-success" id="intolDone">
+                            <br><br>
+                        <input type="submit" value="Done" class="btn btn-success" id="intolDone">
                     </div>
                 </form>
             </div>
@@ -191,7 +189,7 @@
                             <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}  
                             {% endfor %}
                             <br>
-                        <input type="submit" value="Done" class="btn-success" id="intolDone">
+                        <input type="submit" value="Done" class="btn btn-success" id="intolDone">
                     </div>
                 </form>
             </div>

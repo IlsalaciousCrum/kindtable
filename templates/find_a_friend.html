@@ -3,6 +3,11 @@
 
 <div class="row"  style="padding-top: 3em">
     <div class="col-md-4 col-md-offset-4 round_div">
+
+
+
+
+
         <h1>Find a friend</h1>
         <form action="/addafriend" method="POST">
             <div class="form-group">
@@ -13,14 +18,22 @@
             <div class="form-group">
                 <input type="submit" value="Add Friend" class="btn btn-success btn-block" class="form-control">
             </div>
-        <form><br>
+            <form><br>
 
-        <b>You are already friends with:</b><br>
-        <ul>
-            {% for person in this_user.friends %}    
-            <li><a href="/friendprofile/{{ person.friends.user_id }}">{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</a></li>
-            {% endfor %}   
-        </ul>
-    </div>
-</div>
-        {% endblock %}
+                <b>You are already friends with:</b><br>
+                <ul>
+                    {% for person in this_user.friends %}    
+                    <li><a href="/friendprofile/{{ person.friends.user_id }}">{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</a></li>
+                    {% endfor %}   
+                </ul>
+           
+
+
+
+
+
+
+
+            </div>
+        </div>
+{% endblock %}
