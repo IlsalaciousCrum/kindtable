@@ -4,46 +4,45 @@
 
 <div class="row well spaced" style="padding-top: 3em">
     <div class="col-md-8 col-md-offset-2">
-        <div class="row">
-             <h1>Party Profile: {{  party.title  }}</h1>
-        </div>
+      
         <div class = "row round_div" style="padding-top: 2em">
+            <h1>Party Profile: {{  party.title  }}</h1><br>
             <div class="col-md-3">
-                 <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#AddGuests">Add guests</button><br>
-                 <button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#AddAFriend">Add a friend</button>
+                 <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#AddGuests">Add guests</button><br>
+                 <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#AddAFriend">Add a friend</button>
             </div>
 
             <div class="col-md-8">
 
-                    Guests:
-                <ul>
+                    <b>Guests:</b>
+               
                     {% for guest in party.users %}    
-                        <li>{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }})<button type="button" class="btn btn-info btn-xs" id="friend_info{{  guest.user_id  }}">info</button></li>
+                        <button type="button" class="btn btn-primary btn-block" data-toggle="tooltip" title="Click for more info {% if guest.first_name is not none %}about {{ guest.first_name }}{% else %}{{  guest.email  }}{%endif %}" id="friend_info{{  guest.user_id  }}" style="margin-top:5px">{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }})</button>
 
                         <div class="friend_info{{  guest.user_id  }} round_hidden_div"  hidden>
                             <button type="button" class="btn btn-danger btn-xs pull-right" id="close2{{  guest.user_id  }}">x</button>
                             <div class="row">
                                 <div class="col-md-3">
-                                    <button type="button" class="btn btn-info btn-xs change_buttons{{  guest.user_id  }} btn-block" data-toggle="modal" data-target="#guest_basic_info_change{{  guest.user_id  }}" hidden>update<br>basic<br>info</button>
+                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.user_id  }} btn-block" data-toggle="modal" data-target="#guest_basic_info_change{{  guest.user_id  }}" hidden>update<br>basic<br>info</button>
                                 
 
                                 </div>
                                 <div class="col-md-8">
-                                        First name: {{ guest.first_name }}<br>
-                                        Last name: {{ guest.last_name }}<br>
-                                        Email address: {{ guest.email }}<br>
-                                        Diet: {{ guest.diet.diet_type }}<br>
-                                        Diet Reason: {{ guest.diet_reason }}<br>
+                                        <b>First name:</b> {{ guest.first_name }}<br>
+                                        <b>Last name:</b> {{ guest.last_name }}<br>
+                                        <b>Email address:</b> {{ guest.email }}<br>
+                                        <b>Diet:</b> {{ guest.diet.diet_type }}<br>
+                                        <b>Diet Reason:</b> {{ guest.diet_reason }}<br>
                                         
                                 </div>
                             </div>    
 
                             <div class="row" style="padding-top: 2em">  
                                 <div class="col-md-3">
-                                    <button type="button" class="btn btn-info btn-xs change_buttons{{  guest.user_id  }} btn-block" data-toggle="modal" data-target="#Intols{{  guest.user_id  }}" hidden>update<br>intolerance<br>allergies</button>
+                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.user_id  }} btn-block" data-toggle="modal" data-target="#Intols{{  guest.user_id  }}" hidden>update<br>intolerance<br>allergies</button>
                                 </div>
                                 <div class="col-md-6">
-                                Intolerances/Allergies:<br>
+                                <b>Intolerances/Allergies:</b><br>
                                     <ul>
                                         <li>{% for intolerance in guest.intolerances %}{{ intolerance.intol_name }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
                                     </ul>
@@ -52,10 +51,10 @@
 
                             <div class="row" style="padding-top: 2em">
                                 <div class="col-md-3">
-                                    <button type="button" class="btn btn-info btn-xs change_buttons{{  guest.user_id  }} btn-block" data-toggle="modal" data-target="#avoids{{ guest.user_id  }}" hidden>update<br>ingredients<br>to avoid</button>
+                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.user_id  }} btn-block" data-toggle="modal" data-target="#avoids{{ guest.user_id  }}" hidden>update<br>ingredients<br>to avoid</button>
                                 </div>
                                 <div class="col-md-6">
-                                     Ingredients to avoid:<br>
+                                     <b>Ingredients to avoid:</b><br>
                                     <ul>
                                         {% for avoid in guest.avoidances %}
                                         <li>{{ avoid.ingredient }} (<i>{{ avoid.reason}}</i>)</li>
@@ -79,31 +78,31 @@
                                                 <input type="hidden" name="friend_id" value="{{ guest.user_id  }}">
                                                 <label>Email address</label> (required):
                                                 <input type="email" name="email" value="{{ guest.email }}" class="form-control" required>
-                                            </div>
+                                            </div><br>
                                             <div class="form-group">
                                                 <label>Friend's first name (optional):</label>
                                                 <input type="text" name="first_name" class="form-control" value="{% if guest.first_name is not none %}{{ guest.first_name }}{% else %}{%endif %}">
-                                            </div>
+                                            </div><br>
                                             <div class="form-group">
                                                 <label>Friend's last name (optional):</label>
                                                 <input type="text" name="last_name" class="form-control" value="{% if guest.last_name is not none %}{{ guest.last_name }}{% else %}{%endif %}">
-                                            </div>
+                                            </div><br>
                                             <div class="form-group">
-                                                <label>Diet your friend prefers to eat (required):</label>
-                                                <select name="diet_type">
+                                                <label>Diet your friend prefers to eat (required):</label><br>
+                                                <select class="form-control" name="diet_type">
                                                     {% for diet in diets %}
                                                     <option value={{ diet.diet_id }}>{{ diet.diet_type }}</option>
                                                     {% endfor %}
                                                 </select>
-                                            </div>
+                                            </div><br>
                                             <div class="form-group">
                                                 <label>Reason they follow this diet (optional):</label>
                                                 <input type="text" name="diet_reason" class="form-control" value="{% if guest.diet_reason is not none %}{{ guest.diet_reason }}{% else %}{%endif %}">
-                                            </div>
+                                            </div><br>
                                             <div class="form-group">
 
-                                                <input type="submit" value="update friend profile" class="btn btn-success btn-xs">
-                                                <button type="button" class="btn btn-danger btn-xs" id="close{{  guest.user_id  }}">X</button>
+                                                <input type="submit" value="update friend profile" class="btn btn-info">
+                                           
                                             </div>
                                         </form>
                                     </div>
@@ -125,13 +124,13 @@
                                             <input type="hidden" name="friend_id" value="{{ guest.user_id  }}">
                                             <div class="form-group">
                                                     <input type="hidden" name="user_id" value="{{ guest.user_id  }}">
-                                                    <label>Select all that apply:</label>
+                                                    <label>Select all that apply:</label><br>
                                                     {% for intolerance in intol_list %}  
-                                                    <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}  
+                                                    <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}<br>  
                                                     {% endfor %}
-                                            </div>
+                                            </div><br>
                                             <div class="form-group">
-                                                <input type="submit" value="Done" class="btn" id="intolDone">
+                                                <input type="submit" value="Done" class="btn-info" id="intolDone">
                                             </div>
                                         </form>
                                     </div>
@@ -151,13 +150,13 @@
                                         <form action="/partyfriendingredientadded" method="POST">
                                             <div class="form-group">
                                                     <input type="hidden" name="friend_id" value="{{ guest.user_id  }}">
-                                                    <label>Ingredient to avoid:</label>
+                                                    <label>Ingredient to avoid:</label><br>
                                                     <input type="text" name="ingredient" class="form-control">
-                                                    <label>Reason you would like to avoid this ingredient (optional):</label>
+                                                    <label>Reason you would like to avoid this ingredient (optional):</label><br>
                                                     <input type="text" name="reason" class="form-control">
-                                            </div>
+                                            </div><br>
                                             <div class="form-group">
-                                                <input type="submit" value="Done" class="btn" id="avoidDone">
+                                                <input type="submit" value="Done" class="btn btn-info" id="avoidDone">
                                             </div>
                                         </form>
                                     </div>
@@ -177,13 +176,13 @@
                 <a href="/searchrecipes" class="btn btn-success btn-block">Add recipes<br>for this party</a></li>
             </div>
             <div class="col-md-8">
-                Recipes:
-                <ul>
-                    {% for recipe in party.recipes %}    
-                    <li>{{ recipe.title }}
+                <b>Recipes:</b><br>
+                    {% for recipe in party.recipes %} 
+                    <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#SeeRecipe{{ recipe.record_id  }}" style="margin-top:5px">   
+                    {{ recipe.title }}</button>
 
-            <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#SeeRecipe{{ recipe.record_id  }}">preview</button>
-                    <a href="/show_recipe/{{  recipe.record_id  }}" target="_blank" class="btn btn-primary btn-xs">new window</a></li>
+            
+                    
                
 
             <!-- Modal -->
@@ -196,6 +195,7 @@
                                 <h4 class="modal-title">{{  recipe.title  }}</h4>
                             </div>
                             <div class="modal-body">
+                                <a href="/recipe/{{  recipe.record_id  }}" target="_blank" class="btn btn-primary btn-block">Open recipe in new window</a>
                                 <iframe src="/show_recipe/{{ recipe.record_id  }}" style="zoom:0.60" frameborder="0" height="1000" width="99.6%"></iframe>
                             </div>
                         </div>
@@ -223,14 +223,14 @@
                             <div class="modal-body">
                                 <form action="/guest_added" method="POST">
                                     <div class="form-group">
-                                        <label>Select friends:</label>
+                                        <label>Select friends:</label><br>
                                             {% for person in this_user.friends %}
                                             <input type="checkbox" name="guests" value={{ person.friends.user_id }}> {{ person.friends.first_name}} {{ person.friends.last_name }} ({{ person.friends.email }})<br>
                                             {% endfor %}  
                                     </div>
                                     <div class="form-group">
                                         <input type="hidden" name="party_id" value="{{ party.party_id }}">
-                                        <input type="submit" value="Add guest" class="btn">
+                                        <input type="submit" value="Add guest" class="btn btn-info">
                                     </div>
                                 </form>
                             </div>
@@ -257,7 +257,7 @@
                                     <input type="email" name="email_address" class="form-control">
                                 </div>
                                 <div class="form-group">
-                                    <input type="submit" value="Add Friend" class="btn">    
+                                    <input type="submit" value="Add Friend" class="btn btn-info">    
                                 </div>
                             </form>
                         </div>
@@ -299,14 +299,14 @@
     });
 
     $("#friend_info{{  guest.user_id  }}").click(function(){
-        $("#friend_info{{  guest.user_id  }}").toggle();
+        // $("#friend_info{{  guest.user_id  }}").toggle();
         
         $(".friend_info{{  guest.user_id  }}").show();
         console.log("show form");
     });
     $("#close2{{  guest.user_id  }}").click(function(){
         $(".friend_info{{  guest.user_id  }}").hide();
-        $("#friend_info{{  guest.user_id  }}").toggle();
+        // $("#friend_info{{  guest.user_id  }}").toggle();
         console.log("show form");
     });
 
@@ -320,5 +320,11 @@
 
     
     {% endfor %}
+
+    $(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();
+    });
+
+      </script>
     </script>
     {% endblock %}

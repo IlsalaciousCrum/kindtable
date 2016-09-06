@@ -27,14 +27,7 @@
   <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
     <ul class="nav navbar-nav">
-      <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Quickstart<span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          <li><a href="/userprofile">My Profile</a></li>
-          <li><a href="/findfriend">Add a new friend</a></li>
-          <li><a href="/addaparty">Create a party</a></li>
-        </ul>
-      </li>
+     <li><a href="/userprofile">My Profile</a></li>
       <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
         <ul class="dropdown-menu">
@@ -52,7 +45,9 @@
             
             {%endif %}
             ({{ friend.friends.email }})</a></li>
-            {% endfor %}</a>
+            {% endfor %}
+            <li role="separator" class="divider"></li>
+            <li><a href="/findfriend">Add a new friend</a></li>
           </ul>
           
         </li>
@@ -64,6 +59,8 @@
             {% for party in this_user.parties %}
             <li><a href="/party_profile/{{ party.party_id }}">{{  party.title  }}</a></li>
             {% endfor %}
+            <li role="separator" class="divider"></li>
+            <li><a href="/addaparty">Create a party</a></li>
           </ul>
           
         </li>

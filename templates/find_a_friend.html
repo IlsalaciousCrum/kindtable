@@ -1,26 +1,26 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="well spaced">
 
-    <form action="/addafriend" method="POST">
-        <div class="form-group">
-            <label>
-                <h4>New friend to add:</h4>
-                <p>Email address: <input type="email" name="email_address" class="form-control"><p>
-                </label>
-            </div>
+<div class="row"  style="padding-top: 3em">
+    <div class="col-md-4 col-md-offset-4 round_div">
+        <h1>Find a friend</h1>
+        <form action="/addafriend" method="POST">
+            <div class="form-group">
+                <label>Email address:</label><br> 
+                <input type="email" name="email_address" class="form-control" placeholder="Email">
+            </div><br>
 
             <div class="form-group">
-
-                <input type="submit" value="Add Friend" class="btn">
+                <input type="submit" value="Add Friend" class="btn btn-success btn-block" class="form-control">
             </div>
-            <form>
+        <form><br>
 
-                <p>Your friends:
-                    <ul>
-                        {% for person in this_user.friends %}    
-                        <li><a href="/friendprofile/{{ person.friends.user_id }}">{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</a></li>
-                        {% endfor %}   
-                    </ul>
-                </div>
-                {% endblock %}
+        <b>You are already friends with:</b><br>
+        <ul>
+            {% for person in this_user.friends %}    
+            <li><a href="/friendprofile/{{ person.friends.user_id }}">{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</a></li>
+            {% endfor %}   
+        </ul>
+    </div>
+</div>
+        {% endblock %}

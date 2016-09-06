@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="recipe_page"
+<div class="recipe_page">
 <div class="row">
     <div class="col-md-4 side_column">
         <div class="row display_guest">
@@ -120,7 +120,7 @@
                         <input type="hidden" name="title" value="{{ responses['response'][i].get('title') }}">
                         <input type="hidden" name="recipe_image_url" value="{{ responses['response'][i].get('image_url') }}">
                         <input type="hidden" name="recipe_url" value="{{ responses['response'][i].get('recipe_url') }}">
-                        <button>View recipe</button>
+                        <button class="btn btn-primary">View recipe</button>
                     </form>
                     
                     <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle displayed" width="250" height="250">

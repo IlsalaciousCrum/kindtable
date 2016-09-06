@@ -114,10 +114,19 @@ h1  {
     text-align: center;
 }
 
+b  {
+    font-weight: bold
+}
 
 .side_column {
     float:left;
     overflow-y: auto;
     max-height:720px;
 
+}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }

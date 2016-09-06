@@ -145,13 +145,13 @@ def add_a_friend():
                 db.session.add(newfriend)
                 db.session.commit()
                 flash("%s is now in your friend's list" % email_address, "success")
-                return redirect("/friendprofile/%s" % newfriend.user_id)
+                return redirect("/userprofile")
         else:
             make_user(email_address, diet_id=6)
             newfriend = db.session.query(User).filter(User.email == email_address).first()
             make_friendship(user_id, newfriend.user_id)
-            flash("This person is not yet in our system. Would you like to update their profile?", "info")
-            return redirect("/friendprofile/%s" % newfriend.user_id)
+            flash("This person is not yet in our system. Please click on their button and update their profile", "info")
+            return redirect("/userprofile")
     else:
         flash("You need to enter a valid email address", "warning")
         return redirect("/findfriend")
@@ -411,6 +411,34 @@ def show_re_search_spoonacular():
 
 
 @app.route('/show_recipe/<int:record_id>')
+def preview_saved_recipe(record_id):
+    """Show a recipe in the RecipeBox"""
+
+    check_id = session.get("user_id")
+    if check_id:
+        this_user = User.query.get(check_id)
+        this_recipe = RecipeBox.query.get(record_id)
+        recipe_id = this_recipe.recipe_id
+        works_for = json.loads(this_recipe.works_for)
+        ingredients = spoonacular_recipe_ingredients(recipe_id)
+        instructions = spoonacular_recipe_instructions(recipe_id)
+        party = Party.query.get(this_recipe.party_id)
+
+        avoid = guest_avoidances(party.party_id)
+        intolerances = guest_intolerances(party.party_id)
+
+        return render_template("recipe_preview.html",
+                               this_user=this_user,
+                               this_recipe=this_recipe,
+                               party=party,
+                               avoid=avoid,
+                               intolerances=intolerances,
+                               works_for=works_for,
+                               ingredients=ingredients,
+                               instructions=instructions)
+
+
+@app.route('/recipe/<int:record_id>')
 def show_saved_recipe(record_id):
     """Show a recipe in the RecipeBox"""
 
@@ -435,8 +463,7 @@ def show_saved_recipe(record_id):
                                intolerances=intolerances,
                                works_for=works_for,
                                ingredients=ingredients,
-                               instructions=instructions,
-                               )
+                               instructions=instructions)
 
 # ----------- Begin Post Routes ------------------
 
