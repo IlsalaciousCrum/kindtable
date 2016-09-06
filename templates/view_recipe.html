@@ -3,8 +3,9 @@
 {% block content %}
 <h1>{{  title  }}</h1>
 <div class="row">
-    <div class="col-md-8 col-md-offset-2"
-        <form action="/addtorecipebox" method="POST">
+    <div class="col-md-8 col-md-offset-2">
+    <form action="/addtorecipebox" method="POST">
+        <div class="form-group">
             <input type="hidden" name="party_diets" value="{{  newdiets  }}">
             <input type="hidden" name="party_avoids" value="{{  avoids  }}">
             <input type="hidden" name="party_intols" value="{{  intols  }}">
@@ -12,12 +13,15 @@
             <input type="hidden" name="title" value="{{  title  }}">
             <input type="hidden" name="recipe_image_url" value="{{  recipe_image_url  }}">
             <input type="hidden" name="recipe_url" value="{{  recipe_url }}">
-            <button class="btn btn-primary btn-block">Save this recipe</button>
-        </form>
-        <a href="/searchrecipes" class="btn btn-primary btn-block">Back to recipe search page</a></li>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Save this recipe" class="btn btn-success btn-block">
+        </div>
+    </form>
+    <a href="/searchrecipes" class="btn btn-primary btn-block">Back to recipe search page</a></li>
 
 
-        <br>
+    <br>
     <b>Safe for:</b>
     <ul>
         <li><b>Diets:</b> {% for diet in newdiets %} {{  diet  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
@@ -55,13 +59,13 @@
 
     <!-- <div>
     <a href="/party_profile/{{ party_id  }}">Back to party profile</a>
-    </div> -->
+</div> -->
 
     <!-- <div>
     <iframe sandbox="allow-same-origin allow-scripts" src="{{ recipe_url}}" width=100% height=500></iframe>
-    </div> -->
+</div> -->
 
-    </div>
+</div>
 </div>
 </div>
 {% endblock %}
