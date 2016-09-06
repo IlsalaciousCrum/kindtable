@@ -7,15 +7,15 @@
     {{ intolerance.intol_name }}<br>
     {% endfor %}
 
-<form action="/intolerance_added" method="POST">
+    <form action="/intolerance_added" method="POST">
 
-    <div class="form-group">
-        <label>
-            <h4><strong>Add an intolerances or allergy:</strong></h4>
+        <div class="form-group">
+            <label>
+                <h4><strong>Add an intolerances or allergy:</strong></h4>
 
-            {% for intolerance in intol_list %}  
-            <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>{{ intolerance.intol_name }}
-            {% endfor %}
+                {% for intolerance in intol_list %}  
+                <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>{{ intolerance.intol_name }}
+                {% endfor %}
             </select><br>
 
         </label>
@@ -25,7 +25,7 @@
 
         <input type="submit" value="Add Intolerance" class="btn">
     </div>
-    </div>
+</div>
 
 <a href="/userprofile">Thanks, I'm done adding intolerances/allergies</a>
 

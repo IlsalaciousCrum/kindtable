@@ -20,35 +20,35 @@
     <li>Diets: {% for diet in newdiets %} {{  diet  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
     <li>Intolerances: {% for intol in intols %}{{  intol  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
     <li>Avoids: {% for avoid in avoids %}{{  avoid  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-   
+    
 </ul>
 
 <ul>
     <li><strong>Ingredients</strong></li>
-        <ul>{% for each in ingredients %}
-            <li>{{  each.decode('utf-8')  }}</li>
-    {% endfor %}</ul>
+    <ul>{% for each in ingredients %}
+        <li>{{  each.decode('utf-8')  }}</li>
+        {% endfor %}</ul>
 
-</ul>
+    </ul>
 
-<ul>
-    <li><strong>Instructions</strong></li>
-    <ul>{% for each in instructions %}
-    <li>{{  each.decode('utf-8') }}</li>
-    {% endfor %}</ul>
+    <ul>
+        <li><strong>Instructions</strong></li>
+        <ul>{% for each in instructions %}
+            <li>{{  each.decode('utf-8') }}</li>
+            {% endfor %}</ul>
 
-</ul>
-
-
+        </ul>
 
 
 
 
 
 
-    <img src="{{  recipe_image_url  }}" alt="{{  title  }}" ><br><br><br>
-<a href="/searchrecipes" class="btn btn-primary btn-lg">Back to recipe search page</a></li>
-</div>
+
+
+        <img src="{{  recipe_image_url  }}" alt="{{  title  }}" ><br><br><br>
+        <a href="/searchrecipes" class="btn btn-primary btn-lg">Back to recipe search page</a></li>
+    </div>
 
 <!-- <div>
 <a href="/party_profile/{{ party_id  }}">Back to party profile</a>

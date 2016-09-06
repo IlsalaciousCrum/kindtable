@@ -1,27 +1,27 @@
 {% extends 'homepage.html' %}
 {% block content %}
 <div class="well spaced">
-<div>
-    <h1>Login</h1>
-    <form action="/loggedin" method="POST">
+    <div>
+        <h1>Login</h1>
+        <form action="/loggedin" method="POST">
 
-        <div class="form-group">
-            <label>Email:
-                <input type="email" name="email" required class="form-control">
-            </label>
-        </div>
+            <div class="form-group">
+                <label>Email:
+                    <input type="email" name="email" required class="form-control">
+                </label>
+            </div>
 
-        <div class="form-group">
-            <label>Password:
-                <input type="password" name="password" required class="form-control">
-            </label>
-        </div>
+            <div class="form-group">
+                <label>Password:
+                    <input type="password" name="password" required class="form-control">
+                </label>
+            </div>
 
-        <div class="form-group">
-            <input type="submit" value="Log In" class="btn">
-        </div>
+            <div class="form-group">
+                <input type="submit" value="Log In" class="btn">
+            </div>
 
-    </form>
-</div>
+        </form>
+    </div>
 </div>
 {% endblock %}

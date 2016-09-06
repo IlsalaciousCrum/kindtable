@@ -1,193 +1,199 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="well spaced">  <!-- 1 -->
-<h1>{{  this_user.first_name  }} {{  this_user.last_name  }}
-<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#userchange">update</button></h1>
 
-    <!-- Modal -->
-    <div id="userchange" class="modal fade" role="dialog">
-         <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Update Basic Profile Information</h4>
-                </div>
-                      <div class="modal-body">
-                        <form action="/update_user" method="POST">
-
-
-    <div class="form-group">
-        <label>
-
-            <strong>Email address</strong> (required): <input type="text" name="email" value="{{ this_user.email }}" class="form-control" required>
+<div class="row well spaced" style="padding-top: 3em">
+    <div class="col-md-6 col-md-offset-3">
         
-                First name (optional):
-                <input type="text" name="first_name" class="form-control" value="{% if this_user.first_name is not none %}{{ this_user.first_name }}{% else %}{%endif %}">
+        <div class="row">
       
-                Last name (optional):
-                <input type="text" name="last_name" class="form-control" value="{% if this_user.last_name is not none %}{{ this_user.last_name }}{% else %}{%endif %}">
-
-
-                <p>Diet you prefer to eat (required):</p>
-                
-                <select name="diet_type">
-                    {% for diet in diets %}
-                    <option value={{ diet.diet_id }}>{{ diet.diet_type }}</option>
+                <h1>{{  this_user.first_name  }} {{  this_user.last_name  }}</h1>
+       
+        </div>
+        <div class = "row round_div" style="padding-top: 2em">
+            <div class="col-md-3">
+                <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#userchange" style="width: 100%">update<br>basic<br>info</button></h1>
+            </div>
+            <div class="col-md-6">
+                First name: {{ this_user.first_name }}<br>
+                Last name: {{ this_user.last_name }} <br>
+                Email address: {{ this_user.email }} <br>
+                Diet: {{ this_user.diet.diet_type }}<br>
+                Diet Reason: {{ this_user.diet_reason }}
+            </div>
+        </div>    
+                            
+        <div class = "row round_div" style="padding-top: 2em">
+            <div class="col-md-3">
+                <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#Intols" style="width: 100%">add an<br>intolerance/<br>allergy</button>
+            </div>
+            <div class="col-md-6">
+            Intolerances:
+            <ul>
+                <div id="userIntolerances">
+                    <li>{% for intolerance in this_user.intolerances %}{{ intolerance.intol_name }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                </ul>
+            </div>
+        </div>
+        <div class = "row round_div" style="padding-top: 2em">
+            <div class="col-md-3">
+                <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#IngToAvoid">add<br>ingredients<br>to avoid</button>
+            </div>
+            <div class="col-md-6">
+                Ingredients to avoid:
+                <ul>
+                    {% for avoid in this_user.avoidances %}
+                    <li>{{ avoid.ingredient }} - (<i>{{ avoid.reason}}</i>)</li>
                     {% endfor %}
-                </select><br>
-                Reason they follow this diet (optional):<br>
-                <input type="text" name="diet_reason" class="form-control" value="{% if this_user.diet_reason is not none %}{{ this_user.diet_reason }}{% else %}{%endif %}">
-
-                  
-            </div><br>
-            <div class="form-group">
-                <input type="submit" value="update friend profile" class="btn">
+                </ul>
             </div>
-        </label>
-    </div>
-</form>
-                      </div>
-
+        </div>        
+                          
+        <div class = "row round_div" style="padding-top: 2em">
+            <div class="col-md-3">
+                <a href="/findfriend" class="btn btn-info btn-block">add<br>a new<br>friend</a></li>
             </div>
-
+            <div class="col-md-6">
+                Friends:
+                    <ul>
+                        {% for person in this_user.friends %}    
+                        <li><a href="/friendprofile/{{ person.friends.user_id }}">{% if person.friends.first_name is not none %}{{ person.friends.first_name }}{% else %}{%endif %}
+                            {% if person.friends.last_name is not none %}{{ person.friends.last_name }}{% else %}{%endif %} ({{ person.friends.email }})</a>
+                            {% endfor %}       
+                    </ul>
+            </div>
         </div>
-    </div>
-</li>
-
-
-<ul>
-    <li>First name: {{ this_user.first_name }} 
-    <li>Last name: {{ this_user.last_name }} 
-    <li>Email address: {{ this_user.email }} 
-    <li>Diet: {{ this_user.diet.diet_type }}
-    <li>Diet Reason: {{ this_user.diet_reason }}
-    <li>Intolerances:</li>
-        <ul>
-            <div id="userIntolerances">
-                <li>{% for intolerance in this_user.intolerances %}{{ intolerance.intol_name }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-                
+        <div class = "row round_div" style="padding-top: 2em">
+            <div class="col-md-3">
+                <a href="/addaparty" class="btn btn-info btn-block">add a<br>new<br>party</a></li>        
             </div>
-
-    <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#Intols">Add an intolerance/allergies</button>
-
-    <!-- Modal -->
-    <div id="Intols" class="modal fade" role="dialog">
-         <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add intolerances/allergies</h4>
-                </div>
-                      <div class="modal-body">
-                        <form action="/intolerance_added" method="POST">
-                            <div class="form-group">
-                                <label>
-                                    <p>Select all that apply:</p>
-                                            {% for intolerance in intol_list %}  
-                                        <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}  
-                                            {% endfor %}
-                                        <br>
-
-                                </label>
-                            </div>
-                            <div class="form-group">
-                                <input type="submit" value="Done" class="btn" id="intolDone">
-                            </div>
-                        </form>
-                      </div>
-
+            <div class="col-md-6">
+                Parties:
+                <ul>
+                    {% for party in this_user.parties %}
+                    <li>
+                        <a href="/party_profile/{{ party.party_id }}">{{ party.title }}</a> 
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
-
         </div>
-    </div>
-</li>
+    </div>   <!-- initial column -->
+</div>  <!-- initial row -->
 
 
 
+                    <!-- Modal -->
+                                <div id="userchange" class="modal fade" role="dialog">
+                                    <div class="modal-dialog">
+                                        <!-- Modal content-->
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 class="modal-title">Update Basic Profile Information</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="/update_user" method="POST">
+                                                    <div class="form-group">
+                                                        <label>Email address</label> (required): <input type="text" name="email" value="{{ this_user.email }}" class="form-control" required>
+
+                                                        <label>First name (optional):</label>
+                                                        <input type="text" name="first_name" class="form-control" value="{% if this_user.first_name is not none %}{{ this_user.first_name }}{% else %}{%endif %}">
+
+                                                        <label>Last name (optional):</label>
+                                                        <input type="text" name="last_name" class="form-control" value="{% if this_user.last_name is not none %}{{ this_user.last_name }}{% else %}{%endif %}">
 
 
-        </ul>
-    <li>Ingredients to avoid:</li>
-        <ul>
-                {% for avoid in this_user.avoidances %}
-            <li>{{ avoid.ingredient }} (<i>{{ avoid.reason}}</i>)</li>
-                {% endfor %}
-            
-            <li style="list-style-type:none">
+                                                        <label>Diet you prefer to eat (required):</label><br>
 
-    <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#IngToAvoid">Add ingredients you would like to avoid</button>
+                                                        <select name="diet_type">
+                                                            {% for diet in diets %}
+                                                            <option value={{ diet.diet_id }}>{{ diet.diet_type }}</option>
+                                                            {% endfor %}
+                                                        </select><br>
+                                                        <label>Reason they follow this diet (optional):</label>
+                                                        <input type="text" name="diet_reason" class="form-control" value="{% if this_user.diet_reason is not none %}{{ this_user.diet_reason }}{% else %}{%endif %}"><br>
+                                                
+                                                        <input type="submit" value="update friend profile" class="btn">
+                                                    </div>
+                                                 </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-    <!-- Modal -->
-    <div id="IngToAvoid" class="modal fade" role="dialog">
-         <div class="modal-dialog">
+                                                                    <!-- Modal -->
+                                <div id="Intols" class="modal fade" role="dialog">
+                                    <div class="modal-dialog">
+                                        <!-- Modal content-->
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 class="modal-title">Add intolerances/allergies</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="/intolerance_added" method="POST">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            <p>Select all that apply:</p>
+                                                            {% for intolerance in intol_list %}  
+                                                            <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}  
+                                                            {% endfor %}
+                                                            <br>
 
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add ingredients you would like to avoid</h4>
-                </div>
-                      <div class="modal-body">
-                    <form action="/ingredientadded" method="POST">
-                        <div class="form-group">
-                            <label>
-                                <p>Ingredient to avoid:</p>
-                                    <input type="text" name="ingredient" class="form-control">
-                                <p>Reason you would like to avoid this ingredient (optional):</p>
-                                    <input type="text" name="reason" class="form-control">
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <input type="submit" value="Done" class="btn" id="avoidDone">
-                        </div>
-                    </form>
-                      </div>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="submit" value="Done" class="btn" id="intolDone">
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-            </div>
+                                                                        <!-- Modal -->
+                                <div id="IngToAvoid" class="modal fade" role="dialog">
+                                    <div class="modal-dialog">
 
-        </div>
-    </div>
-</li>
+                                        <!-- Modal content-->
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 class="modal-title">Add ingredients you would like to avoid</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form action="/ingredientadded" method="POST">
+                                                    <div class="form-group">
+                                                        <label>
+                                                            <p>Ingredient to avoid:</p>
+                                                            <input type="text" name="ingredient" class="form-control">
+                                                            <p>Reason you would like to avoid this ingredient (optional):</p>
+                                                            <input type="text" name="reason" class="form-control">
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="submit" value="Done" class="btn" id="avoidDone">
+                                                    </div>
+                                                </form>
+                                            </div>
 
+                                        </div>
+                                    </div>
+                                </div>
 
-
-
-
-
-    <li>Friends:</li>
-        <ul>
-            {% for person in this_user.friends %}    
-                <li><a href="/friendprofile/{{ person.friends.user_id }}">{% if person.friends.first_name is not none %}{{ person.friends.first_name }}{% else %}{%endif %}
-{% if person.friends.last_name is not none %}{{ person.friends.last_name }}{% else %}{%endif %} ({{ person.friends.email }})</a>
-             {% endfor %}       
-        </ul>
-    <li>Parties:</li>
-        <ul>
-            {% for party in this_user.parties %}
-                <li>
-                    <a href="/party_profile/{{ party.party_id }}">{{ party.title }}</a> 
-                </li>
-            {% endfor %}
-
-</div> <!-- 1 -->
-
-<script>
-"use strict";
-    $("#addIntol").click(function(){
+        <script>
+        "use strict";
+        $("#addIntol").click(function(){
             $("#addIntol").hide();
             $("#addIntolForm").toggle();
             console.log("show form");
-    });
+        });
 
-    $("#addIngred").click(function(){
+        $("#addIngred").click(function(){
             $("#addIngred").hide();
             $("#addAvoidForm").toggle();
             console.log("show form");
-    });
+        });
 
-</script>
-{% endblock %}
+        </script>
+        {% endblock %}

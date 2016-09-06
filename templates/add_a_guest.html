@@ -2,10 +2,10 @@
 {% block content %}
 <div class="well spaced">
 
-<form action="/guest_added" method="POST">
-    <div class="form-group">
-        <label>
-            <h4><strong>Add a guest to {{ party.title }}:</strong></h4>
+    <form action="/guest_added" method="POST">
+        <div class="form-group">
+            <label>
+                <h4><strong>Add a guest to {{ party.title }}:</strong></h4>
 
                 <p>Guests invited:</p>
                 {% for person in party_guests %}
@@ -16,18 +16,18 @@
                 {% for person in this_user.friends %}
                 <input type="checkbox" name="guests" value={{ person.friends.user_id }}> {{ person.friends.first_name}} {{ person.friends.last_name }} ({{ person.friends.email }})
                 {% endfor %}
-            <br>           
-        </label>
-    </div>
+                <br>           
+            </label>
+        </div>
 
-    <div class="form-group">
+        <div class="form-group">
 
-        <input type="hidden" name="party_id" value={{ party.party_id }}>
-        <input type="submit" value="Add guest" class="btn">
-    </div>
-</form>
+            <input type="hidden" name="party_id" value={{ party.party_id }}>
+            <input type="submit" value="Add guest" class="btn">
+        </div>
+    </form>
 
-<li style="list-style-type:none"><button type="button" id="addIngred">Add a guest that is not yet a friend</button></li>
+    <li style="list-style-type:none"><button type="button" id="addIngred">Add a guest that is not yet a friend</button></li>
 
 
 

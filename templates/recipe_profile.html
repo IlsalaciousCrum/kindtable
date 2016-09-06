@@ -10,42 +10,42 @@
 
 
 <div class="container-fluid">
-<h1>{{  this_recipe.title  }}</h1>
+    <h1>{{  this_recipe.title  }}</h1>
 
-<p>This recipe is saved to the RecipeBox for <a href="/party_profile/{{  party.party_id  }}">{{  party.title  }}</a>
+    <p>This recipe is saved to the RecipeBox for <a href="/party_profile/{{  party.party_id  }}">{{  party.title  }}</a>
 
-<p><a href="{{ this_recipe.recipe_url}}" target="_blank">View recipe at Spoonacular</a>
+        <p><a href="{{ this_recipe.recipe_url}}" target="_blank">View recipe at Spoonacular</a>
 
-<p>Safe for:</p>
-<ul>
-    {% for key, value in works_for.iteritems() %}
-    {{  key  }}: {% for each in value %}{{  each  }}{% if not loop.last %}, {% endif %}{% endfor %}<br>{% endfor %}</li>
-   </ul>
-<div>
+            <p>Safe for:</p>
+            <ul>
+                {% for key, value in works_for.iteritems() %}
+                {{  key  }}: {% for each in value %}{{  each  }}{% if not loop.last %}, {% endif %}{% endfor %}<br>{% endfor %}</li>
+            </ul>
+            <div>
 
-<ul>
-    <li><strong>Ingredients</strong></li>
-        <ul>{% for each in ingredients %}
-            <li>{{  each.decode('utf-8')  }}</li>
-    {% endfor %}</ul>
+                <ul>
+                    <li><strong>Ingredients</strong></li>
+                    <ul>{% for each in ingredients %}
+                        <li>{{  each.decode('utf-8')  }}</li>
+                        {% endfor %}</ul>
 
-</ul>
+                    </ul>
 
-<ul>
-    <li><strong>Instructions</strong></li>
-    <ul>{% for each in instructions %}
-    <li>{{  each.decode('utf-8') }}</li>
-    {% endfor %}</ul>
-</ul>
-<div>
-    
-<div>
-<img src="{{  this_recipe.recipe_image_url  }}" alt="{{  this_recipe.title  }}" class="img-fluid" >
-</div>
+                    <ul>
+                        <li><strong>Instructions</strong></li>
+                        <ul>{% for each in instructions %}
+                            <li>{{  each.decode('utf-8') }}</li>
+                            {% endfor %}</ul>
+                        </ul>
+                        <div>
+                            
+                            <div>
+                                <img src="{{  this_recipe.recipe_image_url  }}" alt="{{  this_recipe.title  }}" class="img-fluid" >
+                            </div>
 
 
 
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-</div>
-</body>
-</html>
+                            <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+                        </div>
+                    </body>
+                    </html>

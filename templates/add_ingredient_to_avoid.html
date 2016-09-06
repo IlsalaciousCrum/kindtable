@@ -4,10 +4,10 @@
 
 
     <p>Ingredients to avoid for {{ this_user.first_name }} :</p>
-        {% for avoid in this_user.avoidances %}
-        {{ avoid.ingredient}}<br>
-        {% endfor %}<br><br>
-                
+    {% for avoid in this_user.avoidances %}
+    {{ avoid.ingredient}}<br>
+    {% endfor %}<br><br>
+    
     <form action="/ingredientadded" method="POST">
         <div class="form-group">
             <label>

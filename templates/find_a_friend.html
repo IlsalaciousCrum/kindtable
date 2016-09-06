@@ -2,25 +2,25 @@
 {% block content %}
 <div class="well spaced">
 
-<form action="/addafriend" method="POST">
-    <div class="form-group">
-        <label>
-            <h4>New friend to add:</h4>
-            <p>Email address: <input type="email" name="email_address" class="form-control"><p>
-        </label>
-    </div>
+    <form action="/addafriend" method="POST">
+        <div class="form-group">
+            <label>
+                <h4>New friend to add:</h4>
+                <p>Email address: <input type="email" name="email_address" class="form-control"><p>
+                </label>
+            </div>
 
-    <div class="form-group">
+            <div class="form-group">
 
-        <input type="submit" value="Add Friend" class="btn">
-    </div>
-<form>
+                <input type="submit" value="Add Friend" class="btn">
+            </div>
+            <form>
 
-<p>Your friends:
-    <ul>
-        {% for person in this_user.friends %}    
-            <li><a href="/friendprofile/{{ person.friends.user_id }}">{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</a></li>
-        {% endfor %}   
-    </ul>
-</div>
-{% endblock %}
+                <p>Your friends:
+                    <ul>
+                        {% for person in this_user.friends %}    
+                        <li><a href="/friendprofile/{{ person.friends.user_id }}">{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</a></li>
+                        {% endfor %}   
+                    </ul>
+                </div>
+                {% endblock %}
