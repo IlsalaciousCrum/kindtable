@@ -150,8 +150,8 @@ def add_a_friend():
             make_user(email_address, diet_id=6)
             newfriend = db.session.query(User).filter(User.email == email_address).first()
             make_friendship(user_id, newfriend.user_id)
-            flash("This person is not yet in our system. Please click on their button and update their profile", "info")
-            return redirect("/userprofile")
+            flash("This person is not yet in our system. Please update their profile", "info")
+            return redirect("/friendprofile/%s" % newfriend.user_id)
     else:
         flash("You need to enter a valid email address", "warning")
         return redirect("/findfriend")

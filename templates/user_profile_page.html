@@ -5,15 +5,14 @@
     <div class="col-md-6 col-md-offset-3">
         
         <div class = "row round_div" style="padding-top: 2em">
-            <h1>User Profile: {{  this_user.first_name  }} {{  this_user.last_name  }}</h1><br>
+            <h1>{{  this_user.first_name  }} {{  this_user.last_name  }}</h1><br>
             <div class="col-md-2">
                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#userchange">update</button></h1>
             </div>
             <div class="col-md-8">
-                <b>First name:</b> {{ this_user.first_name }}<br>
-                <b>Last name:</b> {{ this_user.last_name }} <br>
-                <b>Email address:</b> {{ this_user.email }} <br>
-                <b>Diet:</b> {{ this_user.diet.diet_type }}<br>
+            
+                <b>Email address:</b> {{ this_user.email }}</b> <br>
+                <b>Diet:</b> {{ this_user.diet.diet_type }}</b><br>
                 <b>Diet Reason:</b> {{ this_user.diet_reason }}
             </div>
         </div>    
