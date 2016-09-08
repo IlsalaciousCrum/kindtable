@@ -7,9 +7,9 @@ from flask import Flask, render_template, request, flash, redirect, session, jso
 from Model import (connect_to_db, db, Diet, User,
                    Intolerance, Friends, Party, PartyGuest, RecipeBox, Course, Cuisine)
 
-# import os
+import os
 
-from functions import (guest_diet, guest_intolerances, guest_avoidances,
+from functions import (guest_intolerances, guest_avoidances,
                        spoonacular_request, make_user, make_friendship,
                        make_intolerances, make_avoidance, user_change,
                        spoonacular_recipe_instructions, all_guest_diets,
@@ -18,7 +18,7 @@ from functions import (guest_diet, guest_intolerances, guest_avoidances,
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
-app.secret_key = "9AKT2VAHJTFu9x@uCXU@T[XabEd"
+app.secret_key = os.environ['APP_SECRET_KEY']
 
 # Normally, if you use an undefined variable in Jinja2, it fails silently.
 # This is horrible. Fix this so that, instead, it raises an error.
@@ -701,15 +701,7 @@ def add_recipe_box():
 # ___________________________________________________________________________
 
 if __name__ == "__main__":
-    # We have to set debug=True here, since it has to be True at the point
-    # that we invoke the DebugToolbarExtension
-
-    # Do not debug for demo
-    app.debug = True
-
+ 
     connect_to_db(app)
-
-    # Use the DebugToolbar
-    # DebugToolbarExtension(app)
 
     app.run(host="0.0.0.0")
