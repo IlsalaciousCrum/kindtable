@@ -19,6 +19,7 @@ Development is continuing in the further_development branch of this repository. 
     - [ ] Check all form logic for the ability to handle duplicates and correct
     - [ ] Python logic to handle claiming your account
     - [ ] On the user table, who owns the profile, only shows to who owns it
+    - [ ] Securely hash user identifiable information and passwords    
 - [ ] Flask
     - [ ] [Understand the back code snippet and implement it](http://flask.pocoo.org/snippets/120/)
     - [ ] Can I refactor HTML with Jinja to capitalize on inheritance so that User profile, Friend profile and guest profile all use the same templates? So that the same templates are used in many places?
