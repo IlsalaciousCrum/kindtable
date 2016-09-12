@@ -2,6 +2,7 @@
 *.pyc
 secrets.sh
 .DS_Store
-/Old_files
+Old_files/*
 create_friends_profile_form.html
 user_profile_junk_code.html
+templates/Old_files*
