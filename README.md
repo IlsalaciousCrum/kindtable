@@ -16,7 +16,7 @@ Kind Table
 
 Kind Table takes the work out of choosing recipes for a dinner party or holiday event by managing your friends dietary preferences and presenting recipes that would work for all.
 
-This Readme is a work-in-progress. As is the app, as there is so much more work to do to make user information secure before this could be deployed. Watch this space!
+Please see the further_development branch for continuing work on this project and the .md file Further_Development.md for where I am in the process now. This is a learning project, created for the final project while attending Hackbright Academy. Let the learning/experimenting continue!
 
 **How it works**
 

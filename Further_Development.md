@@ -2,6 +2,8 @@
 
 This is my public to-do list for my Hackbright Academy final project, Kind Table. All development thus far happened in two -- two-week-long sprints, while other things were going on. This web app is functional as is but there is so much that I wanted to add and learn. And refactor. :blush:
 
+Development is continuing in the further_development branch of this repository. There is a copy of this file there that is being updated constantly with progress.
+
 - [ ] Testing
     - [ ] Unittests [flask](http://flask.pocoo.org/docs/0.11/testing/)
     - [ ] SQLAlchemy tests
