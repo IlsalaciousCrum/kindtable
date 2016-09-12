@@ -203,6 +203,25 @@ def connect_to_db(app):
     db.app = app
     db.init_app(app)
 
+##############################################################################
+# For testing:
+
+    def example_data():
+    """Create some sample data."""
+
+    test_diet = Dept(dept_code='fin', dept='Finance', phone='555-1000')
+    test_ingredient = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+     = Dept(dept_code='mktg', dept='Marketing', phone='555-9999')
+    
+    leonard = Employee(name='Leonard', dept=dl)
+    liz = Employee(name='Liz', dept=dl)
+    maggie = Employee(name='Maggie', dept=dm)
+    nadine = Employee(name='Nadine')
+
+    db.session.add_all([df, dl, dm, leonard, liz, maggie, nadine])
+    db.session.commit()
+
+##############################################################################
 
 if __name__ == "__main__":
     # As a convenience, if we run this module interactively, it will leave

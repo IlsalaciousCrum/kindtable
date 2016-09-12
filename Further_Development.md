@@ -1,8 +1,17 @@
 # Post Career Day Further Development
 
-This is my public to-do list for my Hackbright Academy final project, Kind Table. All development thus far happened in two -- two-week-long sprints, while other things were going on. This web app is functional as is but there is so much that I wanted to add and learn. And refactor. :blush:
+This is my public to-do list for my Hackbright Academy final project, Kind Table. All development thus far happened in two 2-week-long sprints, while other things were going on. This web app is functional as is but there is so much that I wanted to add and learn. And refactor. :blush:
 
-- [ ] Testing
+
+###### Working On Now ######
+
+Adding Flask integration testing, test database, test JSON reponse. The rest of the work can then be done through test driven development. And making sure I don't break things along the way, since there are a lot of routes and moving parts.
+
+
+
+---
+
+- [ ] Working on this now.
     - [ ] Unittests [flask](http://flask.pocoo.org/docs/0.11/testing/)
     - [ ] SQLAlchemy tests
     - [ ] Mock server
@@ -38,4 +47,4 @@ This is my public to-do list for my Hackbright Academy final project, Kind Table
         - user_friends
 
 
-As of 9/11/16 5:00pm
+As of 9/12/16 10:00am
