@@ -1,5 +1,6 @@
 """Models for K(i)ndTable WebApp."""
 from flask_sqlalchemy import SQLAlchemy
+from seed import load_testdata
 
 db = SQLAlchemy()
 
@@ -207,19 +208,52 @@ def connect_to_db(app):
 # For testing:
 
     def example_data():
-    """Create some sample data."""
+        """Create some sample data."""
 
-    test_diet = Dept(dept_code='fin', dept='Finance', phone='555-1000')
-    test_ingredient = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-     = Dept(dept_code='mktg', dept='Marketing', phone='555-9999')
-    
-    leonard = Employee(name='Leonard', dept=dl)
-    liz = Employee(name='Liz', dept=dl)
-    maggie = Employee(name='Maggie', dept=dm)
-    nadine = Employee(name='Nadine')
+        goldilocks = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        goldilocks_avoid = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        goldilocks_intol = Dept(dept_code='legal', dept='Legal', phone='555-2222')
 
-    db.session.add_all([df, dl, dm, leonard, liz, maggie, nadine])
-    db.session.commit()
+        mama_bear = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        mama_bear_avoid = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        mama_bear_intol = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        mama_bear_friendship = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+
+        papa_bear = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        papa_bear_friendship = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+
+        baby_bear = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        baby_bear_avoid = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        baby_bear_intol = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        baby_bear_friendship = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+
+        teddy_bear_picnic = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+
+        picnic_guest1 = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        picnic_guest2 = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        picnic_guest3 = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+
+        test_recipe = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+
+        db.session.add_all([goldilocks,
+                            goldilocks_avoid,
+                            goldilocks_intol,
+                            mama_bear,
+                            mama_bear_avoid,
+                            mama_bear_intol,
+                            mama_bear_friendship,
+                            papa_bear,
+                            papa_bear_friendship,
+                            baby_bear,
+                            baby_bear_avoid,
+                            baby_bear_intol,
+                            baby_bear_friendship,
+                            teddy_bear_picnic,
+                            picnic_guest1,
+                            picnic_guest2,
+                            picnic_guest3,
+                            test_recipe])
+        db.session.commit()
 
 ##############################################################################
 

@@ -3,7 +3,6 @@ from unittest import TestCase
 from model import (connect_to_db, db, Diet, User,
                    Intolerance, Friends, Party, PartyGuest, RecipeBox, Course, Cuisine)
 from server import app
-import server
 
 
 class FlaskTestsBasic(TestCase):
@@ -15,6 +14,9 @@ class FlaskTestsBasic(TestCase):
         # Connect to test database
         connect_to_db(app, "postgresql:///testdb")
 
+        # load seed data
+        load_seeddata()
+
         # Create tables and add sample data
         db.create_all()
         example_data()
@@ -22,10 +24,10 @@ class FlaskTestsBasic(TestCase):
 
 
         # # Get the Flask test client
-        # self.client = app.test_client()
+        self.client = app.test_client()
 
         # # Show Flask errors that happen during tests
-        # app.config['TESTING'] = True
+        app.config['TESTING'] = True
 
     def test_index(self):
         """Test homepage page."""

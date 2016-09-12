@@ -6,7 +6,7 @@ from Model import connect_to_db, db, Intolerance, Diet, Cuisine, Course
 from server import app
 
 
-def load_testdata():
+def load_seeddata():
     """Load users from u.users into database."""
 
     diet1 = Diet(diet_type="vegan", description="does not eat an animal byproducts", ranking=1)
