@@ -1,5 +1,6 @@
 #Kind Table
 
+<img src="static/recipe_search.png">
 
 ### Technology Stack
 
