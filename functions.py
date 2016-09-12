@@ -1,9 +1,9 @@
 # # from sqlalchemy import func
 
-from Model import connect_to_db, db, User, UserIntolerance, Intolerance, Diet, IngToAvoid, PartyGuest, Party, Friends, Cuisine, Course
+from Model import db, User, UserIntolerance, Diet, IngToAvoid, Party, Friends, Cuisine, Course
 # from server import app
 
-from flask import Flask, render_template, request, flash, redirect, session, jsonify
+from flask import render_template, request, flash, jsonify
 
 import requests
 import os
