@@ -25,13 +25,6 @@ app.secret_key = os.environ['APP_SECRET_KEY']
 app.jinja_env.undefined = StrictUndefined
 
 
-# flash categories:
-# success
-# info
-# warning
-# danger
-
-
 @app.route('/')
 def index():
     """Homepage."""
@@ -327,12 +320,6 @@ def show_search_spoonacular():
         session["intols"] = get_intolerance
         session["avoids"] = get_avoid
 
-        # print party_diets
-        # print get_avoid
-        # print get_intolerance
-        # for guest in party.users:
-        #     print guest.diet.diet_type
-
         return render_template("Final_search_template.html", party=party,
                                responses=responses,
                                avoids=get_avoid,
@@ -463,8 +450,6 @@ def show_saved_recipe(record_id):
                                works_for=works_for,
                                ingredients=ingredients,
                                instructions=instructions)
-
-# ----------- Begin Post Routes ------------------
 
 
 @app.route('/see_recipe', methods=['POST'])

@@ -20,6 +20,7 @@ This is my public to-do list for my Hackbright Academy final project, Kind Table
 - [ ] Flask
     - [ ] [Understand the back code snippet and implement it](http://flask.pocoo.org/snippets/120/)
     - [ ] Can I refactor HTML with Jinja to capitalize on inheritance so that User profile, Friend profile and guest profile all use the same templates? So that the same templates are used in many places?
+    - [ ] Change base template login/logout session handling to [official handling](http://flask.pocoo.org/docs/0.11/tutorial/templates/#layout-html). Remove from Flask Routes. I think using the conditionals you can just have a different template load
 - [ ] Javascript
     - [ ] AJAX calls to make infinite scroll on recipe page
     - [ ] AJAX calls to rerun search on recipe search page
