@@ -320,7 +320,7 @@ def show_search_spoonacular():
         session["intols"] = get_intolerance
         session["avoids"] = get_avoid
 
-        return render_template("recipe_search_template.html", party=party,
+        return render_template("recipe_search.html", party=party,
                                responses=responses,
                                avoids=get_avoid,
                                intols=get_intolerance,
@@ -379,7 +379,7 @@ def show_re_search_spoonacular():
         cuisine_list = Cuisine.query.order_by(Cuisine.cuisine_name).all()
         course_list = Course.query.order_by(Course.course_name).all()
 
-        return render_template("recipe_search_template.html", party=party,
+        return render_template("recipe_search.html", party=party,
                                responses=responses,
                                this_user=this_user,
                                party_diets=party_diets,
