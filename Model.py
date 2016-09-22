@@ -1,4 +1,4 @@
-"""Models for K(i)ndTable WebApp."""
+'''Models for K(i)ndTable WebApp.'''
 from flask_sqlalchemy import SQLAlchemy
 from seed import load_testdata
 
@@ -9,9 +9,9 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
-    """User of K(i)nd website. Guests and hosts are stored in the same table."""
+    '''User of K(i)nd website. Guests and hosts are stored in the same table.'''
 
-    __tablename__ = "users"
+    __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(64), nullable=False, unique=True)
@@ -20,47 +20,47 @@ class User(db.Model):
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
     email = db.Column(db.String(64), nullable=False, unique=True)
-    diet_id = db.Column(db.Integer, db.ForeignKey("diets.diet_id"))
+    diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'))
     diet_reason = db.Column(db.String(120), nullable=True)  # ie, ethical, religious, general health, specific health
 
-    avoidances = db.relationship("IngToAvoid", backref=db.backref("users_a"))
+    avoidances = db.relationship('IngToAvoid', backref=db.backref('users_a'))
 
-    intolerances = db.relationship("Intolerance",
-                                   secondary="userintolerances",
-                                   backref="users")
+    intolerances = db.relationship('Intolerance',
+                                   secondary='userintolerances',
+                                   backref='users')
 
     diet = db.relationship('Diet', backref='users')
 
     parties = db.relationship('Party')
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        '''Provide helpful representation when printed.'''
 
-        return "<User user_id=%s email=%s  first_name=%s last_name=%s>" % (self.user_id, self.email, self.first_name, self.last_name)
+        return '<User user_id=%s email=%s  first_name=%s last_name=%s>' % (self.user_id, self.email, self.first_name, self.last_name)
 
 
 class Friends(db.Model):
-    """Makes connections between the user and other users they know"""
+    '''Makes connections between the user and other users they know'''
 
-    __tablename__ = "friends"
+    __tablename__ = 'friends'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     friend_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 
-    users = db.relationship("User", foreign_keys=[user_id], backref="friends")
-    friends = db.relationship("User", foreign_keys=[friend_id], backref="users")
+    users = db.relationship('User', foreign_keys=[user_id], backref='friends')
+    friends = db.relationship('User', foreign_keys=[friend_id], backref='users')
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        '''Provide helpful representation when printed.'''
 
-        return "<Friends record_id=%s user_id=%s  friend_id=%s>" % (self.record_id, self.user_id, self.friend_id)
+        return '<Friends record_id=%s user_id=%s  friend_id=%s>' % (self.record_id, self.user_id, self.friend_id)
 
 
 class UserIntolerance(db.Model):
-    """The intolerances that each user has."""
+    '''The intolerances that each user has.'''
 
-    __tablename__ = "userintolerances"
+    __tablename__ = 'userintolerances'
 
     user_intol_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
@@ -68,24 +68,24 @@ class UserIntolerance(db.Model):
 
 
 class Intolerance(db.Model):
-    """Spoonacular's list of possible intolerances."""
+    '''Spoonacular's list of possible intolerances.'''
 
-    __tablename__ = "intolerances"
+    __tablename__ = 'intolerances'
 
     intol_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     intol_name = db.Column(db.String(64), nullable=False)
     intol_description = db.Column(db.String(120), nullable=False)  # Spoonacular's criteria for searching
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        '''Provide helpful representation when printed.'''
 
-        return "<Intolerances int_id=%s int_name=%s int_description=%s>" % (self.intol_id, self.intol_name, self.intol_description)
+        return '<Intolerances int_id=%s int_name=%s int_description=%s>' % (self.intol_id, self.intol_name, self.intol_description)
 
 
 class Diet(db.Model):
-    """What diet a user follows."""
+    '''What diet a user follows.'''
 
-    __tablename__ = "diets"
+    __tablename__ = 'diets'
 
     diet_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     diet_type = db.Column(db.String(64), nullable=False)
@@ -93,96 +93,96 @@ class Diet(db.Model):
     ranking = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        '''Provide helpful representation when printed.'''
 
-        return "<Diet diet_id=%s diet_type=%s description=%s>" % (self.diet_id, self.diet_type, self.description)
+        return '<Diet diet_id=%s diet_type=%s description=%s>' % (self.diet_id, self.diet_type, self.description)
 
 
 class Cuisine(db.Model):
-    """Spoonacular cuisine types."""
+    '''Spoonacular cuisine types.'''
 
-    __tablename__ = "cuisine"
+    __tablename__ = 'cuisine'
 
     cuisine_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     cuisine_name = db.Column(db.String(64), nullable=False)
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        '''Provide helpful representation when printed.'''
 
-        return "<Cuisine cuisine_id=%s cuisine_name=%s>" % (self.cuisine_id, self.cuisine_name)
+        return '<Cuisine cuisine_id=%s cuisine_name=%s>' % (self.cuisine_id, self.cuisine_name)
 
 
 class Course(db.Model):
-    """Spoonacular course types"""
+    '''Spoonacular course types'''
 
-    __tablename__ = "courses"
+    __tablename__ = 'courses'
 
     course_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     course_name = db.Column(db.String(64), nullable=False)
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        '''Provide helpful representation when printed.'''
 
-        return "<Course course_id=%s course_name=%s>" % (self.course_id, self.course_name)
+        return '<Course course_id=%s course_name=%s>' % (self.course_id, self.course_name)
 
 
 class IngToAvoid(db.Model):
-    """Ingredients users would like to avoid."""
+    '''Ingredients users would like to avoid.'''
 
-    __tablename__ = "avoid"
+    __tablename__ = 'avoid'
 
     avoid_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     ingredient = db.Column(db.String(100), nullable=False)
     reason = db.Column(db.String(200), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 
     users = db.relationship('User', backref='ingredients')
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        '''Provide helpful representation when printed.'''
 
-        return "<IngToAvoid avoid_id=%s user_id=%s ingredient=%s reason=%s>" % (self.avoid_id, self.user_id, self.ingredient, self.reason)
+        return '<IngToAvoid avoid_id=%s user_id=%s ingredient=%s reason=%s>' % (self.avoid_id, self.user_id, self.ingredient, self.reason)
 
 
 class PartyGuest(db.Model):
-    """Associate users with a party"""
+    '''Associate users with a party'''
 
     #  this is a true association table now
 
-    __tablename__ = "party_guests"
+    __tablename__ = 'party_guests'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    party_id = db.Column(db.Integer, db.ForeignKey("parties.party_id"), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+    party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 
 
 class Party(db.Model):
-    """Create a dinner party to store and link information about a party"""
+    '''Create a dinner party to store and link information about a party'''
 
-    __tablename__ = "parties"
+    __tablename__ = 'parties'
 
     party_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
-    host_id = db.Column(db.Integer, db.ForeignKey("users.user_id"), nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 
-    users = db.relationship("User",
-                            secondary="party_guests")
+    users = db.relationship('User',
+                            secondary='party_guests')
 
-    recipes = db.relationship("RecipeBox", backref=db.backref("party"))
+    recipes = db.relationship('RecipeBox', backref=db.backref('party'))
 
     def __repr__(self):
-        """Provide helpful representation when printed."""
+        '''Provide helpful representation when printed.'''
 
-        return "<Party party_id=%s title_id=%s host_id=%s>" % (self.party_id, self.title, self.host_id)
+        return <Party party_id=%s title_id=%s host_id=%s>' % (self.party_id, self.title, self.host_id)
 
 
 class RecipeBox(db.Model):
-    "Add a recipe to a recipe box for a given party"
+    '''Add a recipe to a recipe box for a given party'''
 
-    __tablename__ = "recipes"
+    __tablename__ = 'recipes'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    party_id = db.Column(db.Integer, db.ForeignKey("parties.party_id"), nullable=False)
+    party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'), nullable=False)
     recipe_id = db.Column(db.String(120), nullable=False)
     title = db.Column(db.String(120), nullable=False)
     recipe_image_url = db.Column(db.String(300), nullable=False)
@@ -196,7 +196,7 @@ class RecipeBox(db.Model):
 # Helper functions
 
 def connect_to_db(app):
-    """Connect the database to our Flask app."""
+    '''Connect the database to our Flask app.'''
 
     # Configure to use our PostgreSQL database
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///kind'
@@ -208,32 +208,79 @@ def connect_to_db(app):
 # For testing:
 
     def example_data():
-        """Create some sample data."""
+        '''Create some sample data.'''
 
-        goldilocks = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        goldilocks_avoid = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        goldilocks_intol = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        goldilocks = User(email='goldilocks@gmail.com',
+                          diet_id=7,
+                          first_name='Goldy',
+                          last_name='Locks',
+                          diet_reason='It\'s what works for me',
+                          verified='True',
+                          password='FakeyFakey')
+        goldilocks_avoid = IngToAvoid(user_id=1,
+                                      ingredient='cinnamon',
+                                      reason='too spicy')
+        goldilocks_intol = UserIntolerance(user_id=1,
+                                           intol_id=11)
 
-        mama_bear = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        mama_bear_avoid = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        mama_bear_intol = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        mama_bear_friendship = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        mama_bear = User(email='mama@bears.com',
+                         diet_id=4,
+                         first_name='Mama',
+                         last_name='Bears',
+                         diet_reason='Weight loss',
+                         verified='False',
+                         password='Ihatekids')
+        mama_bear_avoid = IngToAvoid(user_id=2,
+                                     ingredient='rutabegas',
+                                     reason='gas')
+        mama_bear_friendship = Friends(user_id=1,
+                                       friend_id=2)
 
-        papa_bear = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        papa_bear_friendship = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        papa_bear = User(email='papa@bear.com',
+                         diet_id=10,
+                         first_name='Papa',
+                         last_name='Bear',
+                         diet_reason='I\'m a bear',
+                         verified='False',
+                         password='Rawr')
+        mama_bear_friendship = Friends(user_id=1,
+                                       friend_id=3)
 
-        baby_bear = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        baby_bear_avoid = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        baby_bear_intol = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        baby_bear_friendship = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        baby_bear = User(email='baby@bear.com',
+                         diet_id=8,
+                         first_name='Baby',
+                         last_name='Bear',
+                         diet_reason='Growing bear',
+                         verified='False',
+                         password='FakeyFakey')
+        baby_bear_avoid = IngToAvoid(user_id=4,
+                                     ingredient='jalapenos',
+                                     reason='too spicy')
+        baby_bear_intol = UserIntolerance(user_id=4,
+                                          intol_id=4)
+        baby_bear_friendship = Friends(user_id=1,
+                                       friend_id=4)
 
-        teddy_bear_picnic = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        teddy_bear_picnic = Party(title='Teddy Bear\'s Picnic',
+                                  host_id=1, )
 
-        picnic_guest1 = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        picnic_guest2 = Dept(dept_code='legal', dept='Legal', phone='555-2222')
-        picnic_guest3 = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        picnic_guest1 = PartyGuest(party_id=1,
+                                   user_id=2)
+        picnic_guest2 = PartyGuest(party_id=1,
+                                   user_id=3)
+        picnic_guest3 = PartyGuest(party_id=1,
+                                   user_id=4)
 
-        test_recipe = Dept(dept_code='legal', dept='Legal', phone='555-2222')
+        test_recipe = RecipeBox(party_id=1,
+                                recipe_id=472678,
+                                title='Paleo honey cake',
+                                recipe_image_url='https://webknox.com/recipeImages/472678-556x370.jpg',
+                                recipe_url='https://spoonacular.com/recipes/paleo-honey-cake-472678',
+                                works_for='{"Diets": ["any", "paleo" "primal"], "Ingredients to omit": ["jalapenos", "rutabegas"], "Intolerances/Allergies": ["wheat", "peanuts"]}',
+                                ingredients = db.Column(db.String(2000), nullable=True)
+    instructions = db.Column(db.String(2000), nullable=True)
+
+
 
         db.session.add_all([goldilocks,
                             goldilocks_avoid,
@@ -257,10 +304,10 @@ def connect_to_db(app):
 
 ##############################################################################
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # As a convenience, if we run this module interactively, it will leave
     # you in a state of being able to work with the database directly.
 
     from server import app
     connect_to_db(app)
-    print "Connected to DB."
+    print 'Connected to DB.'
