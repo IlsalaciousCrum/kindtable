@@ -277,10 +277,10 @@ def connect_to_db(app):
                                 recipe_image_url='https://webknox.com/recipeImages/472678-556x370.jpg',
                                 recipe_url='https://spoonacular.com/recipes/paleo-honey-cake-472678',
                                 works_for='{"Diets": ["any", "paleo" "primal"], "Ingredients to omit": ["jalapenos", "rutabegas"], "Intolerances/Allergies": ["wheat", "peanuts"]}',
-                                ingredients = db.Column(db.String(2000), nullable=True)
-    instructions = db.Column(db.String(2000), nullable=True)
-
-
+                                ingredients='2 1/2 cup blanched almond flour, 1/2 teaspoon celtic sea salt, 4 eggs, 1 tablespoon ground cinnamon, 1/4 teaspoon ground cloves, 1/2 cup honey, 1/2 cup palm oil, 1/2 cup raisins',
+                                instructions='Add all the ingredients to a large blender or food processor and puree until smooth.', 'Scrape down the sides of the bowl when necessary.Give it a taste and add more stevia or salt to taste. Be sure to puree the mixture as much as possible, you don\'t lose anything by overblending but you sacrifice texture and flavor by underblending!',
+                                             'Pour into serving bowls and serve immediately.', 'If not serving right away, cover with plastic wrap and refrigerate',
+                                             'Top the mousse with chopped, salted peanuts and some mini dark chocolate chips if you\'re feeling extra indulgent!')
 
         db.session.add_all([goldilocks,
                             goldilocks_avoid,
