@@ -27,6 +27,7 @@ Adding Flask integration testing, test database, test JSON reponse. The rest of 
     - [ ] Python logic to handle claiming your account
     - [ ] On the user table, who owns the profile, only shows to who owns it
     - [ ] Hash all user indentifiable data and passwords securely
+    - [ ] Ability to enter ingredients you have on hand and be able to search for recipes that use those ingredients (Erin)
 - [ ] Flask
     - [ ] [Understand the back code snippet and implement it](http://flask.pocoo.org/snippets/120/)
     - [ ] Can I refactor HTML with Jinja to capitalize on inheritance so that User profile, Friend profile and guest profile all use the same templates? So that the same templates are used in many places?
