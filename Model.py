@@ -1,6 +1,6 @@
 '''Models for K(i)ndTable WebApp.'''
 from flask_sqlalchemy import SQLAlchemy
-from seed import load_testdata
+# from seed import load_testdata
 
 db = SQLAlchemy()
 
@@ -173,7 +173,7 @@ class Party(db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return <Party party_id=%s title_id=%s host_id=%s>' % (self.party_id, self.title, self.host_id)
+        return '<Party party_id=%s title_id=%s host_id=%s>' % (self.party_id, self.title, self.host_id)
 
 
 class RecipeBox(db.Model):
@@ -206,6 +206,8 @@ def connect_to_db(app):
 
 ##############################################################################
 # For testing:
+
+    #  TODO: DOh! These should all be class methods. Move them up under each Class
 
     def example_data():
         '''Create some sample data.'''
@@ -243,7 +245,7 @@ def connect_to_db(app):
                          diet_reason='I\'m a bear',
                          verified='False',
                          password='Rawr')
-        mama_bear_friendship = Friends(user_id=1,
+        papa_bear_friendship = Friends(user_id=1,
                                        friend_id=3)
 
         baby_bear = User(email='baby@bear.com',
@@ -278,16 +280,16 @@ def connect_to_db(app):
                                 recipe_url='https://spoonacular.com/recipes/paleo-honey-cake-472678',
                                 works_for='{"Diets": ["any", "paleo" "primal"], "Ingredients to omit": ["jalapenos", "rutabegas"], "Intolerances/Allergies": ["wheat", "peanuts"]}',
                                 ingredients='2 1/2 cup blanched almond flour, 1/2 teaspoon celtic sea salt, 4 eggs, 1 tablespoon ground cinnamon, 1/4 teaspoon ground cloves, 1/2 cup honey, 1/2 cup palm oil, 1/2 cup raisins',
-                                instructions='Add all the ingredients to a large blender or food processor and puree until smooth.', 'Scrape down the sides of the bowl when necessary.Give it a taste and add more stevia or salt to taste. Be sure to puree the mixture as much as possible, you don\'t lose anything by overblending but you sacrifice texture and flavor by underblending!',
-                                             'Pour into serving bowls and serve immediately.', 'If not serving right away, cover with plastic wrap and refrigerate',
-                                             'Top the mousse with chopped, salted peanuts and some mini dark chocolate chips if you\'re feeling extra indulgent!')
+                                instructions=('Add all the ingredients to a large blender or food processor and puree until smooth.',
+                                              'Scrape down the sides of the bowl when necessary. Give it a taste and add more stevia or salt to taste. Be sure to puree the mixture as much as possible, you don\'t lose anything by overblending but you sacrifice texture and flavor by underblending!',
+                                              'Pour into serving bowls and serve immediately.', 'If not serving right away, cover with plastic wrap and refrigerate',
+                                              'Top the mousse with chopped, salted peanuts and some mini dark chocolate chips if you\'re feeling extra indulgent!'))
 
         db.session.add_all([goldilocks,
                             goldilocks_avoid,
                             goldilocks_intol,
                             mama_bear,
                             mama_bear_avoid,
-                            mama_bear_intol,
                             mama_bear_friendship,
                             papa_bear,
                             papa_bear_friendship,
