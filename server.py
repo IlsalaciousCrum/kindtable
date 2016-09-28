@@ -399,7 +399,7 @@ def show_re_search_spoonacular():
 
 @app.route('/show_recipe/<int:record_id>')
 def preview_saved_recipe(record_id):
-    """Show a recipe in the RecipeBox"""
+    """Show a recipe preview of recipes saved in the RecipeBox from the party page"""
 
     check_id = session.get("user_id")
     if check_id:
@@ -427,7 +427,7 @@ def preview_saved_recipe(record_id):
 
 @app.route('/recipe/<int:record_id>')
 def show_saved_recipe(record_id):
-    """Show a recipe in the RecipeBox"""
+    """Show a recipe saved in the RecipeBox in it's own page, from the recipe preview, on the party page"""
 
     check_id = session.get("user_id")
     if check_id:
@@ -454,7 +454,7 @@ def show_saved_recipe(record_id):
 
 @app.route('/see_recipe', methods=['POST'])
 def show_recipe():
-    """Preview a recipe"""
+    """Preview a recipe not yet saved, from the recipe search page"""
 
     check_id = session.get("user_id")
     if check_id:
