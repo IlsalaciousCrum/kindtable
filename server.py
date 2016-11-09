@@ -7,6 +7,9 @@ from flask import Flask, render_template, request, flash, redirect, session, jso
 from Model import (connect_to_db, db, Diet, User,
                    Intolerance, Friends, Party, PartyGuest, RecipeBox, Course, Cuisine)
 
+from flask_script import Manager, Server
+from flask_migrate import Migrate, MigrateCommand
+
 import os
 
 from functions import (guest_intolerances, guest_avoidances,
@@ -24,6 +27,12 @@ app.secret_key = os.environ['APP_SECRET_KEY']
 # This is horrible. Fix this so that, instead, it raises an error.
 app.jinja_env.undefined = StrictUndefined
 
+# handles schema migration
+migrate = Migrate(app, db)
+manager = Manager(app)
+server = Server(host="0.0.0.0", port=5000, use_debugger=True, use_reloader=True)
+manager.add_command("runserver", server)
+manager.add_command('db', MigrateCommand)
 
 @app.route('/')
 def index():
@@ -74,10 +83,12 @@ def show_user_profile():
         this_user = User.query.get(user_id)
         diets = Diet.query.order_by(Diet.diet_type).all()
         intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+
         return render_template("/user_profile_page.html",
                                this_user=this_user,
                                intol_list=intol_list,
                                diets=diets)
+
     else:
         return redirect("/login")
 
@@ -687,6 +698,12 @@ def add_recipe_box():
 
 if __name__ == "__main__":
 
-    connect_to_db(app)
+    connect_to_db(app, os.environ.get("DATABASE_URL"))
 
-    app.run(host="0.0.0.0")
+    #  remove app.debug = True before demoing
+
+    # app.debug = True
+
+    # app.run(host="0.0.0.0")
+    
+    manager.run()

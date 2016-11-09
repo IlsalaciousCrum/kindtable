@@ -1,5 +1,7 @@
 '''Models for K(i)ndTable WebApp.'''
 from flask_sqlalchemy import SQLAlchemy
+from passlib.hash import bcrypt
+
 # from seed import load_testdata
 
 db = SQLAlchemy()
@@ -14,12 +16,11 @@ class User(db.Model):
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(64), nullable=False, unique=True)
-    password = db.Column(db.String(64), nullable=True)
+    email = db.Column(db.String(200), nullable=False, unique=True)
+    password = db.Column(db.String(120), nullable=True)
     verified = db.Column(db.Boolean, default=False, nullable=False)
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
-    email = db.Column(db.String(64), nullable=False, unique=True)
     diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'))
     diet_reason = db.Column(db.String(120), nullable=True)  # ie, ethical, religious, general health, specific health
 
@@ -32,6 +33,25 @@ class User(db.Model):
     diet = db.relationship('Diet', backref='users')
 
     parties = db.relationship('Party')
+
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute, it\'s a hash')
+
+    @password.setter
+    def password_encrypt(self, password):
+        """Encrypts a password for the user table."""
+
+        h = bcrypt.encrypt(password)
+        self.password_hash = h
+
+    def verify_password(self, password):
+        """Verifies a password from the user table."""
+
+        if bcrypt.verify(password, self.password_hash) is True:
+            return True
+        else:
+            return False
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -195,114 +215,117 @@ class RecipeBox(db.Model):
 ##############################################################################
 # Helper functions
 
-def connect_to_db(app):
+def connect_to_db(app, db_uri=None):
     '''Connect the database to our Flask app.'''
 
     # Configure to use our PostgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///kind'
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri or 'postgresql:///kind'
 #    app.config['SQLALCHEMY_ECHO'] = True
     db.app = app
     db.init_app(app)
+    with app.app_context():
+        db.create_all()
+    return app
 
 ##############################################################################
 # For testing:
 
     #  TODO: DOh! These should all be class methods. Move them up under each Class
 
-    def example_data():
-        '''Create some sample data.'''
+    # def example_data():
+    #     '''Create some sample data.'''
 
-        goldilocks = User(email='goldilocks@gmail.com',
-                          diet_id=7,
-                          first_name='Goldy',
-                          last_name='Locks',
-                          diet_reason='It\'s what works for me',
-                          verified='True',
-                          password='FakeyFakey')
-        goldilocks_avoid = IngToAvoid(user_id=1,
-                                      ingredient='cinnamon',
-                                      reason='too spicy')
-        goldilocks_intol = UserIntolerance(user_id=1,
-                                           intol_id=11)
+    #     goldilocks = User(email='goldilocks@gmail.com',
+    #                       diet_id=7,
+    #                       first_name='Goldy',
+    #                       last_name='Locks',
+    #                       diet_reason='It\'s what works for me',
+    #                       verified='True',
+    #                       password='FakeyFakey')
+    #     goldilocks_avoid = IngToAvoid(user_id=1,
+    #                                   ingredient='cinnamon',
+    #                                   reason='too spicy')
+    #     goldilocks_intol = UserIntolerance(user_id=1,
+    #                                        intol_id=11)
 
-        mama_bear = User(email='mama@bears.com',
-                         diet_id=4,
-                         first_name='Mama',
-                         last_name='Bears',
-                         diet_reason='Weight loss',
-                         verified='False',
-                         password='Ihatekids')
-        mama_bear_avoid = IngToAvoid(user_id=2,
-                                     ingredient='rutabegas',
-                                     reason='gas')
-        mama_bear_friendship = Friends(user_id=1,
-                                       friend_id=2)
+    #     mama_bear = User(email='mama@bears.com',
+    #                      diet_id=4,
+    #                      first_name='Mama',
+    #                      last_name='Bears',
+    #                      diet_reason='Weight loss',
+    #                      verified='False',
+    #                      password='Ihatekids')
+    #     mama_bear_avoid = IngToAvoid(user_id=2,
+    #                                  ingredient='rutabegas',
+    #                                  reason='gas')
+    #     mama_bear_friendship = Friends(user_id=1,
+    #                                    friend_id=2)
 
-        papa_bear = User(email='papa@bear.com',
-                         diet_id=10,
-                         first_name='Papa',
-                         last_name='Bear',
-                         diet_reason='I\'m a bear',
-                         verified='False',
-                         password='Rawr')
-        papa_bear_friendship = Friends(user_id=1,
-                                       friend_id=3)
+    #     papa_bear = User(email='papa@bear.com',
+    #                      diet_id=10,
+    #                      first_name='Papa',
+    #                      last_name='Bear',
+    #                      diet_reason='I\'m a bear',
+    #                      verified='False',
+    #                      password='Rawr')
+    #     papa_bear_friendship = Friends(user_id=1,
+    #                                    friend_id=3)
 
-        baby_bear = User(email='baby@bear.com',
-                         diet_id=8,
-                         first_name='Baby',
-                         last_name='Bear',
-                         diet_reason='Growing bear',
-                         verified='False',
-                         password='FakeyFakey')
-        baby_bear_avoid = IngToAvoid(user_id=4,
-                                     ingredient='jalapenos',
-                                     reason='too spicy')
-        baby_bear_intol = UserIntolerance(user_id=4,
-                                          intol_id=4)
-        baby_bear_friendship = Friends(user_id=1,
-                                       friend_id=4)
+    #     baby_bear = User(email='baby@bear.com',
+    #                      diet_id=8,
+    #                      first_name='Baby',
+    #                      last_name='Bear',
+    #                      diet_reason='Growing bear',
+    #                      verified='False',
+    #                      password='FakeyFakey')
+    #     baby_bear_avoid = IngToAvoid(user_id=4,
+    #                                  ingredient='jalapenos',
+    #                                  reason='too spicy')
+    #     baby_bear_intol = UserIntolerance(user_id=4,
+    #                                       intol_id=4)
+    #     baby_bear_friendship = Friends(user_id=1,
+    #                                    friend_id=4)
 
-        teddy_bear_picnic = Party(title='Teddy Bear\'s Picnic',
-                                  host_id=1, )
+    #     teddy_bear_picnic = Party(title='Teddy Bear\'s Picnic',
+    #                               host_id=1, )
 
-        picnic_guest1 = PartyGuest(party_id=1,
-                                   user_id=2)
-        picnic_guest2 = PartyGuest(party_id=1,
-                                   user_id=3)
-        picnic_guest3 = PartyGuest(party_id=1,
-                                   user_id=4)
+    #     picnic_guest1 = PartyGuest(party_id=1,
+    #                                user_id=2)
+    #     picnic_guest2 = PartyGuest(party_id=1,
+    #                                user_id=3)
+    #     picnic_guest3 = PartyGuest(party_id=1,
+    #                                user_id=4)
 
-        test_recipe = RecipeBox(party_id=1,
-                                recipe_id=472678,
-                                title='Paleo honey cake',
-                                recipe_image_url='https://webknox.com/recipeImages/472678-556x370.jpg',
-                                recipe_url='https://spoonacular.com/recipes/paleo-honey-cake-472678',
-                                works_for='{"Diets": ["any", "paleo" "primal"], "Ingredients to omit": ["jalapenos", "rutabegas"], "Intolerances/Allergies": ["wheat", "peanuts"]}',
-                                ingredients='2 1/2 cup blanched almond flour, 1/2 teaspoon celtic sea salt, 4 eggs, 1 tablespoon ground cinnamon, 1/4 teaspoon ground cloves, 1/2 cup honey, 1/2 cup palm oil, 1/2 cup raisins',
-                                instructions=('Add all the ingredients to a large blender or food processor and puree until smooth.',
-                                              'Scrape down the sides of the bowl when necessary. Give it a taste and add more stevia or salt to taste. Be sure to puree the mixture as much as possible, you don\'t lose anything by overblending but you sacrifice texture and flavor by underblending!',
-                                              'Pour into serving bowls and serve immediately.', 'If not serving right away, cover with plastic wrap and refrigerate',
-                                              'Top the mousse with chopped, salted peanuts and some mini dark chocolate chips if you\'re feeling extra indulgent!'))
+    #     test_recipe = RecipeBox(party_id=1,
+    #                             recipe_id=472678,
+    #                             title='Paleo honey cake',
+    #                             recipe_image_url='https://webknox.com/recipeImages/472678-556x370.jpg',
+    #                             recipe_url='https://spoonacular.com/recipes/paleo-honey-cake-472678',
+    #                             works_for='{"Diets": ["any", "paleo" "primal"], "Ingredients to omit": ["jalapenos", "rutabegas"], "Intolerances/Allergies": ["wheat", "peanuts"]}',
+    #                             ingredients='2 1/2 cup blanched almond flour, 1/2 teaspoon celtic sea salt, 4 eggs, 1 tablespoon ground cinnamon, 1/4 teaspoon ground cloves, 1/2 cup honey, 1/2 cup palm oil, 1/2 cup raisins',
+    #                             instructions=('Add all the ingredients to a large blender or food processor and puree until smooth.',
+    #                                           'Scrape down the sides of the bowl when necessary. Give it a taste and add more stevia or salt to taste. Be sure to puree the mixture as much as possible, you don\'t lose anything by overblending but you sacrifice texture and flavor by underblending!',
+    #                                           'Pour into serving bowls and serve immediately.', 'If not serving right away, cover with plastic wrap and refrigerate',
+    #                                           'Top the mousse with chopped, salted peanuts and some mini dark chocolate chips if you\'re feeling extra indulgent!'))
 
-        db.session.add_all([goldilocks,
-                            goldilocks_avoid,
-                            goldilocks_intol,
-                            mama_bear,
-                            mama_bear_avoid,
-                            mama_bear_friendship,
-                            papa_bear,
-                            papa_bear_friendship,
-                            baby_bear,
-                            baby_bear_avoid,
-                            baby_bear_intol,
-                            baby_bear_friendship,
-                            teddy_bear_picnic,
-                            picnic_guest1,
-                            picnic_guest2,
-                            picnic_guest3,
-                            test_recipe])
-        db.session.commit()
+    #     db.session.add_all([goldilocks,
+    #                         goldilocks_avoid,
+    #                         goldilocks_intol,
+    #                         mama_bear,
+    #                         mama_bear_avoid,
+    #                         mama_bear_friendship,
+    #                         papa_bear,
+    #                         papa_bear_friendship,
+    #                         baby_bear,
+    #                         baby_bear_avoid,
+    #                         baby_bear_intol,
+    #                         baby_bear_friendship,
+    #                         teddy_bear_picnic,
+    #                         picnic_guest1,
+    #                         picnic_guest2,
+    #                         picnic_guest3,
+    #                         test_recipe])
+    #     db.session.commit()
 
 ##############################################################################
 
