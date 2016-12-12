@@ -10,11 +10,11 @@ import os
 import json
 
 
-def make_user(email, diet_id, first_name=None, last_name=None, diet_reason=None, verified=False, password=None):
+def make_user(email, password, diet_id, first_name=None, last_name=None, diet_reason=None, verified=False):
     """Instantiates a new user and returns that user's user_id"""
 
     new_user = User(first_name=first_name,
-                    last_name=last_name, email=email, diet_id=diet_id, diet_reason=diet_reason, verified=verified)
+                    last_name=last_name, email=email, password=password, diet_id=diet_id, diet_reason=diet_reason, verified=verified)
     db.session.add(new_user)
     db.session.commit()
 

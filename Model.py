@@ -1,5 +1,6 @@
 '''Models for K(i)ndTable WebApp.'''
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.ext.hybrid import hybrid_property
 from passlib.hash import bcrypt
 
 # from seed import load_testdata
@@ -17,7 +18,7 @@ class User(db.Model):
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(200), nullable=False, unique=True)
-    password_hash = db.Column(db.String(120), nullable=True)
+    _password = db.Column(db.String(128))
     verified = db.Column(db.Boolean, default=False, nullable=False)
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
@@ -34,21 +35,21 @@ class User(db.Model):
 
     parties = db.relationship('Party')
 
-    @property
+    @hybrid_property
     def password(self):
-        raise AttributeError('password is not a readable attribute, it\'s a hash')
+        return self._password
 
     @password.setter
-    def password_encrypt(self, password):
+    def _set_password(self, plaintext):
         """Encrypts a password for the user table."""
 
-        h = bcrypt.encrypt(password)
-        self.password_hash = h
+        h = bcrypt.encrypt(plaintext)
+        self._password = h
 
     def verify_password(self, password):
         """Verifies a password from the user table."""
 
-        if bcrypt.verify(password, self.password_hash) is True:
+        if bcrypt.verify(password, self._password) is True:
             return True
         else:
             return False

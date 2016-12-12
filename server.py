@@ -34,6 +34,7 @@ server = Server(host="0.0.0.0", port=5000, use_debugger=True, use_reloader=True)
 manager.add_command("runserver", server)
 manager.add_command('db', MigrateCommand)
 
+
 @app.route('/')
 def index():
     """Homepage."""
@@ -517,8 +518,8 @@ def add_register_users():
         flash("You are already registered here, please log in.", "info")
         return redirect("/login")
     else:
-        make_user(email, diet_id, first_name, last_name,
-                  diet_reason, verified, password)
+        make_user(email, password, diet_id, first_name, last_name,
+                  diet_reason, verified)
 
         user = User.query.filter_by(email=email).first()
         user_id = user.user_id
@@ -539,8 +540,7 @@ def add_login_process():
     user = User.query.filter_by(email=email).first()
 
     if user:
-
-        if verify_password(user, password) is False:
+        if user.verify_password(password) is False:
             flash("Incorrect password", "danger")
             return redirect("/login")
         else:
