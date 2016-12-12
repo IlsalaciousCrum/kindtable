@@ -13,7 +13,7 @@ import json
 def make_user(email, diet_id, first_name=None, last_name=None, diet_reason=None, verified=False, password=None):
     """Instantiates a new user and returns that user's user_id"""
 
-    new_user = User(password=password, first_name=first_name,
+    new_user = User(first_name=first_name,
                     last_name=last_name, email=email, diet_id=diet_id, diet_reason=diet_reason, verified=verified)
     db.session.add(new_user)
     db.session.commit()
@@ -115,8 +115,7 @@ def guest_diet(partyid):
         diet_rank = guest.diet.ranking
         diet_ranking.append(diet_rank)
 
-    diet_ranking = sorted(diet_ranking)
-    most_limiting = diet_ranking[0]
+    most_limiting = min(diet_ranking)
     diet_string = Diet.query.filter_by(ranking=most_limiting).first()
     diet_string = str(diet_string.diet_type)
 

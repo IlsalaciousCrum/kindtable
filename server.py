@@ -539,10 +539,11 @@ def add_login_process():
     user = User.query.filter_by(email=email).first()
 
     if user:
-        if user.password != password:
+
+        if verify_password(user, password) is False:
             flash("Incorrect password", "danger")
             return redirect("/login")
-        elif user.password == password:
+        else:
             session["user_id"] = user.user_id
             flash("Logged in", "success")
             return redirect("/userprofile")
