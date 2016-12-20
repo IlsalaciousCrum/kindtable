@@ -11,22 +11,22 @@ Adding Flask integration testing, test database, test JSON reponse. The rest of 
 
 ---
 
-- [ ] Working on this now.
+- [ ] Testing
     - [ ] Unittests [flask](http://flask.pocoo.org/docs/0.11/testing/)
     - [ ] SQLAlchemy tests
     - [ ] Mock server
 - [ ] SQL Alchemy
+    - [x] Implemented model migrations
     - [ ] In My Party Profile, a field to display date/time/location of planned party.
     - [ ] Refactor SQLAlchemy and functions so that it's the same function for user and guest
 - [ ] Python
-    - [ ] Fix recipe and ingredient storage - decoding and encoding UTF-8
+    - [x] Fix recipe and ingredient storage - decoding and encoding UTF-8
     - [ ] Ability to change anything you have added, everywhere
     - [ ] for login page, blanks and other errors are currently handled by HTML coding. They should probably be handled on the server side with python
     - [ ] Logic for all forms to handle capitalization. store information in all lower caps, capitalize it as needed
     - [ ] Check all form logic for the ability to handle duplicates and correct
     - [ ] Python logic to handle claiming your account
-    - [ ] On the user table, who owns the profile, only shows to who owns it
-    - [ ] Hash all user indentifiable data and passwords securely
+    - [x] Only storing hashed and salted passwords
     - [ ] Ability to enter ingredients you have on hand and be able to search for recipes that use those ingredients (Erin)
 - [ ] Flask
     - [ ] [Understand the back code snippet and implement it](http://flask.pocoo.org/snippets/120/)

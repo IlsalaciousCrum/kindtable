@@ -5,10 +5,12 @@ from jinja2 import StrictUndefined
 from flask import Flask, render_template, request, flash, redirect, session, json
 
 from Model import (connect_to_db, db, Diet, User,
-                   Intolerance, Friends, Party, PartyGuest, RecipeBox, Course, Cuisine)
+                   Intolerance, Friends, Party, PartyGuest, RecipeBox, Course, Cuisine, PartyRecipes)
 
 from flask_script import Manager, Server
 from flask_migrate import Migrate, MigrateCommand
+
+from flask_mail import Mail, Message
 
 import os
 
@@ -19,6 +21,19 @@ from functions import (guest_intolerances, guest_avoidances,
                        new_guest_diet, new_spoonacular_request, spoonacular_recipe_ingredients)
 
 app = Flask(__name__)
+
+# config variables for Flask-Mail
+
+app.config.update(
+    DEBUG=True,
+    #EMAIL SETTINGS
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=465,
+    MAIL_USE_SSL=True,
+    MAIL_USERNAME=os.environ['KIND_TABLE_EMAIL'],
+    MAIL_PASSWORD=os.environ['KIND_TABLE_EMAIL_PASSWORD'],
+    )
+mail = Mail(app)
 
 # Required to use Flask sessions and the debug toolbar
 app.secret_key = os.environ['APP_SECRET_KEY']
@@ -33,6 +48,21 @@ manager = Manager(app)
 server = Server(host="0.0.0.0", port=5000, use_debugger=True, use_reloader=True)
 manager.add_command("runserver", server)
 manager.add_command('db', MigrateCommand)
+
+
+@app.route('/send-email')
+def send_mail():
+    """Testing sending email through Flask-Mail and the website"""
+
+    try:
+        msg = Message("Send Mail Tutorial!",
+                      sender="kindtableapp@gmail.com",
+                      recipients=["ilsalacious@gmail.com"])
+        msg.body = "Yo!\nHave you heard the good word of Python???"
+        mail.send(msg)
+        return 'Mail sent!'
+    except Exception, e:
+        return(str(e))
 
 
 @app.route('/')
@@ -107,6 +137,19 @@ def show_get_a_friend():
         return redirect("/login")
 
 
+@app.route('/findmanyfriends', methods=['GET'])
+def show_get_many_friends():
+    """Create a profile for a friend"""
+
+    user_id = session.get("user_id")
+    if user_id:
+        this_user = User.query.get(user_id)
+        return render_template("find_many_friends.html",
+                               this_user=this_user)
+    else:
+        return redirect("/login")
+
+
 @app.route('/friendprofile/<int:friend_id>', methods=['GET'])
 def show_friend_profile(friend_id):
     """Show logged in user's friends profile"""
@@ -160,6 +203,39 @@ def add_a_friend():
     else:
         flash("You need to enter a valid email address", "warning")
         return redirect("/findfriend")
+
+
+@app.route('/addmanyfriends', methods=['POST'])
+def add_many_friends():
+    """Add multiple friends connections to the friends table"""
+
+    user_id = session.get("user_id")
+    email_address = request.form.get("email_address")
+
+    if email_address:
+        in_database = db.session.query(User).filter(User.email == email_address).first()
+
+        if in_database is not None:
+            check_for_friend = db.session.query(Friends).filter(Friends.user_id == user_id, Friends.friend_id == in_database.user_id).first()
+            if check_for_friend:
+                flash("%s is already one of your friends. Would you like to add someone else?" % email_address, "info")
+                return redirect("/findmanyfriends")
+            else:
+                friend_id = in_database.user_id
+                newfriend = Friends(user_id=user_id, friend_id=friend_id)
+                db.session.add(newfriend)
+                db.session.commit()
+                flash("%s is now in your friend's list" % email_address, "success")
+                return redirect("/findmanyfriends")
+        else:
+            make_user(email_address, diet_id=6)
+            newfriend = db.session.query(User).filter(User.email == email_address).first()
+            make_friendship(user_id, newfriend.user_id)
+            flash("This new friend is not yet in our system. Please remember to update their profile page.", "info")
+            return redirect("/findmanyfriends")
+    else:
+        flash("Please enter a valid email address", "warning")
+        return redirect("/findmanyfriends")
 
 
 @app.route('/addafriendasguest', methods=['POST'])
@@ -645,50 +721,71 @@ def add_recipe_box():
 
     check_id = session.get("user_id")
     party_id = session.get("party_id")
+    title = request.form.get("title")
+
+    # Creates the -workfor- json
+    party_diets = session.get("diets")
+    party_intols = session.get("intols")
+    party_avoids = session.get("avoids")
+    food_dict = {}
+    food_dict["Diets"] = party_diets
+    food_dict["Intolerances/Allergies"] = party_intols
+    food_dict["Ingredients to omit"] = party_avoids
+    food_dump = (json.dumps(food_dict))
 
     if check_id:
         recipe_id = request.form.get("recipe_id")
-        this_recipe = RecipeBox.query.filter_by(recipe_id=recipe_id).first()
+        this_recipe = RecipeBox.query.filter(recipe_id == recipe_id).first()
         if this_recipe:
-            flash("This recipe is already saved to your Recipe Box.", "danger")
-            return redirect("/searchrecipes")
+            party_recipe = PartyRecipes.query.filter(recipe_id == recipe_id, party_id == party_id).first()
+            if party_recipe:
+                flash("This recipe is already saved to your Recipe Box.", "danger")
+                return redirect("/searchrecipes")
+            else:
+                recipe_added = PartyRecipes(party_id=party_id,
+                                            recipe_id=recipe_id,
+                                            works_for=food_dump)
+                db.session.add(recipe_added)
+                db.session.commit()
+                flash("The recipe for %s has been saved to your recipe box." % title, "success")
+                return redirect("/searchrecipes")
         else:
-            title = request.form.get("title")
             recipe_image_url = request.form.get("recipe_image_url")
             recipe_url = request.form.get("recipe_url")
-            party_diets = session.get("diets")
-            party_intols = session.get("intols")
-            party_avoids = session.get("avoids")
-            # instruction_listA = request.form.get("instructions")
-            # instruction_list = []
-            # for each in instruction_listA:
-            #     instruction_list.append(each)
-            # ingredient_listA = request.form.get("ingredients")
-            # ingredient_list = []
-            # for each in ingredient_listA:
-            #     instruction_list.append(each)
 
-            # instructions = {}
-            # instructions["Instructions"] = instruction_list
-            # ingredients = {}
-            # ingredients["Ingredients"] = ingredient_list
+            instruction_listA = request.form.get("instructions")
+            ingredient_listA = request.form.get("ingredients")
+            raise Exception
 
-            food_dict = {}
-            food_dict["Diets"] = party_diets
-            food_dict["Intolerances/Allergies"] = party_intols
-            food_dict["Ingredients to omit"] = party_avoids
+            instruction_list = []
+            for each in instruction_listA:
+                instruction_list.append(each)
 
-            food_dump = (json.dumps(food_dict))
-            # ingredient_dump = (json.dumps(ingredient_list))
-            # instruction_dump = (json.dumps(instruction_list))
+            ingredient_list = []
+            for each in ingredient_listA:
+                instruction_list.append(each)
+
+            instructions = {}
+            instructions["Instructions"] = instruction_list
+            ingredients = {}
+            ingredients["Ingredients"] = ingredient_list
+
+            ingredient_dump = (json.dumps(ingredient_list))
+            instruction_dump = (json.dumps(instruction_list))
 
             new_recipe = RecipeBox(party_id=party_id,
                                    recipe_id=recipe_id,
                                    title=title,
                                    recipe_image_url=recipe_image_url,
                                    recipe_url=recipe_url,
-                                   works_for=food_dump)
+                                   ingredients=ingredient_dump,
+                                   instruction_dump=instruction_dump)
             db.session.add(new_recipe)
+            db.session.commit()
+            recipe_added = PartyRecipes(party_id=party_id,
+                                        recipe_id=new_recipe.recipe_id,
+                                        works_for=food_dump)
+            db.session.add(recipe_added)
             db.session.commit()
             flash("The recipe for %s has been saved to your recipe box." % title, "success")
             return redirect("/searchrecipes")

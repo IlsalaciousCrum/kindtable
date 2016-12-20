@@ -189,7 +189,9 @@ class Party(db.Model):
     users = db.relationship('User',
                             secondary='party_guests')
 
-    recipes = db.relationship('RecipeBox', backref=db.backref('party'))
+    recipes = db.relationship('RecipeBox',
+                              secondary='partyrecipes',
+                              backref='parties')
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -198,19 +200,28 @@ class Party(db.Model):
 
 
 class RecipeBox(db.Model):
-    '''Add a recipe to a recipe box for a given party'''
+    '''Add a recipe to a users recipe box'''
 
     __tablename__ = 'recipes'
 
-    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'), nullable=False)
+    recipe_record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     recipe_id = db.Column(db.String(120), nullable=False)
     title = db.Column(db.String(120), nullable=False)
     recipe_image_url = db.Column(db.String(300), nullable=False)
     recipe_url = db.Column(db.String(300), nullable=False)
-    works_for = db.Column(db.String(1000), nullable=True)
     ingredients = db.Column(db.String(2000), nullable=True)
     instructions = db.Column(db.String(2000), nullable=True)
+
+
+class PartyRecipes(db.Model):
+    '''Associate a recipe with a party'''
+
+    __tablename__ = 'partyrecipes'
+
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'), nullable=False)
+    recipe_record_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_record_id'), nullable=False)
+    works_for = db.Column(db.String(1000), nullable=True)
 
 
 ##############################################################################

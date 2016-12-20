@@ -306,7 +306,7 @@ def spoonacular_recipe_ingredients(recipe_id):
     for each in ingredients:
         print each
         one = each["originalString"]
-        ingredients_list.append(one.encode('utf-8'))
+        ingredients_list.append(one)
     print ingredients_list
     return ingredients_list
 
@@ -329,6 +329,6 @@ def spoonacular_recipe_instructions(recipe_id):
     for i in spoon:
         for each in i["steps"]:
             step = each["step"]
-            instructions_list.append(step.encode('utf-8'))
+            instructions_list.append(step)
 
     return instructions_list

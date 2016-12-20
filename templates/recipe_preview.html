@@ -26,7 +26,7 @@
         <ul>
             <li><b>Ingredients</b></li>
             <ul>{% for each in ingredients %}
-                <li>{{  each.decode('utf-8')  }}</li>
+                <li>{{  each  }}</li>
                 {% endfor %}</ul>
 
             </ul>
@@ -34,7 +34,7 @@
             <ul>
                 <li><b>Instructions</b></li>
                 <ul>{% for each in instructions %}
-                    <li>{{  each.decode('utf-8') }}</li>
+                    <li>{{  each }}</li>
                     {% endfor %}</ul>
                 </ul>
                 <div>

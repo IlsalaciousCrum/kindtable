@@ -31,13 +31,13 @@
 
            <b>Ingredients</b></li>
                 <ul>{% for each in ingredients %}
-                    <li>{{  each.decode('utf-8')  }}</li>
+                    <li>{{  each  }}</li>
                     {% endfor %}
                 </ul>
 
             <b>Instructions</b>
             <ul>{% for each in instructions %}
-                <li>{{  each.decode('utf-8') }}</li>
+                <li>{{  each  }}</li>
                 {% endfor %}
             </ul>
 
@@ -46,5 +46,20 @@
     </div>
 </div>
 {% endblock %}
+
+
+    recipes = db.relationship('RecipeBox',
+                              secondary='partyrecipes',
+                              backref='parties')
+
+class PartyRecipes(db.Model):
+    '''Associate a recipe with a party'''
+
+    __tablename__ = 'partyrecipes'
+
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'), nullable=False)
+    recipe_record_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_record_id'), nullable=False)
+    works_for = db.Column(db.String(1000), nullable=True)
 
 
