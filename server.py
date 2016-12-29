@@ -4,8 +4,7 @@ from jinja2 import StrictUndefined
 
 from flask import Flask, render_template, request, flash, redirect, session, json
 
-from Model import (connect_to_db, db, Diet, User,
-                   Intolerance, Friends, Party, PartyGuest, RecipeBox, Course, Cuisine, PartyRecipes)
+from Model import (connect_to_db, db, User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes)
 
 from flask_script import Manager, Server
 from flask_migrate import Migrate, MigrateCommand
@@ -13,6 +12,8 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_mail import Mail, Message
 
 import os
+
+import datetime
 
 from functions import (guest_intolerances, guest_avoidances,
                        spoonacular_request, make_user, make_friendship,

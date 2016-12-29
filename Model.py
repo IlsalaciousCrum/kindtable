@@ -21,10 +21,9 @@ class User(db.Model):
     _password = db.Column(db.String(128))
     email_verified = db.Column(db.Boolean, unique=False, default=False)
 
-    user_profile = db.relationship('Profile', backref='user')
     parties = db.relationship('Party')
-    friend_profiles = db.relationship('Profiles',
-                              secondary='friends')
+    friend_profiles = db.relationship('Profile',
+                                      secondary='friends')
 
     saved_recipes = db.relationship('RecipeCard',
                                     secondary='recipebox',
@@ -69,24 +68,24 @@ class Profile(db.Model):
     diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'))
     diet_reason = db.Column(db.String(120), nullable=True)  # ie, ethical, religious, general health, specific health
     profile_notes = db.Column(db.String(300), nullable=True)
+    last_updated = db.Column(db.DateTime(timezone=True), nullable=False)
 
     diet = db.relationship('Diet', backref='profiles')
 
-    avoidances = db.relationship('IngToAvoid', backref=db.backref('profiles'))
+    avoidances = db.relationship('IngToAvoid', backref='profiles')
 
     intolerances = db.relationship('Intolerance',
                                    secondary='userintolerances',
                                    backref='profiles')
 
-
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-    return '<Profile profile_id=%s user_id=%s user_id=%s is_user_profile=%s email=%s first_name=%s last_name=%s diet_id=%s diet_reason=%s>' % (self.profile_id, self.user_id, self.is_user_profile, self.email, self.first_name, self.last_name, self.diet_id, self.diet_reason)
+        return '<Profile profile_id=%s user_id=%s user_id=%s is_user_profile=%s email=%s first_name=%s last_name=%s diet_id=%s diet_reason=%s>' % (self.profile_id, self.user_id, self.is_user_profile, self.email, self.first_name, self.last_name, self.diet_id, self.diet_reason)
 
 
 class Friend(db.Model):
-    '''Makes connections between the user and their contact'''
+    '''Makes connection between the user and their contact'''
 
     __tablename__ = 'friends'
 
@@ -97,7 +96,6 @@ class Friend(db.Model):
     friendship_verified_by_facebook = db.Column(db.Boolean, unique=False, default=False)
 
     profile = db.relationship('Profile', backref='friends')
-
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -132,11 +130,11 @@ class Intolerance(db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Intolerances int_id=%s int_name=%s int_description=%s>' % (self.intol_id, self.intol_name, self.intol_description)
+        return '<Intolerance int_id=%s int_name=%s int_description=%s>' % (self.intol_id, self.intol_name, self.intol_description)
 
 
 class Diet(db.Model):
-    '''What diet a user follows.'''
+    '''Spoonacular's diet choices.'''
 
     __tablename__ = 'diets'
 
@@ -148,7 +146,7 @@ class Diet(db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Diet diet_id=%s diet_type=%s description=%s>' % (self.diet_id, self.diet_type, self.description)
+        return '<Diet diet_id=%s diet_type=%s description=%s restrictive_ranking=%s>' % (self.diet_id, self.diet_type, self.description, self.restrictive_ranking)
 
 
 class Cuisine(db.Model):
@@ -189,12 +187,10 @@ class IngToAvoid(db.Model):
     reason = db.Column(db.String(200), nullable=True)
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
 
-    profiles = db.relationship('Profile', backref='ingredients')
-
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<IngToAvoid avoid_id=%s user_id=%s ingredient=%s reason=%s>' % (self.avoid_id, self.user_id, self.ingredient, self.reason)
+        return '<IngToAvoid avoid_id=%s profile_id=%s ingredient=%s reason=%s>' % (self.avoid_id, self.profile_id, self.ingredient, self.reason)
 
 
 class PartyGuest(db.Model):
@@ -216,10 +212,12 @@ class Party(db.Model):
 
     party_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
-    host_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    date_of_party = db.Column(db.Date, nullable=True)
+    time_of_party = db.Column(db.Time(timezone=True), nullable=True)
 
-    guests = db.relationship('Profiles',
-                             secondary='party_guests')
+    guest_profiles = db.relationship('Profile',
+                                     secondary='party_guests')
 
     recipes = db.relationship('RecipeCard',
                               secondary='partyrecipes',
@@ -228,7 +226,7 @@ class Party(db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Party party_id=%s title_id=%s host_id=%s>' % (self.party_id, self.title, self.host_id)
+        return '<Party party_id=%s title_id=%s host_id=%s date=%s time=%s>' % (self.party_id, self.title, self.host_id, self.date, self.time)
 
 
 class RecipeCard(db.Model):
@@ -262,7 +260,7 @@ class PartyRecipes(db.Model):
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'), nullable=False)
-    recipe_record_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_record_id'), nullable=False)
+    recipe_record_id = db.Column(db.Integer, db.ForeignKey('recipecard.recipe_record_id'), nullable=False)
     works_for = db.Column(db.String(1000), nullable=True)
 
 

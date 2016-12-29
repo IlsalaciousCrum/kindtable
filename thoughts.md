@@ -26,3 +26,5 @@ already knowing what you are going to do that day, checking in with timelines an
 ## Future Features:
 + being able to attach preferred recipes to a profile. So a user would get ideas of things to make for this friend
 + updating google calendar with dinner party dates and invites
++ indicate when a profile was last updated - tells the user so they can determine if they want to refresh the information.
++ adding a date and time to the party: http://stackoverflow.com/questions/12019766/how-to-get-month-and-year-from-date-field-in-sqlalchemy

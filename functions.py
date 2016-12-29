@@ -1,6 +1,7 @@
 # # from sqlalchemy import func
 
-from Model import db, User, UserIntolerance, Diet, IngToAvoid, Party, Friends, Cuisine, Course
+from Model import (connect_to_db, db, User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes)
+
 # from server import app
 
 from flask import render_template, request, flash, jsonify
@@ -8,6 +9,7 @@ from flask import render_template, request, flash, jsonify
 import requests
 import os
 import json
+import datetime
 
 
 def make_user(email, password, diet_id, first_name=None, last_name=None, diet_reason=None, verified=False):
