@@ -21,4 +21,8 @@ themselves notes.
 + The many benefits of daily standup (the effect on productivity of 
 already knowing what you are going to do that day, checking in with timelines and goals everyday and how that keeps me on task)
 + Database migration. HB didn't seem to discuss that.
-+ 
++ When designing the model, discriminating between what is information to be stored or accessed through object oriented programming vs. queries
+
+## Future Features:
++ being able to attach preferred recipes to a profile. So a user would get ideas of things to make for this friend
++ updating google calendar with dinner party dates and invites

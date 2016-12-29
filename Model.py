@@ -19,14 +19,16 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
     _password = db.Column(db.String(128))
-    validated = db.Column(db.Boolean, unique=False, default=False)
+    email_verified = db.Column(db.Boolean, unique=False, default=False)
 
-    profile = db.relationship('Profile')
+    user_profile = db.relationship('Profile', backref='user')
     parties = db.relationship('Party')
-    friends = db.relationship('Friend')
+    friend_profiles = db.relationship('Profiles',
+                              secondary='friends')
+
     saved_recipes = db.relationship('RecipeCard',
                                     secondary='recipebox',
-                                    backref='user')
+                                    backref='users')
 
     @hybrid_property
     def password(self):
@@ -54,35 +56,33 @@ class User(db.Model):
 
 
 class Profile(db.Model):
-    '''A profile to pin diet information to for either users or friends'''
+    '''Information about users and their contacts'''
 
     __tablename__ = 'profiles'
 
     profile_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     is_user_profile = db.Column(db.Boolean, unique=False, default=False)
-    email = db.Column(db.String(200), nullable=False, unique=True)
+    email = db.Column(db.String(200), nullable=False, unique=False)
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
-
-    user = db.relationship('User')
-
     diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'))
     diet_reason = db.Column(db.String(120), nullable=True)  # ie, ethical, religious, general health, specific health
+    profile_notes = db.Column(db.String(300), nullable=True)
 
-    diet = db.relationship('Diet', backref='profile')
+    diet = db.relationship('Diet', backref='profiles')
 
-    avoidances = db.relationship('IngToAvoid', backref=db.backref('friends'))
+    avoidances = db.relationship('IngToAvoid', backref=db.backref('profiles'))
 
     intolerances = db.relationship('Intolerance',
                                    secondary='userintolerances',
-                                   backref='friends')
+                                   backref='profiles')
 
 
     def __repr__(self):
-    '''Provide helpful representation when printed.'''
+        '''Provide helpful representation when printed.'''
 
-    return '<User user_id=%s profile_id=%s>' % (self.user_id, self.profile_id)
+    return '<Profile profile_id=%s user_id=%s user_id=%s is_user_profile=%s email=%s first_name=%s last_name=%s diet_id=%s diet_reason=%s>' % (self.profile_id, self.user_id, self.is_user_profile, self.email, self.first_name, self.last_name, self.diet_id, self.diet_reason)
 
 
 class Friend(db.Model):
@@ -92,29 +92,32 @@ class Friend(db.Model):
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
-    friend_id = db.Column(db.Integer, nullable=True)
-    email = db.Column(db.String(200), nullable=True, unique=True)
-    first_name = db.Column(db.String(64), nullable=True)
-    last_name = db.Column(db.String(64), nullable=True)
-    friend_notes = db.Column(db.String(300), nullable=True)
+    friend_profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
+    friendship_verified_by_email = db.Column(db.Boolean, unique=False, default=False)
+    friendship_verified_by_facebook = db.Column(db.Boolean, unique=False, default=False)
 
-    user_details = db.relationship('User', foreign_keys=[user_id], backref='friends')
+    profile = db.relationship('Profile', backref='friends')
+
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Friends record_id=%s user_id=%s  friend_id=%s>' % (self.record_id, self.user_id, self.friend_id)
+        return '<Friend record_id=%s user_id=%s  profile_id=%s friendship_verified_by_email=%s friendship_verified_by_facebook=%s>' % (self.record_id, self.user_id, self.profile_id, self.friendship_verified_by_email, self.friendship_verified_by_facebook)
 
 
 class UserIntolerance(db.Model):
-    '''The intolerances that each user has.'''
+    '''Associates the intolerances that each user has.'''
 
     __tablename__ = 'userintolerances'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
     intol_id = db.Column(db.Integer, db.ForeignKey('intolerances.intol_id'), nullable=False)
+
+    def __repr__(self):
+        '''Provide helpful representation when printed.'''
+
+        return '<UserIntolerance record_id=%s profile_id=%s intol_id=%s>' % (self.record_id, self.profile_id, self.intol_id)
 
 
 class Intolerance(db.Model):
@@ -203,7 +206,7 @@ class PartyGuest(db.Model):
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
 
 
 class Party(db.Model):
@@ -215,10 +218,10 @@ class Party(db.Model):
     title = db.Column(db.String(120), nullable=False)
     host_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
 
-    users = db.relationship('User',
-                            secondary='party_guests')
+    guests = db.relationship('Profiles',
+                             secondary='party_guests')
 
-    recipes = db.relationship('RecipeBox',
+    recipes = db.relationship('RecipeCard',
                               secondary='partyrecipes',
                               backref='parties')
 
