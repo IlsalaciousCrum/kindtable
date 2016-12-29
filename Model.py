@@ -12,28 +12,21 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
-    '''User of K(i)nd website. Guests and hosts are stored in the same table.'''
+    '''Registered users of KindTable WebApp.'''
 
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(200), nullable=False, unique=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
     _password = db.Column(db.String(128))
-    verified = db.Column(db.Boolean, default=False, nullable=False)
-    first_name = db.Column(db.String(64), nullable=True)
-    last_name = db.Column(db.String(64), nullable=True)
-    diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'))
-    diet_reason = db.Column(db.String(120), nullable=True)  # ie, ethical, religious, general health, specific health
+    validated = db.Column(db.Boolean, unique=False, default=False)
 
-    avoidances = db.relationship('IngToAvoid', backref=db.backref('users_a'))
-
-    intolerances = db.relationship('Intolerance',
-                                   secondary='userintolerances',
-                                   backref='users')
-
-    diet = db.relationship('Diet', backref='users')
-
+    profile = db.relationship('Profile')
     parties = db.relationship('Party')
+    friends = db.relationship('Friend')
+    saved_recipes = db.relationship('RecipeCard',
+                                    secondary='recipebox',
+                                    backref='user')
 
     @hybrid_property
     def password(self):
@@ -57,20 +50,56 @@ class User(db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<User user_id=%s email=%s  first_name=%s last_name=%s>' % (self.user_id, self.email, self.first_name, self.last_name)
+        return '<User user_id=%s profile_id=%s validated=%s>' % (self.user_id, self.profile_id, self.validated)
 
 
-class Friends(db.Model):
-    '''Makes connections between the user and other users they know'''
+class Profile(db.Model):
+    '''A profile to pin diet information to for either users or friends'''
+
+    __tablename__ = 'profiles'
+
+    profile_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    is_user_profile = db.Column(db.Boolean, unique=False, default=False)
+    email = db.Column(db.String(200), nullable=False, unique=True)
+    first_name = db.Column(db.String(64), nullable=True)
+    last_name = db.Column(db.String(64), nullable=True)
+
+    user = db.relationship('User')
+
+    diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'))
+    diet_reason = db.Column(db.String(120), nullable=True)  # ie, ethical, religious, general health, specific health
+
+    diet = db.relationship('Diet', backref='profile')
+
+    avoidances = db.relationship('IngToAvoid', backref=db.backref('friends'))
+
+    intolerances = db.relationship('Intolerance',
+                                   secondary='userintolerances',
+                                   backref='friends')
+
+
+    def __repr__(self):
+    '''Provide helpful representation when printed.'''
+
+    return '<User user_id=%s profile_id=%s>' % (self.user_id, self.profile_id)
+
+
+class Friend(db.Model):
+    '''Makes connections between the user and their contact'''
 
     __tablename__ = 'friends'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    friend_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
+    friend_id = db.Column(db.Integer, nullable=True)
+    email = db.Column(db.String(200), nullable=True, unique=True)
+    first_name = db.Column(db.String(64), nullable=True)
+    last_name = db.Column(db.String(64), nullable=True)
+    friend_notes = db.Column(db.String(300), nullable=True)
 
-    users = db.relationship('User', foreign_keys=[user_id], backref='friends')
-    friends = db.relationship('User', foreign_keys=[friend_id], backref='users')
+    user_details = db.relationship('User', foreign_keys=[user_id], backref='friends')
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -83,8 +112,8 @@ class UserIntolerance(db.Model):
 
     __tablename__ = 'userintolerances'
 
-    user_intol_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
     intol_id = db.Column(db.Integer, db.ForeignKey('intolerances.intol_id'), nullable=False)
 
 
@@ -155,9 +184,9 @@ class IngToAvoid(db.Model):
     avoid_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     ingredient = db.Column(db.String(100), nullable=False)
     reason = db.Column(db.String(200), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'), nullable=False)
 
-    users = db.relationship('User', backref='ingredients')
+    profiles = db.relationship('Profile', backref='ingredients')
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -199,10 +228,10 @@ class Party(db.Model):
         return '<Party party_id=%s title_id=%s host_id=%s>' % (self.party_id, self.title, self.host_id)
 
 
-class RecipeBox(db.Model):
+class RecipeCard(db.Model):
     '''Add a recipe to a users recipe box'''
 
-    __tablename__ = 'recipes'
+    __tablename__ = 'recipecard'
 
     recipe_record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     recipe_id = db.Column(db.String(120), nullable=False)
@@ -211,6 +240,16 @@ class RecipeBox(db.Model):
     recipe_url = db.Column(db.String(300), nullable=False)
     ingredients = db.Column(db.String(2000), nullable=True)
     instructions = db.Column(db.String(2000), nullable=True)
+
+
+class RecipeBox(db.Model):
+    '''Recipes bookmarked by a user'''
+
+    __tablename__ = 'recipebox'
+
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    recipe_record_id = db.Column(db.Integer, db.ForeignKey('recipecard.recipe_record_id'), nullable=False)
 
 
 class PartyRecipes(db.Model):

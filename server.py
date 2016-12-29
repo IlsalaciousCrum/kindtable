@@ -30,6 +30,7 @@ app.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=465,
     MAIL_USE_SSL=True,
+    MAIL_DEFAULT_SENDER=('Kind Table', 'kindtableapp@gmail.com'),
     MAIL_USERNAME=os.environ['KIND_TABLE_EMAIL'],
     MAIL_PASSWORD=os.environ['KIND_TABLE_EMAIL_PASSWORD'],
     )
@@ -55,10 +56,9 @@ def send_mail():
     """Testing sending email through Flask-Mail and the website"""
 
     try:
-        msg = Message("Send Mail Tutorial!",
-                      sender="kindtableapp@gmail.com",
+        msg = Message("Ilsa has sent you a Kind Table Request!",
                       recipients=["ilsalacious@gmail.com"])
-        msg.body = "Yo!\nHave you heard the good word of Python???"
+        msg.body = "Ilsa (ilsalacious@gmail.com) would like you to fill out a brief dietary preference profile to make cooking for you easier."
         mail.send(msg)
         return 'Mail sent!'
     except Exception, e:
