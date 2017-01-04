@@ -1,12 +1,73 @@
 '''Models for K(i)ndTable WebApp.'''
 from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
 from passlib.hash import bcrypt
-from . import db, login_manager
+from . import db
 
 ##############################################################################
 # Model definitions
+
+
+class Diet(db.Model):
+    '''Spoonacular's diet choices.'''
+
+    __tablename__ = 'diets'
+
+    diet_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    diet_type = db.Column(db.String(64), nullable=False)
+    description = db.Column(db.String(120), nullable=False)
+    ranking = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        '''Provide helpful representation when printed.'''
+
+        return '<Diet diet_id=%s diet_type=%s description=%s \
+        restrictive_ranking=%s>' % (self.diet_id,
+                                    self.diet_type,
+                                    self.description,
+                                    self.restrictive_ranking)
+
+
+class Profile(db.Model):
+    '''Information about users and their contacts'''
+
+    __tablename__ = 'profiles'
+
+    profile_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    is_user_profile = db.Column(db.Boolean, unique=False, default=False)
+    email = db.Column(db.String(200), nullable=False, unique=False)
+    email_verified = db.Column(db.Boolean, unique=False, default=False)
+    first_name = db.Column(db.String(64), nullable=True)
+    last_name = db.Column(db.String(64), nullable=True)
+    diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'))
+    # ie, ethical, religious, general health, specific health
+    diet_reason = db.Column(db.String(120), nullable=True)
+    profile_notes = db.Column(db.String(300), nullable=True)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
+
+    diet = db.relationship('Diet', backref='profiles', lazy='joined')
+
+    avoidances = db.relationship('IngToAvoid', backref='profiles', lazy='joined')
+
+    intolerances = db.relationship('Intolerance',
+                                   secondary='userintolerances',
+                                   backref='profiles',
+                                   lazy='joined')
+    user = db.relationship('User')
+
+    def __repr__(self):
+        '''Provide helpful representation when printed.'''
+
+        return '<Profile profile_id=%s user_id=%s user_id=%s \
+        is_user_profile=%s email=%s first_name=%s last_name=%s \
+        diet_id=%s diet_reason=%s>' % (self.profile_id,
+                                       self.user_id,
+                                       self.is_user_profile,
+                                       self.email,
+                                       self.first_name,
+                                       self.last_name,
+                                       self.diet_id,
+                                       self.diet_reason)
 
 
 class User(db.Model):
@@ -15,19 +76,13 @@ class User(db.Model):
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    _password = db.Column(db.String(128))
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                            nullable=False)
-    _password = db.Column(db.String(128))
-    email_verified = db.Column(db.Boolean, unique=False, default=False)
 
-    parties = db.relationship('Party')
-
-    user_profile = db.relationship('Profile', backref='user', post_update=True)
-
-    saved_recipes = db.relationship('RecipeCard',
-                                    secondary='recipebox',
-                                    backref='users',
-                                    post_update=True)
+    parties = db.relationship('Party', backref='user')
+    recipebox = db.relationship('RecipeBox', backref='user')
+    profile = db.relationship('Profile')
 
     @hybrid_property
     def password(self):
@@ -57,48 +112,6 @@ class User(db.Model):
                           self.validated)
 
 
-class Profile(db.Model):
-    '''Information about users and their contacts'''
-
-    __tablename__ = 'profiles'
-
-    profile_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    is_user_profile = db.Column(db.Boolean, unique=False, default=False)
-    email = db.Column(db.String(200), nullable=False, unique=False)
-    first_name = db.Column(db.String(64), nullable=True)
-    last_name = db.Column(db.String(64), nullable=True)
-    diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'))
-    # ie, ethical, religious, general health, specific health
-    diet_reason = db.Column(db.String(120), nullable=True)
-    profile_notes = db.Column(db.String(300), nullable=True)
-    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
-
-    diet = db.relationship('Diet', backref='profiles', lazy='joined', post_update=True)
-
-    avoidances = db.relationship('IngToAvoid', backref='profiles', lazy='joined', post_update=True)
-
-    intolerances = db.relationship('Intolerance',
-                                   secondary='userintolerances',
-                                   backref='profiles',
-                                   lazy='joined',
-                                   post_update=True)
-
-    def __repr__(self):
-        '''Provide helpful representation when printed.'''
-
-        return '<Profile profile_id=%s user_id=%s user_id=%s \
-        is_user_profile=%s email=%s first_name=%s last_name=%s \
-        diet_id=%s diet_reason=%s>' % (self.profile_id,
-                                       self.user_id,
-                                       self.is_user_profile,
-                                       self.email,
-                                       self.first_name,
-                                       self.last_name,
-                                       self.diet_id,
-                                       self.diet_reason)
-
-
 class Friend(db.Model):
     '''Makes connection between the user and their contact'''
 
@@ -115,8 +128,8 @@ class Friend(db.Model):
     friendship_verified_by_facebook = db.Column(db.Boolean, unique=False,
                                                 default=False)
 
-    profile = db.relationship('Profile', backref='friend', post_update=True)
-    user = db.relationship('User', backref='friends', post_update=True)
+    profile = db.relationship('Profile', backref='friend')
+    user = db.relationship('User', backref='friends')
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -128,26 +141,6 @@ class Friend(db.Model):
                                                 self.profile_id,
                                                 self.friendship_verified_by_email,
                                                 self.friendship_verified_by_facebook)
-
-
-class UserIntolerance(db.Model):
-    '''Associates the intolerances that each user has.'''
-
-    __tablename__ = 'userintolerances'
-
-    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
-                           nullable=False)
-    intol_id = db.Column(db.Integer, db.ForeignKey('intolerances.intol_id'),
-                         nullable=False)
-
-    def __repr__(self):
-        '''Provide helpful representation when printed.'''
-
-        return '<UserIntolerance record_id=%s profile_id=%s \
-        intol_id=%s>' % (self.record_id,
-                         self.profile_id,
-                         self.intol_id)
 
 
 class Intolerance(db.Model):
@@ -168,24 +161,24 @@ class Intolerance(db.Model):
                                 self.intol_description)
 
 
-class Diet(db.Model):
-    '''Spoonacular's diet choices.'''
+class UserIntolerance(db.Model):
+    '''Associates the intolerances that each user has.'''
 
-    __tablename__ = 'diets'
+    __tablename__ = 'userintolerances'
 
-    diet_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    diet_type = db.Column(db.String(64), nullable=False)
-    description = db.Column(db.String(120), nullable=False)
-    ranking = db.Column(db.Integer, nullable=False)
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
+                           nullable=False)
+    intol_id = db.Column(db.Integer, db.ForeignKey('intolerances.intol_id'),
+                         nullable=False)
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Diet diet_id=%s diet_type=%s description=%s \
-        restrictive_ranking=%s>' % (self.diet_id,
-                                    self.diet_type,
-                                    self.description,
-                                    self.restrictive_ranking)
+        return '<UserIntolerance record_id=%s profile_id=%s \
+        intol_id=%s>' % (self.record_id,
+                         self.profile_id,
+                         self.intol_id)
 
 
 class Cuisine(db.Model):
@@ -239,20 +232,6 @@ class IngToAvoid(db.Model):
                        self.reason)
 
 
-class PartyGuest(db.Model):
-    '''Associate users with a party'''
-
-    #  this is a true association table now
-
-    __tablename__ = 'party_guests'
-
-    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'),
-                         nullable=False)
-    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
-                           nullable=False)
-
-
 class Party(db.Model):
     '''Create a dinner party to store and link information about a party'''
 
@@ -268,14 +247,12 @@ class Party(db.Model):
     guest_profiles = db.relationship('Profile',
                                      secondary='party_guests',
                                      lazy='joined',
-                                     backref='party',
-                                     post_update=True)
+                                     backref='party')
 
     recipes = db.relationship('RecipeCard',
                               secondary='partyrecipes',
                               backref='parties',
-                              lazy='joined',
-                              post_update=True)
+                              lazy='joined')
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -287,6 +264,19 @@ class Party(db.Model):
                      self.date,
                      self.time)
 
+
+class PartyGuest(db.Model):
+    '''Associate users with a party'''
+
+    #  this is a true association table now
+
+    __tablename__ = 'party_guests'
+
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'),
+                         nullable=False)
+    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
+                           nullable=False)
 
 class RecipeCard(db.Model):
     '''Add a recipe to a users recipe box'''
@@ -326,7 +316,7 @@ class RecipeBox(db.Model):
                                  db.ForeignKey('recipecard.recipe_record_id'),
                                  nullable=False)
 
-    recipes = db.relationship('RecipeCard', lazy='joined', post_update=True)
+    recipes = db.relationship('RecipeCard', lazy='joined')
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
