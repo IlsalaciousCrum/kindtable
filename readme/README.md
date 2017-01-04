@@ -22,20 +22,20 @@ This Readme is a work-in-progress. As is the app, as there is so much more work 
 
 Users enter dietary restriction information about themselves and their contacts into webforms served by a Flask app, which populate a Postgres database using SQLAlchemy:
 
-<img src="static/user_profile.png">
+<img src="app/static/user_profile.png">
 
 The user creates a party and invites their contacts:
 
-<img src="static/party_profile_unexploded.png">
+<img src="app/static/party_profile_unexploded.png">
 
 An API call is made to Spoonacular with all the guests dietary restrictions collated and then recipes are presented to the user. Recipe limiters such as diet type, intolerances/allergies and ingredients to avoid can be deselected and the search rerun. 
 
-<img src="static/recipe_search.png">
+<img src="app/static/recipe_search.png">
 
 Recipes can be previewed and then saved to the SQL Alchemy database. The dietary restrictions that were used to run the search are also saved.
 These recipes can be viewed from the party profile page. 
 
-<img src="static/recipe_preview.png">
+<img src="app/static/recipe_preview.png">
 
 
 ### About the Developer    
