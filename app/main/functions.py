@@ -1,6 +1,6 @@
 # # from sqlalchemy import func
 
-from Model import (connect_to_db, db, User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes)
+from app.models import (db, User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes)
 
 # from server import app
 

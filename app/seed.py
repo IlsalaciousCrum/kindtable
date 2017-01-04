@@ -1,12 +1,11 @@
-"""Utility file to seed K(i)nd database data for testing"""
-
-from sqlalchemy import func
-
-from Model import connect_to_db, db, Intolerance, Diet, Cuisine, Course
-from server import app
+"""Loads seed data for Spoonacular"""
 
 
-def load_seeddata():
+from app.models import Diet, Intolerance, Cuisine, Course
+from app import db
+
+
+def LoadSeedData():
     """Load users from u.users into database."""
 
     diet1 = Diet(diet_type="vegan", description="does not eat an animal byproducts", ranking=1)
@@ -188,9 +187,3 @@ def load_seeddata():
     db.session.commit()
 
     print "loaded Courses"
-
-
-if __name__ == "__main__":
-    connect_to_db(app)
-    db.create_all()
-

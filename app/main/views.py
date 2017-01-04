@@ -1,19 +1,24 @@
 """K(i)nd app"""
 
-from jinja2 import StrictUndefined
+from datetime import datetime
 
-from flask import Flask, render_template, request, flash, redirect, session, json
+from flask import Flask, render_template, request, flash, redirect, session, json, url_for
 
-from Model import (connect_to_db, db, User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes)
+from flask_moment import Moment
 
-from flask_script import Manager, Server
-from flask_migrate import Migrate, MigrateCommand
+from . import main
+
+# commented out because I have not made my forms yet, NameForm is a placeholder name, not a real form
+# from .forms import NameForm
+
+
+from app.models import User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
+
+from .. import db
 
 from flask_mail import Mail, Message
 
 import os
-
-import datetime
 
 from functions import (guest_intolerances, guest_avoidances,
                        spoonacular_request, make_user, make_friendship,
@@ -21,38 +26,8 @@ from functions import (guest_intolerances, guest_avoidances,
                        spoonacular_recipe_instructions, all_guest_diets,
                        new_guest_diet, new_spoonacular_request, spoonacular_recipe_ingredients)
 
-app = Flask(__name__)
 
-# config variables for Flask-Mail
-
-app.config.update(
-    DEBUG=True,
-    #EMAIL SETTINGS
-    MAIL_SERVER='smtp.gmail.com',
-    MAIL_PORT=465,
-    MAIL_USE_SSL=True,
-    MAIL_DEFAULT_SENDER=('Kind Table', 'kindtableapp@gmail.com'),
-    MAIL_USERNAME=os.environ['KIND_TABLE_EMAIL'],
-    MAIL_PASSWORD=os.environ['KIND_TABLE_EMAIL_PASSWORD'],
-    )
-mail = Mail(app)
-
-# Required to use Flask sessions and the debug toolbar
-app.secret_key = os.environ['APP_SECRET_KEY']
-
-# Normally, if you use an undefined variable in Jinja2, it fails silently.
-# This is horrible. Fix this so that, instead, it raises an error.
-app.jinja_env.undefined = StrictUndefined
-
-# handles schema migration
-migrate = Migrate(app, db)
-manager = Manager(app)
-server = Server(host="0.0.0.0", port=5000, use_debugger=True, use_reloader=True)
-manager.add_command("runserver", server)
-manager.add_command('db', MigrateCommand)
-
-
-@app.route('/send-email')
+@main.route('/send-email')
 def send_mail():
     """Testing sending email through Flask-Mail and the website"""
 
@@ -66,7 +41,7 @@ def send_mail():
         return(str(e))
 
 
-@app.route('/')
+@main.route('/')
 def index():
     """Homepage."""
 
@@ -77,14 +52,14 @@ def index():
         return render_template("kind_homepage.html")
 
 
-@app.route('/login', methods=['GET'])
+@main.route('/login', methods=['GET'])
 def show_login_form():
     """Show login form."""
 
     return render_template("login_form.html")
 
 
-@app.route('/logout')
+@main.route('/logout')
 def add_logout():
     """Log out."""
 
@@ -97,7 +72,7 @@ def add_logout():
         return redirect("/login")
 
 
-@app.route('/register', methods=['GET'])
+@main.route('/register', methods=['GET'])
 def show_register_form():
     """Show form for user signup."""
 
@@ -106,7 +81,7 @@ def show_register_form():
     return render_template("register_form.html", diets=diets)
 
 
-@app.route('/userprofile', methods=['GET'])
+@main.route('/userprofile', methods=['GET'])
 def show_user_profile():
     """Show logged in user's profile"""
 
@@ -125,7 +100,7 @@ def show_user_profile():
         return redirect("/login")
 
 
-@app.route('/findfriend', methods=['GET'])
+@main.route('/findfriend', methods=['GET'])
 def show_get_a_friend():
     """Create a profile for a friend"""
 
@@ -138,7 +113,7 @@ def show_get_a_friend():
         return redirect("/login")
 
 
-@app.route('/findmanyfriends', methods=['GET'])
+@main.route('/findmanyfriends', methods=['GET'])
 def show_get_many_friends():
     """Create a profile for a friend"""
 
@@ -151,7 +126,7 @@ def show_get_many_friends():
         return redirect("/login")
 
 
-@app.route('/friendprofile/<int:friend_id>', methods=['GET'])
+@main.route('/friendprofile/<int:friend_id>', methods=['GET'])
 def show_friend_profile(friend_id):
     """Show logged in user's friends profile"""
 
@@ -173,7 +148,7 @@ def show_friend_profile(friend_id):
         return redirect("/login")
 
 
-@app.route('/addafriend', methods=['POST'])
+@main.route('/addafriend', methods=['POST'])
 def add_a_friend():
     """Add a friend connections to the friends table"""
 
@@ -206,7 +181,7 @@ def add_a_friend():
         return redirect("/findfriend")
 
 
-@app.route('/addmanyfriends', methods=['POST'])
+@main.route('/addmanyfriends', methods=['POST'])
 def add_many_friends():
     """Add multiple friends connections to the friends table"""
 
@@ -239,7 +214,7 @@ def add_many_friends():
         return redirect("/findmanyfriends")
 
 
-@app.route('/addafriendasguest', methods=['POST'])
+@main.route('/addafriendasguest', methods=['POST'])
 def add_a_friend_as_guest():
     """Add a friend connections to the friends table"""
 
@@ -282,7 +257,7 @@ def add_a_friend_as_guest():
             return redirect('/party_profile/%s' % party_id)
 
 
-@app.route('/update_user_from_party_profile', methods=['POST'])
+@main.route('/update_user_from_party_profile', methods=['POST'])
 def change_friend_at_party():
     """Update the friend basic profile at party"""
 
@@ -298,7 +273,7 @@ def change_friend_at_party():
     return redirect('/party_profile/%s' % party_id)
 
 
-@app.route('/update_user', methods=['POST'])
+@main.route('/update_user', methods=['POST'])
 def change_user_basic_info():
     """Update the current users basic profile at party"""
 
@@ -313,7 +288,7 @@ def change_user_basic_info():
     return redirect('/userprofile')
 
 
-@app.route('/partyfriendintol', methods=['POST'])
+@main.route('/partyfriendintol', methods=['POST'])
 def add_friends_intolerance_from_party():
     """Add a friend intolerance to the their profile from the party page"""
 
@@ -326,7 +301,7 @@ def add_friends_intolerance_from_party():
     return redirect("/party_profile/%s" % party_id)
 
 
-@app.route('/partyfriendingredientadded', methods=['POST'])
+@main.route('/partyfriendingredientadded', methods=['POST'])
 def add_friends_ingredient_from_party():
     """Add an user's ingredient to avoid to the user profile from the party page"""
 
@@ -340,7 +315,7 @@ def add_friends_ingredient_from_party():
     return redirect("/party_profile/%s" % party_id)
 
 
-@app.route('/changefrienduserinfo', methods=['POST'])
+@main.route('/changefrienduserinfo', methods=['POST'])
 def add_friend_profile_registered():
     """Instantiate unverified User and make connection on friends table."""
 
@@ -357,7 +332,7 @@ def add_friend_profile_registered():
     return redirect("/friendprofile/%s" % newfriend.user_id)
 
 
-@app.route('/party_profile/<int:party_id>')
+@main.route('/party_profile/<int:party_id>')
 def show_party_profile(party_id):
     """Show the party profile"""
 
@@ -378,7 +353,7 @@ def show_party_profile(party_id):
         return redirect("/login")
 
 
-@app.route('/addaparty', methods=['GET'])
+@main.route('/addaparty', methods=['GET'])
 def show_party_form():
     """Show the dinner party form"""
 
@@ -390,7 +365,7 @@ def show_party_form():
         return redirect("/login")
 
 
-@app.route('/searchrecipes')
+@main.route('/searchrecipes')
 def show_search_spoonacular():
     """Collate party information, query spoonacular and show results."""
 
@@ -426,7 +401,7 @@ def show_search_spoonacular():
         return redirect("/login")
 
 
-@app.route('/reloadsearchrecipes', methods=["POST"])
+@main.route('/reloadsearchrecipes', methods=["POST"])
 def show_re_search_spoonacular():
     """Collate party information, query spoonacular and show results."""
 
@@ -486,7 +461,7 @@ def show_re_search_spoonacular():
         return redirect("/login")
 
 
-@app.route('/show_recipe/<int:record_id>')
+@main.route('/show_recipe/<int:record_id>')
 def preview_saved_recipe(record_id):
     """Show a recipe preview of recipes saved in the RecipeBox from the party page"""
 
@@ -514,7 +489,7 @@ def preview_saved_recipe(record_id):
                                instructions=instructions)
 
 
-@app.route('/recipe/<int:record_id>')
+@main.route('/recipe/<int:record_id>')
 def show_saved_recipe(record_id):
     """Show a recipe saved in the RecipeBox in it's own page, from the recipe preview, on the party page"""
 
@@ -541,7 +516,7 @@ def show_saved_recipe(record_id):
                                instructions=instructions)
 
 
-@app.route('/see_recipe', methods=['POST'])
+@main.route('/see_recipe', methods=['POST'])
 def show_recipe():
     """Preview a recipe not yet saved, from the recipe search page"""
 
@@ -579,7 +554,7 @@ def show_recipe():
         return redirect("/login")
 
 
-@app.route('/registered', methods=['POST'])
+@main.route('/registered', methods=['POST'])
 def add_register_users():
     """Process registration."""
 
@@ -606,7 +581,7 @@ def add_register_users():
         return redirect("/userprofile")
 
 
-@app.route('/loggedin', methods=['POST'])
+@main.route('/loggedin', methods=['POST'])
 def add_login_process():
     """Process login."""
 
@@ -629,7 +604,7 @@ def add_login_process():
         return redirect("/register")
 
 
-@app.route('/intolerance_added', methods=['POST'])
+@main.route('/intolerance_added', methods=['POST'])
 def add_an_intolerance():
     """Add a user intolerance to the user profile"""
 
@@ -642,7 +617,7 @@ def add_an_intolerance():
     return redirect("/userprofile")
 
 
-@app.route('/ingredientadded', methods=['POST'])
+@main.route('/ingredientadded', methods=['POST'])
 def add_an_ingredient():
     """Add an user's ingredient to avoid to the user profile"""
 
@@ -657,7 +632,7 @@ def add_an_ingredient():
     return redirect("/userprofile")
 
 
-@app.route('/friendintolerance_added', methods=['POST'])
+@main.route('/friendintolerance_added', methods=['POST'])
 def add_friends_intolerance():
     """Add a friend intolerance to the their profile"""
 
@@ -669,7 +644,7 @@ def add_friends_intolerance():
     return redirect("friendprofile/%s" % friend_id)
 
 
-@app.route('/friendingredientadded', methods=['POST'])
+@main.route('/friendingredientadded', methods=['POST'])
 def add_friends_ingredient():
     """Add an user's ingredient to avoid to the user profile"""
 
@@ -682,7 +657,7 @@ def add_friends_ingredient():
     return redirect("friendprofile/%s" % friend_id)
 
 
-@app.route('/party_added', methods=['POST'])
+@main.route('/party_added', methods=['POST'])
 def add_party():
     """Add a new dinner party to the dinner party table"""
 
@@ -702,7 +677,7 @@ def add_party():
         return redirect("/addaparty")
 
 
-@app.route('/guest_added', methods=['POST'])
+@main.route('/guest_added', methods=['POST'])
 def add_guest():
     """Add a guest to a diner party"""
 
@@ -716,7 +691,7 @@ def add_guest():
     return redirect('/party_profile/' + party_id)
 
 
-@app.route('/addtorecipebox', methods=['POST'])
+@main.route('/addtorecipebox', methods=['POST'])
 def add_recipe_box():
     """Add a recipe to the recipe box"""
 
@@ -792,17 +767,3 @@ def add_recipe_box():
             return redirect("/searchrecipes")
     else:
         return redirect("/login")
-
-# ___________________________________________________________________________
-
-if __name__ == "__main__":
-
-    connect_to_db(app, os.environ.get("DATABASE_URL"))
-
-    #  remove app.debug = True before demoing
-
-    # app.debug = True
-
-    # app.run(host="0.0.0.0")
-    
-    manager.run()

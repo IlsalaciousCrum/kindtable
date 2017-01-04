@@ -15,6 +15,15 @@ themselves notes.
 ## To Do:
 
 + Update seed file to add a default user_id for the profiles table to use when there is not a registered user for that profile. Instead of a hashed password, store something that is not a hash and will never validate through user authentication so that no one can ever use that user_id to log in.
++ functions that add a date and time to the party: http://stackoverflow.com/questions/12019766/how-to-get-month-and-year-from-date-field-in-sqlalchemy
++ indicate when a profile was last updated - tells the user so they can determine if they want to refresh the information.
++ classmethod datetime.utcnow()
+Return the current UTC date and time, with tzinfo None. This is like now(), but returns the current UTC date and time, as a naive datetime object. See also now().
++ POST/Redirect/Get for forms to eliminate the possibility of refreshing a post form.
++ url_for() gets passed the view function name (like 'show_login_form') and so will still work if you change the route name later. 
++ sending asynchronous email - Thread or Celery queue
+
+
 
 ## Thing I've learned on this project:
 + The benefits of project managements, project design, carefully thinlking out your sprint goals.
@@ -26,5 +35,4 @@ already knowing what you are going to do that day, checking in with timelines an
 ## Future Features:
 + being able to attach preferred recipes to a profile. So a user would get ideas of things to make for this friend
 + updating google calendar with dinner party dates and invites
-+ indicate when a profile was last updated - tells the user so they can determine if they want to refresh the information.
-+ adding a date and time to the party: http://stackoverflow.com/questions/12019766/how-to-get-month-and-year-from-date-field-in-sqlalchemy
+

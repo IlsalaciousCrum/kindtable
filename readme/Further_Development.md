@@ -2,13 +2,6 @@
 
 This is my public to-do list for my Hackbright Academy final project, Kind Table. All development thus far happened in two 2-week-long sprints, while other things were going on. This web app is functional as is but there is so much that I wanted to add and learn. And refactor. :blush:
 
-
-###### Working On Now ######
-
-Adding Flask integration testing, test database, test JSON reponse. The rest of the work can then be done through test driven development. And making sure I don't break things along the way, since there are a lot of routes and moving parts.
-
-
-
 ---
 
 - [ ] Testing
@@ -17,8 +10,8 @@ Adding Flask integration testing, test database, test JSON reponse. The rest of 
     - [ ] Mock server
 - [ ] SQL Alchemy
     - [x] Implemented model migrations
-    - [ ] In My Party Profile, a field to display date/time/location of planned party.
-    - [ ] Refactor SQLAlchemy and functions so that it's the same function for user and guest
+    - [x] In My Party Profile, a field to display date/time/location of planned party.
+    - [x] Refactor SQLAlchemy and functions so that it's the same function for user and guest
 - [ ] Python
     - [x] Fix recipe and ingredient storage - decoding and encoding UTF-8
     - [ ] Ability to change anything you have added, everywhere
@@ -38,15 +31,15 @@ Adding Flask integration testing, test database, test JSON reponse. The rest of 
     - [ ] Angular JS for most responsive interface
 - [ ] APIs
     - [ ] add emailing for lost passwords, connecting friends, beta-test codes
-        - [Using flask](https://pythonhosted.org/flask-mail/)
-        - [Using an email API](http://blog.mashape.com/list-of-10-email-apis/)
+        - [x][Using flask](https://pythonhosted.org/flask-mail/)
+        ~~- [Using an email API](http://blog.mashape.com/list-of-10-email-apis/)~~
 
     - [ ] [easily preload your friends from your address book (Todd)](https://developers.google.com/people/v1/getting-started)
     - [ ] [connect facebook to load your friends (Javascript SDK)](https://developers.facebook.com/docs/facebook-login/permissions#reference-user_friends)
         - user_friends
-        - Provides access the list of friends that also use your app. These friends can be found on the friends edge on the user object.
+        - Provides access to the list of friends that also use your app. These friends can be found on the friends edge on the user object.
         - In order for a person to show up in one person's friend list, both people must have decided to share their list of friends with your app and not disabled that permission during login.Also both friends must have been asked for user_friends during the login process.
         - user_friends
 
 
-As of 9/12/16 10:00am
+As of 1/3/17 10:49am

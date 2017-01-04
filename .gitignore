@@ -2,10 +2,9 @@
 *.pyc
 secrets.sh
 .DS_Store
-Old_files/*
 create_friends_profile_form.html
 user_profile_junk_code.html
-templates/Old_files*
+
 
 #File for adding here document git commit messages
 message.txt
