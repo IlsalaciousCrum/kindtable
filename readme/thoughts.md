@@ -22,15 +22,21 @@ Return the current UTC date and time, with tzinfo None. This is like now(), but 
 + POST/Redirect/Get for forms to eliminate the possibility of refreshing a post form.
 + url_for() gets passed the view function name (like 'show_login_form') and so will still work if you change the route name later. 
 + sending asynchronous email - Thread or Celery queue
++ "On a production server, the login route must be made available over secure HTTP so that the form data transmitted to the server is encrypted. Without secure HTTP, the login credentials can be intercepted during transit, defeating any efforts put into securing passwords in the server." 
++ Finish figuring out Heroku staging and production workflow
++ Get a new SSL certificate from let's encrypt
++ understand Procfiles for Heroku a bit better and make sure that manage.py is the right file to mention in it
++ Set up Heroku for SSL certificate
 
 
 
 ## Thing I've learned on this project:
-+ The benefits of project managements, project design, carefully thinlking out your sprint goals.
++ The benefits of project managements, project design, carefully thinking out your sprint goals.
 + The many benefits of daily standup (the effect on productivity of 
 already knowing what you are going to do that day, checking in with timelines and goals everyday and how that keeps me on task)
 + Database migration. HB didn't seem to discuss that.
 + When designing the model, discriminating between what is information to be stored or accessed through object oriented programming vs. queries
++ post redirect get view flow to prevent refreshing forms
 
 ## Future Features:
 + being able to attach preferred recipes to a profile. So a user would get ideas of things to make for this friend

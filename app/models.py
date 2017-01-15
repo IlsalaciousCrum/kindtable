@@ -1,8 +1,9 @@
 '''Models for K(i)ndTable WebApp.'''
 from datetime import datetime
-from sqlalchemy.ext.hybrid import hybrid_property
 from passlib.hash import bcrypt
 from . import db
+from . import login_manager
+from flask_login import UserMixin
 
 ##############################################################################
 # Model definitions
@@ -58,25 +59,28 @@ class Profile(db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Profile profile_id=%s user_id=%s user_id=%s \
-        is_user_profile=%s email=%s first_name=%s last_name=%s \
-        diet_id=%s diet_reason=%s>' % (self.profile_id,
-                                       self.user_id,
-                                       self.is_user_profile,
-                                       self.email,
-                                       self.first_name,
-                                       self.last_name,
-                                       self.diet_id,
-                                       self.diet_reason)
+        return '<Profile profile_id=%s is_user_profile=%s email=%s email_verified=%s \
+        first_name=%s last_name=%s \
+        diet_id=%s diet_reason=%s \
+        profile_notes=%s last_updated=%s>' % (self.profile_id,
+                                              self.is_user_profile,
+                                              self.email,
+                                              self.email_verified,
+                                              self.first_name,
+                                              self.last_name,
+                                              self.diet_id,
+                                              self.diet_reason,
+                                              self.profile_notes,
+                                              self.last_updated)
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     '''Registered users of KindTable WebApp.'''
 
     __tablename__ = 'users'
 
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    _password = db.Column(db.String(128))
+    password_hash = db.Column(db.String(128))
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                            nullable=False)
 
@@ -84,32 +88,33 @@ class User(db.Model):
     recipebox = db.relationship('RecipeBox', backref='user')
     profile = db.relationship('Profile')
 
-    @hybrid_property
+    @property
     def password(self):
-        return self._password
+        raise AttributeError('password is not a readable attribute')
 
     @password.setter
-    def _set_password(self, plaintext):
+    def password(self, plaintext):
         """Encrypts a password for the user table."""
 
-        h = bcrypt.encrypt(plaintext)
-        self._password = h
+        self.password_hash = bcrypt.encrypt(plaintext)
 
     def verify_password(self, password):
         """Verifies a password from the user table."""
 
-        if bcrypt.verify(password, self._password) is True:
+        if bcrypt.verify(password, self.password_hash) is True:
             return True
         else:
             return False
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.get(int(user_id))
+
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<User user_id=%s profile_id=%s \
-        validated=%s>' % (self.user_id,
-                          self.profile_id,
-                          self.validated)
+        return '<User user_id=%s profile_id=%s>' % (self.user_id,
+                                                    self.profile_id)
 
 
 class Friend(db.Model):

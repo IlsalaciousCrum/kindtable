@@ -1,25 +1,18 @@
 """K(i)nd app"""
 
 from datetime import datetime
-
 from flask import Flask, render_template, request, flash, redirect, session, json, url_for
-
 from flask_moment import Moment
-
 from . import main
 
 # commented out because I have not made my forms yet, NameForm is a placeholder name, not a real form
 # from .forms import NameForm
 
-
 from app.models import User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
-
 from .. import db
-
 from flask_mail import Mail, Message
-
+from flask_login import login_required
 import os
-
 from functions import (guest_intolerances, guest_avoidances,
                        spoonacular_request, make_user, make_friendship,
                        make_intolerances, make_avoidance, user_change,
@@ -82,6 +75,7 @@ def show_register_form():
 
 
 @main.route('/userprofile', methods=['GET'])
+@login_required
 def show_user_profile():
     """Show logged in user's profile"""
 
@@ -101,6 +95,7 @@ def show_user_profile():
 
 
 @main.route('/findfriend', methods=['GET'])
+@login_required
 def show_get_a_friend():
     """Create a profile for a friend"""
 
@@ -114,6 +109,7 @@ def show_get_a_friend():
 
 
 @main.route('/findmanyfriends', methods=['GET'])
+@login_required
 def show_get_many_friends():
     """Create a profile for a friend"""
 
@@ -127,6 +123,7 @@ def show_get_many_friends():
 
 
 @main.route('/friendprofile/<int:friend_id>', methods=['GET'])
+@login_required
 def show_friend_profile(friend_id):
     """Show logged in user's friends profile"""
 
@@ -149,6 +146,7 @@ def show_friend_profile(friend_id):
 
 
 @main.route('/addafriend', methods=['POST'])
+@login_required
 def add_a_friend():
     """Add a friend connections to the friends table"""
 
@@ -182,6 +180,7 @@ def add_a_friend():
 
 
 @main.route('/addmanyfriends', methods=['POST'])
+@login_required
 def add_many_friends():
     """Add multiple friends connections to the friends table"""
 
@@ -215,6 +214,7 @@ def add_many_friends():
 
 
 @main.route('/addafriendasguest', methods=['POST'])
+@login_required
 def add_a_friend_as_guest():
     """Add a friend connections to the friends table"""
 
@@ -258,6 +258,7 @@ def add_a_friend_as_guest():
 
 
 @main.route('/update_user_from_party_profile', methods=['POST'])
+@login_required
 def change_friend_at_party():
     """Update the friend basic profile at party"""
 
@@ -274,6 +275,7 @@ def change_friend_at_party():
 
 
 @main.route('/update_user', methods=['POST'])
+@login_required
 def change_user_basic_info():
     """Update the current users basic profile at party"""
 
@@ -289,6 +291,7 @@ def change_user_basic_info():
 
 
 @main.route('/partyfriendintol', methods=['POST'])
+@login_required
 def add_friends_intolerance_from_party():
     """Add a friend intolerance to the their profile from the party page"""
 
@@ -302,6 +305,7 @@ def add_friends_intolerance_from_party():
 
 
 @main.route('/partyfriendingredientadded', methods=['POST'])
+@login_required
 def add_friends_ingredient_from_party():
     """Add an user's ingredient to avoid to the user profile from the party page"""
 
@@ -316,6 +320,7 @@ def add_friends_ingredient_from_party():
 
 
 @main.route('/changefrienduserinfo', methods=['POST'])
+@login_required
 def add_friend_profile_registered():
     """Instantiate unverified User and make connection on friends table."""
 
@@ -333,6 +338,7 @@ def add_friend_profile_registered():
 
 
 @main.route('/party_profile/<int:party_id>')
+@login_required
 def show_party_profile(party_id):
     """Show the party profile"""
 
@@ -354,6 +360,7 @@ def show_party_profile(party_id):
 
 
 @main.route('/addaparty', methods=['GET'])
+@login_required
 def show_party_form():
     """Show the dinner party form"""
 
@@ -366,6 +373,7 @@ def show_party_form():
 
 
 @main.route('/searchrecipes')
+@login_required
 def show_search_spoonacular():
     """Collate party information, query spoonacular and show results."""
 
@@ -402,6 +410,7 @@ def show_search_spoonacular():
 
 
 @main.route('/reloadsearchrecipes', methods=["POST"])
+@login_required
 def show_re_search_spoonacular():
     """Collate party information, query spoonacular and show results."""
 
@@ -462,6 +471,7 @@ def show_re_search_spoonacular():
 
 
 @main.route('/show_recipe/<int:record_id>')
+@login_required
 def preview_saved_recipe(record_id):
     """Show a recipe preview of recipes saved in the RecipeBox from the party page"""
 
@@ -490,6 +500,7 @@ def preview_saved_recipe(record_id):
 
 
 @main.route('/recipe/<int:record_id>')
+@login_required
 def show_saved_recipe(record_id):
     """Show a recipe saved in the RecipeBox in it's own page, from the recipe preview, on the party page"""
 
@@ -517,6 +528,7 @@ def show_saved_recipe(record_id):
 
 
 @main.route('/see_recipe', methods=['POST'])
+@login_required
 def show_recipe():
     """Preview a recipe not yet saved, from the recipe search page"""
 
@@ -555,6 +567,7 @@ def show_recipe():
 
 
 @main.route('/registered', methods=['POST'])
+@login_required
 def add_register_users():
     """Process registration."""
 
@@ -582,6 +595,7 @@ def add_register_users():
 
 
 @main.route('/loggedin', methods=['POST'])
+@login_required
 def add_login_process():
     """Process login."""
 
@@ -605,6 +619,7 @@ def add_login_process():
 
 
 @main.route('/intolerance_added', methods=['POST'])
+@login_required
 def add_an_intolerance():
     """Add a user intolerance to the user profile"""
 
@@ -618,6 +633,7 @@ def add_an_intolerance():
 
 
 @main.route('/ingredientadded', methods=['POST'])
+@login_required
 def add_an_ingredient():
     """Add an user's ingredient to avoid to the user profile"""
 
@@ -633,6 +649,7 @@ def add_an_ingredient():
 
 
 @main.route('/friendintolerance_added', methods=['POST'])
+@login_required
 def add_friends_intolerance():
     """Add a friend intolerance to the their profile"""
 
@@ -645,6 +662,7 @@ def add_friends_intolerance():
 
 
 @main.route('/friendingredientadded', methods=['POST'])
+@login_required
 def add_friends_ingredient():
     """Add an user's ingredient to avoid to the user profile"""
 
@@ -658,6 +676,7 @@ def add_friends_ingredient():
 
 
 @main.route('/party_added', methods=['POST'])
+@login_required
 def add_party():
     """Add a new dinner party to the dinner party table"""
 
@@ -678,6 +697,7 @@ def add_party():
 
 
 @main.route('/guest_added', methods=['POST'])
+@login_required
 def add_guest():
     """Add a guest to a diner party"""
 
@@ -692,6 +712,7 @@ def add_guest():
 
 
 @main.route('/addtorecipebox', methods=['POST'])
+@login_required
 def add_recipe_box():
     """Add a recipe to the recipe box"""
 

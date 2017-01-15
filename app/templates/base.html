@@ -1,16 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kind Table</title>
+{% extends "bootstrap/base.html" %}
+
+{% block title %}KindTable{% endblock %}
+
+{% block head %}
+  {{ super() }}
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/site.css">
-  <script src="http://code.jquery.com/jquery.js"></script>
-  <script src="/static/tooltip.js"></script>
-</head>
+  <link rel="stylesheet" type="text/css" href="{{  url_for('static', filename='site.css') }}">
+{% endblock %}
 
 
-
+{% block navbar %}
 <nav class="navbar navbar-default">
   <div class="container-fluid">
    <!--     Brand and toggle get grouped for better mobile display--> 
@@ -24,11 +23,7 @@
     <a class="navbar-brand" href="/">Kind Table</a>
   </div>
 
-
-  <!-- Collect the nav links, forms, and other content for toggling -->
-
-  {% if session.get('user_id') == True %}
-
+  {% if current_user.is_authenticated %}
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
        <li><a href="/userprofile">My Profile</a></li>
@@ -40,13 +35,10 @@
             {% if friend.friends.first_name is not none %}   
             {{ friend.friends.first_name }}
             {% else %}
-
             {%endif %}
-
             {% if friend.friends.first_name is not none %}   
             {{ friend.friends.last_name }}
             {% else %}
-
             {%endif %}
             ({{ friend.friends.email }})</a></li>
             {% endfor %}
@@ -54,10 +46,7 @@
             <li><a href="/findfriend">Add a new friend</a></li>
             <li><a href="/findmanyfriends">Add multiple friends</a></li>
           </ul>
-
         </li>
-
-
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Parties<span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -67,16 +56,12 @@
             <li role="separator" class="divider"></li>
             <li><a href="/addaparty">Create a party</a></li>
           </ul>
-
         </li>
-
       </ul>    
       <ul class="nav navbar-nav navbar-right">
         <li><a href="/logout">Log out</a></li>
       </ul>
-
     </div><!-- /.navbar-collapse -->
-
   {% else %}
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
@@ -88,33 +73,31 @@
 </div><!-- /.container-fluid -->
 </nav>
 
+{% endblock %}
 
+<!-- ------------ -->
 
-
+{% block content %}
 <div class="container-fluid">
-
   {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  {% for category, message in messages %}
-  <div class="alert alert-{{ category }}">{{ message }}</div>
-  {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
-
-
-<div id="extending">
-
-  {% block content %}
-  {% endblock %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  <div id="extending">
+    {% block page_content %}
+    {% endblock %}
+  </div>
 </div>
+
+{% endblock %}  <!-- /content -->
 
 {% block scripts %}
 {{ super() }}
 {{ moment.include_moment() }}
-{% endblock %}
-
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-</div>
-</body>
-</html>
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="/static/tooltip.js"></script>
+{% endblock %}

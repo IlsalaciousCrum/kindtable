@@ -1,7 +1,7 @@
 """Loads seed data for Spoonacular"""
 
 
-from app.models import Diet, Intolerance, Cuisine, Course
+from models import Diet, Intolerance, Cuisine, Course
 from app import db
 
 
