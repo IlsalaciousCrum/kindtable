@@ -17,7 +17,6 @@
 **Application:** Python, Flask, Jinja, SQLAlchemy, PostgreSQL    
 **APIs:** Spoonacular  
 **Front-End**: HTML/CSS, Bootstrap, JQuery, JavaScript
-*See Further_Development.md file for my public to-do list of further improvements to this project*
 
 Kind Table
 --------
@@ -26,7 +25,7 @@ Kind Table
 
 Kind Table takes the work out of choosing recipes for a dinner party or holiday event by managing your friends dietary preferences and presenting recipes that would work for all.
 
-Please see the further_development branch for continuing work on this project and the .md file Further_Development.md for where I am in the process now. This is a learning project, created for the final project while attending Hackbright Academy. Let the learning/experimenting continue!
+This was my final project while attending Hackbright Academy. 
 
 **How it works**
 
