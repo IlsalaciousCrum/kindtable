@@ -1,8 +1,8 @@
-#This is an abandoned branch. This branch marks the progress made on this project as 
-of the end of Hackbright. The branch named Further_Development is also abandoned, that 
-marks the progress in the first three months after Hackbright when I wasn't focusing on 
-this project. Current development is happening in the branch marked V2 and will be pushed 
-to master once the project is deployed.
+#_This is an abandoned branch. This branch marks the progress made on this project as_
+#_of the end of Hackbright. The branch named Further_Development is also abandoned, that_
+#_marks the progress in the first three months after Hackbright when I wasn't focusing on_ 
+#_this project. Current development is happening in the branch marked V2 and will be pushed_ 
+#_to master once the project is deployed._
 
 #Kind Table
 
