@@ -4,8 +4,7 @@ secrets.sh
 .DS_Store
 create_friends_profile_form.html
 user_profile_junk_code.html
+thoughts.md
 
-
-#File for adding here document git commit messages
+#File for adding document git commit messages
 message.txt
-
