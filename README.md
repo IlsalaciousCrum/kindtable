@@ -1,3 +1,12 @@
+
+> This is an abandoned branch. This branch marks the progress made on this project after
+> Hackbright but before the massive overhaul of V2 (mostly bug fixes).  Current development is happening in the branch marked V2 and will be pushed 
+> to master once the project is deployed.
+
+--------
+--------
+
+
 #Kind Table
 
 <img src="static/recipe_search.png">
