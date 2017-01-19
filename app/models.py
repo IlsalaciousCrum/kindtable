@@ -14,7 +14,7 @@ class Diet(db.Model):
 
     __tablename__ = 'diets'
 
-    diet_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    diet_id = db.Column(db.Integer, primary_key=True)
     diet_type = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(120), nullable=False)
     ranking = db.Column(db.Integer, nullable=False)
@@ -36,6 +36,7 @@ class Profile(db.Model):
 
     profile_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     is_user_profile = db.Column(db.Boolean, unique=False, default=False)
+    created_by_email_owner = db.Column(db.Boolean, unique=False, default=False)
     email = db.Column(db.String(200), nullable=False, unique=False)
     email_verified = db.Column(db.Boolean, unique=False, default=False)
     first_name = db.Column(db.String(64), nullable=True)
@@ -82,7 +83,7 @@ class User(UserMixin, db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     password_hash = db.Column(db.String(128))
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
-                           nullable=False)
+                           nullable=False, unique=False)
 
     parties = db.relationship('Party', backref='user')
     recipebox = db.relationship('RecipeBox', backref='user')
@@ -153,7 +154,7 @@ class Intolerance(db.Model):
 
     __tablename__ = 'intolerances'
 
-    intol_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    intol_id = db.Column(db.Integer, primary_key=True)
     intol_name = db.Column(db.String(64), nullable=False)
     intol_description = db.Column(db.String(120), nullable=False)
 
