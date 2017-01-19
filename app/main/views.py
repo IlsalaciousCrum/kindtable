@@ -45,24 +45,24 @@ def index():
         return render_template("kind_homepage.html")
 
 
-@main.route('/login', methods=['GET'])
-def show_login_form():
-    """Show login form."""
+# @main.route('/login', methods=['GET'])
+# def show_login_form():
+#     """Show login form."""
 
-    return render_template("login_form.html")
+#     return render_template("login_form.html")
 
 
-@main.route('/logout')
-def add_logout():
-    """Log out."""
+# @main.route('/logout')
+# def add_logout():
+#     """Log out."""
 
-    check_id = session.get("user_id")
-    if check_id:
-        del session["user_id"]
-        flash("Logged Out.", "danger")
-        return redirect("/")
-    else:
-        return redirect("/login")
+#     check_id = session.get("user_id")
+#     if check_id:
+#         del session["user_id"]
+#         flash("Logged Out.", "danger")
+#         return redirect("/")
+#     else:
+#         return redirect("/login")
 
 
 @main.route('/register', methods=['GET'])
