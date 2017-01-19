@@ -51,7 +51,7 @@ class Profile(db.Model):
     avoidances = db.relationship('IngToAvoid', backref='profiles', lazy='joined')
 
     intolerances = db.relationship('Intolerance',
-                                   secondary='userintolerances',
+                                   secondary='profileintolerances',
                                    backref='profiles',
                                    lazy='joined')
     user = db.relationship('User')
@@ -166,10 +166,10 @@ class Intolerance(db.Model):
                                 self.intol_description)
 
 
-class UserIntolerance(db.Model):
+class ProfileIntolerance(db.Model):
     '''Associates the intolerances that each user has.'''
 
-    __tablename__ = 'userintolerances'
+    __tablename__ = 'profileintolerances'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
@@ -180,7 +180,7 @@ class UserIntolerance(db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<UserIntolerance record_id=%s profile_id=%s \
+        return '<ProfileIntolerance record_id=%s profile_id=%s \
         intol_id=%s>' % (self.record_id,
                          self.profile_id,
                          self.intol_id)
