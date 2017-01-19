@@ -1,6 +1,6 @@
 # # from sqlalchemy import func
 
-from app.models import (db, User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes)
+from app.models import (db, User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes)
 
 # from server import app
 
@@ -75,7 +75,7 @@ def make_intolerances(user_id, intol_ids):
     """Instantiates new intolerances on the intolerances table"""
     for intol_id in intol_ids:
         intol_id = int(intol_id)
-        new_intol = UserIntolerance(user_id=user_id, intol_id=intol_id)
+        new_intol = ProfileIntolerance(user_id=user_id, intol_id=intol_id)
         db.session.add(new_intol)
         db.session.commit()
     return

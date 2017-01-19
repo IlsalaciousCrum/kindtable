@@ -12,8 +12,8 @@ class Config:
     MAIL_USERNAME = os.environ['KIND_TABLE_EMAIL'],
     MAIL_PASSWORD = os.environ['KIND_TABLE_EMAIL_PASSWORD'],
     SECRET_KEY = os.environ['APP_SECRET_KEY']
-    KIND_MAIL_SUBJECT_PREFIX = '[Flasky]'
-    KIND_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
+    KIND_MAIL_SUBJECT_PREFIX = '[Kind Table App]'
+    KIND_MAIL_SENDER = 'Kind Table Admin <kindtableapp@gmail.com>'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     @staticmethod

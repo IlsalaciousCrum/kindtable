@@ -2,7 +2,7 @@
 
 import os
 from app import create_app, db
-from app.models import User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
+from app.models import User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
 from Flask_script import Manager, Shell, Server
 from flask_migrate import Migrate, MigrateCommand, upgrade
 from jinja2 import StrictUndefined
@@ -21,7 +21,7 @@ def make_shell_context():
     '''This function loads the model into a shell'''
 
     return dict(app=app, db=db, User=User, Profile=Profile, Friend=Friend,
-                UserIntolerance=UserIntolerance, Intolerance=Intolerance,
+                ProfileIntolerance=ProfileIntolerance, Intolerance=Intolerance,
                 Diet=Diet, Cuisine=Cuisine, Course=Course, IngToAvoid=IngToAvoid,
                 PartyGuest=PartyGuest, Party=Party, RecipeCard=RecipeCard,
                 RecipeBox=RecipeBox, PartyRecipes=PartyRecipes)

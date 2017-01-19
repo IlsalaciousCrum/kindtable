@@ -2,6 +2,8 @@ from flask import render_template, redirect, request, url_for, flash
 
 from . import userdata
 
+from .. import db
+
 from ..models import Profile
 
 from .forms import ProfileData
@@ -16,11 +18,6 @@ def register():
         return url_for('auth/login.html')
         flash('That email address is already registered. Would you like to login or reset your password?')
 
-        user = user_profile.user
-        if user is not None and user.verify_password(form.password.data):
-            login_user(user, form.remember_me.data)
-            return redirect(request.args.get('next') or url_for('main.index'))
-            flash('Invalid username or password.')
     else:
         return render_template('auth/login.html', form=form)
 

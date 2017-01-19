@@ -1,9 +1,10 @@
 '''Models for K(i)ndTable WebApp.'''
+
 from datetime import datetime
 from passlib.hash import bcrypt
-from . import db
-from . import login_manager
+from . import db, login_manager
 from flask_login import UserMixin
+
 
 ##############################################################################
 # Model definitions
@@ -26,7 +27,7 @@ class Diet(db.Model):
         restrictive_ranking=%s>' % (self.diet_id,
                                     self.diet_type,
                                     self.description,
-                                    self.restrictive_ranking)
+                                    self.ranking)
 
 
 class Profile(db.Model):

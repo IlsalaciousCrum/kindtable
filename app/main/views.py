@@ -8,7 +8,7 @@ from . import main
 # commented out because I have not made my forms yet, NameForm is a placeholder name, not a real form
 # from .forms import NameForm
 
-from app.models import User, Profile, Friend, UserIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
+from app.models import User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
 from .. import db
 from flask_mail import Mail, Message
 from flask_login import login_required
