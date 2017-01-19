@@ -31,7 +31,9 @@
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
         <ul class="dropdown-menu">
           {% for friend in this_user.friends %}
-          <li><a href="/friendprofile/{{ friend.friends.user_id }}">
+          <li><a href={{ url_for('main.user', username=current_user.username) }}
+
+            "/friendprofile/{{ friend.friends.user_id }}">
             {% if friend.friends.first_name is not none %}   
             {{ friend.friends.first_name }}
             {% else %}
