@@ -11,7 +11,7 @@ for each in diet_query:
     entry = (each[0], display_text)
     diet_options.append(entry)
 
-intol_query = db.session.query(Intolerance.intol_id, Intolerance.intol.description).all()
+intol_query = db.session.query(Intolerance.intol_id, Intolerance.intol_name, Intolerance.intol_description).all()
 intol_options = []
 for each in intol_query:
     display_text = each[1] + ": " + each[2]

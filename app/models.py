@@ -56,7 +56,6 @@ class Profile(db.Model):
                                    secondary='profileintolerances',
                                    backref='profiles',
                                    lazy='joined')
-    user = db.relationship('User')
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -88,7 +87,10 @@ class User(UserMixin, db.Model):
 
     parties = db.relationship('Party', backref='user')
     recipebox = db.relationship('RecipeBox', backref='user')
-    profile = db.relationship('Profile')
+
+    profile = db.relationship("Profile",
+                              uselist=False,
+                              backref="user")
 
     @property
     def password(self):

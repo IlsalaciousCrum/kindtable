@@ -67,8 +67,8 @@
   {% else %}
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li><a href={{ url_for('auth.register', username=current_user.username) }}>Register</a></li>
-        <li><a href={{ url_for('auth.login', username=current_user.username) }}>Log in</a></li>
+        <li><a href={{ url_for('auth.register') }}>Register</a></li>
+        <li><a href={{ url_for('auth.login') }}>Log in</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   {% endif %}
