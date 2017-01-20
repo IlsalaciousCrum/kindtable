@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for, flash
+from flask import render_template, redirect, request, url_for, flash, session
 
 from flask_login import login_user, logout_user, login_required
 
@@ -18,18 +18,24 @@ def login():
     if form.validate_on_submit():
         print 1
         user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile == True).first()
-        print 2
+        print user
+        print form.password.data
+        print user.verify_password(form.password.data)
         if user is not None and user.verify_password(form.password.data):
-            print 3
+            print 2
             login_user(user, form.remember_me.data)
+            print 3
+            profile = Profile.query.get(user.profile_id)
             print 4
+            print profile
+            raise Exception
+            session['user_id'] = user.id
             return redirect(url_for('main.index'))
         else:
             print 5
             render_template('auth/login.html', form=form)
             flash('Invalid username or password.')
     else:
-        print 6
         return render_template('auth/login.html', form=form)
 
 

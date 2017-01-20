@@ -4,6 +4,7 @@ from datetime import datetime
 from passlib.hash import bcrypt
 from . import db, login_manager
 from flask_login import UserMixin
+import pytz
 
 
 ##############################################################################
@@ -100,7 +101,7 @@ class User(UserMixin, db.Model):
     def password(self, plaintext):
         """Encrypts a password for the user table."""
 
-        self.password_hash = bcrypt.encrypt(plaintext)
+        self.password_hash = bcrypt.hash(plaintext)
 
     def verify_password(self, password):
         """Verifies a password from the user table."""
@@ -250,9 +251,7 @@ class Party(db.Model):
     title = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
                         nullable=False)
-    date_of_party = db.Column(db.Date, nullable=True)
-    time_of_party = db.Column(db.Time(timezone=True), nullable=True)
-
+    datetime_of_party = db.Column(db.DateTime(timezone=True), nullable=True)
     guest_profiles = db.relationship('Profile',
                                      secondary='party_guests',
                                      lazy='joined',
@@ -262,6 +261,27 @@ class Party(db.Model):
                               secondary='partyrecipes',
                               backref='parties',
                               lazy='joined')
+
+    @property
+    def date(self):
+        raise AttributeError('This is UTC time. Use the class method')
+
+    @date.setter
+    def date(self, plaintext, local_timezone):
+        """Converts a local time to a UTC time"""
+
+        local = pytz.timezone(local_timezone)
+        naive = datetime.datetime.strptime(plaintext, "%Y-%m-%d %H:%M:%S")
+        local_dt = local.localize(naive, is_dst=None)
+        self.datetime_of_party = local_dt.astimezone(pytz.utc)
+
+    def party_in_local_time(self, local_timezone):
+        """Converts the stored UTC time to the local time of the user"""
+
+        fmt = fmt = '%A %B %s, %Y %H:%M %Z'
+        UTC_dt = self.datetime_of_party
+        local_date_time = UTC_dt.astimezone(local_timezone)
+        return local_date_time.strftime(fmt)
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -286,6 +306,7 @@ class PartyGuest(db.Model):
                          nullable=False)
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                            nullable=False)
+
 
 class RecipeCard(db.Model):
     '''Add a recipe to a users recipe box'''
