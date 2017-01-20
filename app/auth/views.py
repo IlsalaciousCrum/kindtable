@@ -6,7 +6,7 @@ from . import auth
 
 from .. import db
 
-from ..models import Profile
+from ..models import Profile, User
 
 from .forms import LoginForm
 
@@ -15,16 +15,21 @@ from .forms import LoginForm
 def login():
     form = LoginForm()
     print form.email.data
-    print form.password.data
     if form.validate_on_submit():
-        user_profile = Profile.query.filter_by(email=form.email.data, is_user_profile=True).first()
-        # user_profile = db.session.query(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile is True).first()
-        user = user_profile.user
+        print 1
+        user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile == True).first()
+        print 2
         if user is not None and user.verify_password(form.password.data):
+            print 3
             login_user(user, form.remember_me.data)
-            return redirect(request.args.get('next') or url_for('main.index'))
+            print 4
+            return redirect(url_for('main.index'))
+        else:
+            print 5
+            render_template('auth/login.html', form=form)
             flash('Invalid username or password.')
     else:
+        print 6
         return render_template('auth/login.html', form=form)
 
 

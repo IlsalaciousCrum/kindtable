@@ -38,11 +38,7 @@ def send_mail():
 def index():
     """Homepage."""
 
-    user_id = session.get("user_id")
-    if user_id:
-        return redirect("/userprofile")
-    else:
-        return render_template("kind_homepage.html")
+    return render_template("kind_homepage.html")
 
 
 # @main.route('/login', methods=['GET'])
