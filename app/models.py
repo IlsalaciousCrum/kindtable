@@ -42,7 +42,7 @@ class Profile(db.Model):
     email_verified = db.Column(db.Boolean, unique=False, default=False)
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
-    diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'))
+    diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'), default=10)
     # ie, ethical, religious, general health, specific health
     diet_reason = db.Column(db.String(120), nullable=True)
     profile_notes = db.Column(db.String(300), nullable=True)
