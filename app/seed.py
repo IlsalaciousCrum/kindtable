@@ -1,6 +1,5 @@
 """Loads seed data"""
 
-
 from models import Diet, Intolerance, Cuisine, Course, Profile, User, Friend, Party
 from app import db
 from pytz import timezone
@@ -51,9 +50,22 @@ def LoadTestPeople():
 
     print "Friends added"
 
+    pac = pytz.timezone('America/Los_Angeles')
     utc = pytz.utc
-    dt = datetime(2017, 2, 14, 7, 0, 0, tzinfo=utc)
-    party = Party(title="This is the best party", user_id=1, datetime_of_party=dt)
+
+    dt = datetime(2017, 2, 14, 19, 0)
+    dt1 = pac.localize(dt, is_dst=True)
+    utc_dt2 = dt1.astimezone(utc)
+
+    party = Party(party_id="1", title="This is the best party", user_id=1, datetime_of_party=utc_dt2)
+    db.session.add(party)
+    db.session.commit()
+
+    dt = datetime(2017, 3, 14, 17, 0)
+    dt1 = pac.localize(dt, is_dst=True)
+    utc_dt2 = dt1.astimezone(utc)
+
+    party = Party(party_id="2", title="This party is ok", user_id=1, datetime_of_party=utc_dt2)
     db.session.add(party)
     db.session.commit()
 
