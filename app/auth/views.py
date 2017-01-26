@@ -16,19 +16,10 @@ def login():
     form = LoginForm()
     print form.email.data
     if form.validate_on_submit():
-        print 1
         user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile == True).first()
-        print user
-        print form.password.data
-        print user.verify_password(form.password.data)
         if user is not None and user.verify_password(form.password.data):
-            print 2
             login_user(user, form.remember_me.data)
-            print 3
             profile = Profile.query.get(user.profile_id)
-            print 4
-            print profile
-            raise Exception
             session['user_id'] = user.id
             return redirect(url_for('main.index'))
         else:

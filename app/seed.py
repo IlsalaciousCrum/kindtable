@@ -17,24 +17,39 @@ def LoadTestPeople():
     todd = Profile(profile_id=2, is_user_profile=True, created_by_email_owner=True, email='censorydep@gmail.com', email_verified=True, first_name='Todd')
     db.session.add(todd)
     db.session.commit()
-    ilsa = User(user_id=1, password="N3v3rm1nd", profile_id=2)
+
+    darrin = Profile(profile_id=3, is_user_profile=False, created_by_email_owner=False, email='darrin@erin.com', email_verified=False, first_name='Darrin')
+    db.session.add(darrin)
+    db.session.commit()
+    erin = Profile(profile_id=4, is_user_profile=False, created_by_email_owner=False, email='erin@darrin.com', email_verified=False, first_name='Erin')
+    db.session.add(erin)
+    db.session.commit()
+    ilsa = User(user_id=1, password="Password!", profile_id=2)
     db.session.add(ilsa)
     db.session.commit()
     todd = User(user_id=2, password='No', profile_id=2)
     db.session.add(todd)
     db.session.commit()
 
-    print "Ilsa and Todd Profiles and Users loaded"
+    print "Profiles and Users loaded"
 
     ilsa_friend = Friend(user_id=1, friend_profile_id=2, friendship_verified_by_email=True)
     db.session.add(ilsa_friend)
+    db.session.commit()
+
+    darrin_friend = Friend(user_id=1, friend_profile_id=3, friendship_verified_by_email=False)
+    db.session.add(darrin_friend)
+    db.session.commit()
+
+    erin_friend = Friend(user_id=1, friend_profile_id=4, friendship_verified_by_email=False)
+    db.session.add(erin_friend)
     db.session.commit()
 
     todd_friend = Friend(user_id=2, friend_profile_id=1, friendship_verified_by_email=True)
     db.session.add(todd_friend)
     db.session.commit()
 
-    print "Ilsa and Todd are friends!"
+    print "Friends added"
 
     utc = pytz.utc
     dt = datetime(2017, 2, 14, 7, 0, 0, tzinfo=utc)
@@ -42,7 +57,7 @@ def LoadTestPeople():
     db.session.add(party)
     db.session.commit()
 
-    print "And now they are going to a party!"
+    print "Party added"
 
 
 def LoadSeedData():
