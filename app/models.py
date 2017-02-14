@@ -121,6 +121,17 @@ class User(UserMixin, db.Model):
         return '<User user_id=%s profile_id=%s>' % (self.user_id,
                                                     self.profile_id)
 
+    def friends_dict(self):
+        '''Return a dictionary of a user's friends'''
+
+        friends = Friend.query.filter_by(user_id=self.user_id)
+        friends_dict = {}
+        for friend in friends:
+            friends_dict[friend.friend_profile_id] = {'first_name': friend.profile.first_name,
+                                                      'last_name': friend.profile.last_name,
+                                                      'email': friend.profile.email}
+        return friends_dict
+
 
 class Friend(db.Model):
     '''Makes connection between the user and their contact'''
@@ -140,6 +151,11 @@ class Friend(db.Model):
 
     profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
+
+
+
+
+
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''

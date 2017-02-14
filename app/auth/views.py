@@ -21,6 +21,7 @@ def login():
             login_user(user, form.remember_me.data)
             profile = Profile.query.get(user.profile_id)
             session['user_id'] = user.id
+            friends = Friend.query.filter_by(user_id=user.user_id).all()
             
             return redirect(url_for('main.index'))
         else:

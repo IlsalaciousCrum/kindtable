@@ -10,17 +10,17 @@ from datetime import datetime
 def LoadTestPeople():
     """Load fake users and information for development purposes"""
 
-    ilsa = Profile(profile_id=1, is_user_profile=True, created_by_email_owner=True, email='ilsalacious@gmail.com', email_verified=True, first_name='Ilsa')
+    ilsa = Profile(profile_id=1, is_user_profile=True, created_by_email_owner=True, email='ilsalacious@gmail.com', email_verified=True, first_name='Ilsa', last_name='Gordon')
     db.session.add(ilsa)
     db.session.commit()
-    todd = Profile(profile_id=2, is_user_profile=True, created_by_email_owner=True, email='censorydep@gmail.com', email_verified=True, first_name='Todd')
+    todd = Profile(profile_id=2, is_user_profile=True, created_by_email_owner=True, email='censorydep@gmail.com', email_verified=True, first_name='Todd', last_name='Gage')
     db.session.add(todd)
     db.session.commit()
 
-    darrin = Profile(profile_id=3, is_user_profile=False, created_by_email_owner=False, email='darrin@erin.com', email_verified=False, first_name='Darrin')
+    darrin = Profile(profile_id=3, is_user_profile=False, created_by_email_owner=False, email='darrin@erin.com', email_verified=False, first_name='Darrin', last_name='Ward')
     db.session.add(darrin)
     db.session.commit()
-    erin = Profile(profile_id=4, is_user_profile=False, created_by_email_owner=False, email='erin@darrin.com', email_verified=False, first_name='Erin')
+    erin = Profile(profile_id=4, is_user_profile=False, created_by_email_owner=False, email='erin@darrin.com', email_verified=False, first_name='Erin', last_name='Rosenthal')
     db.session.add(erin)
     db.session.commit()
     ilsa = User(user_id=1, password="Password!", profile_id=2)
