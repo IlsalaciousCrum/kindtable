@@ -6,7 +6,7 @@ from . import auth
 
 from .. import db
 
-from ..models import Profile, User
+from ..models import Profile, User, Party
 
 from .forms import LoginForm
 
@@ -21,8 +21,11 @@ def login():
             login_user(user, form.remember_me.data)
             profile = Profile.query.get(user.profile_id)
             session['user_id'] = user.id
-            friends = Friend.query.filter_by(user_id=user.user_id).all()
-            
+            friends = user.friends_dict()
+            session['friends_dict'] = friends
+            parties = Party.query.filter_by(user_id=1).all()
+            session['parties'] = parties
+
             return redirect(url_for('main.index'))
         else:
             print 5

@@ -152,11 +152,6 @@ class Friend(db.Model):
     profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
 
-
-
-
-
-
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
