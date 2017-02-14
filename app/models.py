@@ -144,11 +144,11 @@ class Friend(db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Friend record_id=%s user_id=%s  profile_id=%s \
+        return '<Friend record_id=%s user_id=%s  friend_profile_id=%s \
         friendship_verified_by_email=%s \
         friendship_verified_by_facebook=%s>' % (self.record_id,
                                                 self.user_id,
-                                                self.profile_id,
+                                                self.friend_profile_id,
                                                 self.friendship_verified_by_email,
                                                 self.friendship_verified_by_facebook)
 

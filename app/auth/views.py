@@ -21,6 +21,7 @@ def login():
             login_user(user, form.remember_me.data)
             profile = Profile.query.get(user.profile_id)
             session['user_id'] = user.id
+            
             return redirect(url_for('main.index'))
         else:
             print 5
