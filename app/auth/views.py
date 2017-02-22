@@ -25,7 +25,7 @@ def login():
             session['friends_dict'] = friends
             parties = Party.query.filter_by(user_id=1).all()
             session['parties'] = parties
-
+            session['profile'] = profile
             return redirect(url_for('main.index'))
         else:
             print 5

@@ -10,6 +10,7 @@ import requests
 import os
 import json
 import datetime
+import bleach
 
 
 def make_user(email, password, diet_id, first_name=None, last_name=None, diet_reason=None, verified=False):
@@ -207,6 +208,10 @@ def spoonacular_request(party_id):
 
     responses["response"] = response
     return responses
+
+
+    # When redoing this code, use: cleaned = bleach.clean(html, tags=[], attributes={}, styles=[], strip=True)
+    # where html is the text you want any html tags or script tags removed.
 
 
 def new_guest_diet(diets):
