@@ -5,6 +5,7 @@ from flask_mail import Mail
 from flask_moment import Moment
 from flask_login import LoginManager
 from config import config
+from jinja2 import StrictUndefined
 
 
 db = SQLAlchemy()
@@ -23,12 +24,14 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    bootstrap.init_app(app)
+    # bootstrap.init_app(app)
+    Bootstrap(app)
     mail.init_app(app)
     moment.init_app(app)
     db.app = app
     db.init_app(app)
     login_manager.init_app(app)
+    app.jinja_env.undefined = StrictUndefined
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)

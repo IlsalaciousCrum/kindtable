@@ -23,10 +23,10 @@ def LoadTestPeople():
     erin = Profile(profile_id=4, is_user_profile=False, created_by_email_owner=False, email='erin@darrin.com', email_verified=False, first_name='Erin', last_name='Rosenthal')
     db.session.add(erin)
     db.session.commit()
-    ilsa = User(user_id=1, password="Password!", profile_id=2)
+    ilsa = User(id=1, password="Password!", profile_id=1)
     db.session.add(ilsa)
     db.session.commit()
-    todd = User(user_id=2, password='No', profile_id=2)
+    todd = User(id=2, password='No', profile_id=2)
     db.session.add(todd)
     db.session.commit()
 

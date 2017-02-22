@@ -20,6 +20,7 @@ from functions import (guest_intolerances, guest_avoidances,
                        new_guest_diet, new_spoonacular_request, spoonacular_recipe_ingredients)
 
 
+
 @main.route('/send-email')
 def send_mail():
     """Testing sending email through Flask-Mail and the website"""

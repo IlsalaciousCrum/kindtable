@@ -200,7 +200,7 @@ def spoonacular_request(party_id):
         print recipe_url
         image_url = base_url + image_url
         each_response = {}
-        each_response["title"] = titlepi pfree
+        each_response["title"] = title
         each_response["recipe_url"] = recipe_url
         each_response["image_url"] = image_url
         each_response["recipe_id"] = recipe_id

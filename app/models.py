@@ -81,7 +81,7 @@ class User(UserMixin, db.Model):
 
     __tablename__ = 'users'
 
-    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     password_hash = db.Column(db.String(128))
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                            nullable=False, unique=False)
@@ -112,25 +112,23 @@ class User(UserMixin, db.Model):
             return False
 
     @login_manager.user_loader
-    def load_user(user_id):
-        return User.query.get(int(user_id))
+    def load_user(id):
+        return User.query.get(int(id))
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<User user_id=%s profile_id=%s>' % (self.user_id,
+        return '<User user_id=%s profile_id=%s>' % (self.id,
                                                     self.profile_id)
 
-    def friends_dict(self):
-        '''Return a dictionary of a user's friends'''
+    def friends_list(self):
+        '''Returns a nested list of a users friends'''
 
-        friends = Friend.query.filter_by(user_id=self.user_id)
-        friends_dict = {}
-        for friend in friends:
-            friends_dict[friend.friend_profile_id] = {'first_name': friend.profile.first_name,
-                                                      'last_name': friend.profile.last_name,
-                                                      'email': friend.profile.email}
-        return friends_dict
+        friends_query = Friend.query.filter_by(user_id=self.id).all()
+        friends_list = []
+        for friend in friends_query:
+            friends_list.append([friend.profile.profile_id, friend.profile.email, friend.profile.first_name, friend.profile.last_name])
+        return friends_list
 
 
 class Friend(db.Model):
@@ -139,7 +137,7 @@ class Friend(db.Model):
     __tablename__ = 'friends'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
                         nullable=False)
     friend_profile_id = db.Column(db.Integer,
                                   db.ForeignKey('profiles.profile_id'),
@@ -260,7 +258,7 @@ class Party(db.Model):
 
     party_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
                         nullable=False)
     datetime_of_party = db.Column(db.DateTime(timezone=True), nullable=True)
     guest_profiles = db.relationship('Profile',
@@ -297,12 +295,9 @@ class Party(db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Party party_id=%s title_id=%s host_id=%s date=%s \
-        time=%s>' % (self.party_id,
-                     self.title,
-                     self.host_id,
-                     self.date,
-                     self.time)
+        return '<Party party_id=%s title_id=%s host_id=%s>' % (self.party_id,
+                                                               self.title,
+                                                               self.user_id)
 
 
 class PartyGuest(db.Model):
@@ -352,7 +347,7 @@ class RecipeBox(db.Model):
     __tablename__ = 'recipebox'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     recipe_record_id = db.Column(db.Integer,
                                  db.ForeignKey('recipecard.recipe_record_id'),
                                  nullable=False)

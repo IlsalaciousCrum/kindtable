@@ -8,6 +8,8 @@ from ..models import Profile
 
 from .forms import ProfileData
 
+from flask_login import logout_user, login_required
+
 
 @userdata.route('/register', methods=['GET', 'POST'])
 def register():
@@ -22,9 +24,9 @@ def register():
         return render_template('auth/login.html', form=form)
 
 
-# @auth.route('/logout')
-# @login_required
-# def logout():
-#     logout_user()
-#     flash('You have been logged out.')
-#     return redirect(url_for('main.index'))
+@userdata.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.')
+    return redirect(url_for('main.index'))

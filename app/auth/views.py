@@ -15,24 +15,26 @@ from .forms import LoginForm
 def login():
     form = LoginForm()
     print form.email.data
+    print form.password.data
     if form.validate_on_submit():
+        print 1
         user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile == True).first()
+        print 2
         if user is not None and user.verify_password(form.password.data):
+            print 3
             login_user(user, form.remember_me.data)
-            profile = Profile.query.get(user.profile_id)
             session['user_id'] = user.id
-            friends = user.friends_dict()
-            session['friends_dict'] = friends
-            parties = Party.query.filter_by(user_id=1).all()
+            friends = user.friends_list()
+            session['friends'] = friends
+            party_query = Party.query.filter_by(user_id=user.id).all()
+            parties = [[party.party_id, party.title] for party in party_query]
             session['parties'] = parties
-            session['profile'] = profile
             return redirect(url_for('main.index'))
         else:
-            print 5
-            render_template('auth/login.html', form=form)
+            print 4
             flash('Invalid username or password.')
-    else:
-        return render_template('auth/login.html', form=form)
+            render_template('auth/login.html', form=form)
+    return render_template('auth/login.html', form=form)
 
 
 @auth.route('/logout')

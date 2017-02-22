@@ -30,20 +30,11 @@
        <li class="dropdown">
         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
         <ul class="dropdown-menu">
-          {% for friend in session.friends_dict %}
-          <li><a href={{ url_for('main.show_friend_profile', variable=friend. ) }}
-
-            "/friendprofile/{{ friend.friends.user_id }}">
-            {% if friend.friends.first_name is not none %}   
-            {{ friend.friends.first_name }}
-            {% else %}
-            {%endif %}
-            {% if friend.friends.first_name is not none %}   
-            {{ friend.friends.last_name }}
-            {% else %}
-            {%endif %}
-            ({{ friend.friends.email }})</a></li>
-            {% endfor %}
+          {% for friend in session['friends'] %}
+          <li><a href="{{ url_for('main.show_friend_profile', friend_id =friend[0]) }}">
+            {% if friend[2] is not none %}{{ friend[2] }}{% else %}{%endif %} {% if friend[3] is not none %}{{ friend[3] }}{% else %}{%endif %}
+            ({{ friend[1] }})</a></li>
+         {% endfor %}
             <li role="separator" class="divider"></li>
             <li><a href="/findfriend">Add a new friend</a></li>
             <li><a href="/findmanyfriends">Add multiple friends</a></li>
@@ -52,8 +43,8 @@
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Parties<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            {% for party in session.parties %}
-            <li><a href="/party_profile/{{ party.party_id }}">{{  party.title  }}</a></li>
+            {% for party in session['parties'] %}
+            <li><a href="{{ url_for('main.show_party_profile', party_id = party[0]) }}">{{  party[0]  }}</a></li>
             {% endfor %}
             <li role="separator" class="divider"></li>
             <li><a href="/addaparty">Create a party</a></li>
