@@ -1,15 +1,18 @@
-{% extends "bootstrap/base.html" %}
 
-{% block title %}KindTable{% endblock %}
-
-{% block head %}
-  {{ super() }}
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kind Table</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="{{  url_for('static', filename='site.css') }}">
-{% endblock %}
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="/static/tooltip.js"></script>
+</head>
 
 
 {% block navbar %}
+
 <nav class="navbar navbar-default">
   <div class="container-fluid">
    <!--     Brand and toggle get grouped for better mobile display--> 
@@ -24,21 +27,21 @@
   </div>
 
   {% if current_user.is_authenticated %}
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-       <li><a href="/userprofile">My Profile</a></li>
-       <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
-        <ul class="dropdown-menu">
-          {% for friend in session['friends'] %}
-          <li><a href="{{ url_for('main.show_friend_profile', friend_id =friend[0]) }}">
-            {% if friend[2] is not none %}{{ friend[2] }}{% else %}{%endif %} {% if friend[3] is not none %}{{ friend[3] }}{% else %}{%endif %}
-            ({{ friend[1] }})</a></li>
-         {% endfor %}
-            <li role="separator" class="divider"></li>
-            <li><a href="/findfriend">Add a new friend</a></li>
-            <li><a href="/findmanyfriends">Add multiple friends</a></li>
-          </ul>
+  <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+    <ul class="nav navbar-nav">
+     <li><a href="/userprofile">My Profile</a></li>
+     <li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        {% for friend in session['friends'] %}
+        <li><a href="{{ url_for('main.show_friend_profile', friend_id =friend[0]) }}">
+          {% if friend[2] is not none %}{{ friend[2] }}{% else %}{%endif %} {% if friend[3] is not none %}{{ friend[3] }}{% else %}{%endif %}
+          ({{ friend[1] }})</a></li>
+          {% endfor %}
+          <li role="separator" class="divider"></li>
+          <li><a href="/findfriend">Add a new friend</a></li>
+          <li><a href="/findmanyfriends">Add multiple friends</a></li>
+      </ul>
         </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Parties<span class="caret"></span></a>
@@ -55,17 +58,16 @@
         <li><a href="/logout">Log out</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
-  {% else %}
+    {% else %}
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li><a href={{ url_for('auth.register') }}>Register</a></li>
         <li><a href={{ url_for('auth.login') }}>Log in</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
-  {% endif %}
-</div><!-- /.container-fluid -->
+    {% endif %}
+  </div><!-- /.container-fluid -->
 </nav>
-
 {% endblock %}
 
 <!-- ------------ -->
@@ -73,11 +75,11 @@
 {% block content %}
 <div class="container-fluid">
   {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
+  {% if messages %}
+  {% for category, message in messages %}
+  <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %}
+  {% endif %}
   {% endwith %}
   <div id="extending">
     {% block page_content %}
@@ -88,9 +90,7 @@
 {% endblock %}  <!-- /content -->
 
 {% block scripts %}
-{{ super() }}
 {{ moment.include_moment() }}
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="/static/tooltip.js"></script>
 {% endblock %}
+
+</html>
