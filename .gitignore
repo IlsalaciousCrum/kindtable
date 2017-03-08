@@ -1,4 +1,5 @@
 *kind_env*
+*Old*
 *.pyc
 secrets.sh
 .DS_Store
