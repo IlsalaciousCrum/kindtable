@@ -2,9 +2,12 @@
 
 from datetime import datetime
 from passlib.hash import bcrypt
-from . import db, login_manager
-from flask_login import UserMixin
+from . import db, login_manager, login_serializer
+from flask_login import UserMixin, login_serializer, token_loader
 import pytz
+from itsdangerous import URLSafeTimedSerializer
+
+
 
 
 ##############################################################################
@@ -110,6 +113,38 @@ class User(UserMixin, db.Model):
             return True
         else:
             return False
+
+    def get_auth_token(self):
+        '''Encode a secure token for a cookie'''
+        
+        data = [str(self.id), self.password_hash]
+        return login_serializer.dumps(data)
+
+    @login_manager.token_loader
+    def load_token(token):
+      '''The token_loader function asks this function to take the token that was 
+    stored on the users computer, process it to check if its valid and then 
+    return a User Object if its valid or None if its not valid.'''
+
+    #The Token was encrypted using itsdangerous.URLSafeTimedSerializer which 
+    #allows us to have a max_age on the token itself.  When the cookie is stored
+    #on the users computer it also has a exipry date, but could be changed by
+    #the user, so this feature allows us to enforce the exipry date of the token
+    #server side and not rely on the users cookie to exipre. 
+    max_age = app.config["REMEMBER_COOKIE_DURATION"].total_seconds()
+ 
+    #Decrypt the Security Token, data = [username, hashpass]
+    data = login_serializer.loads(token, max_age=max_age)
+ 
+    #Find the User
+    user = User.get(data[0])
+ 
+    #Check Password and return user or None
+    if user and data[1] == user.password:
+        return user
+    return None
+
+
 
     @login_manager.user_loader
     def load_user(id):

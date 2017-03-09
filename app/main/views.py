@@ -1,7 +1,7 @@
 """K(i)nd app"""
 
 from datetime import datetime
-from flask import Flask, render_template, request, flash, redirect, session, json, url_for
+from flask import render_template, request, flash, redirect, session, json, url_for
 from flask_moment import Moment
 from . import main
 
@@ -11,14 +11,12 @@ from . import main
 from app.models import User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
 from .. import db
 from flask_mail import Mail, Message
-from flask_login import login_required
-import os
+from flask_login import login_required, login_fresh, current_user
 from functions import (guest_intolerances, guest_avoidances,
                        spoonacular_request, make_user, make_friendship,
                        make_intolerances, make_avoidance, user_change,
                        spoonacular_recipe_instructions, all_guest_diets,
                        new_guest_diet, new_spoonacular_request, spoonacular_recipe_ingredients)
-
 
 
 @main.route('/send-email')
@@ -29,7 +27,7 @@ def send_mail():
         msg = Message("Ilsa has sent you a Kind Table Request!",
                       recipients=["ilsalacious@gmail.com"])
         msg.body = "Ilsa (ilsalacious@gmail.com) would like you to fill out a brief dietary preference profile to make cooking for you easier."
-        mail.send(msg)
+        Mail.send(msg)
         return 'Mail sent!'
     except Exception, e:
         return(str(e))
@@ -39,27 +37,16 @@ def send_mail():
 def index():
     """Homepage."""
 
+    if not login_fresh():
+        user_id = current_user.get_id()
+        user = db.session.query.filter_by(user_id=user_id).first()
+        friends = user.friends_list()
+        session['friends'] = friends
+        party_query = Party.query.filter_by(user_id=user.id).all()
+        parties = [[party.party_id, party.title] for party in party_query]
+        session['parties'] = parties
+
     return render_template("kind_homepage.html")
-
-
-# @main.route('/login', methods=['GET'])
-# def show_login_form():
-#     """Show login form."""
-
-#     return render_template("login_form.html")
-
-
-# @main.route('/logout')
-# def add_logout():
-#     """Log out."""
-
-#     check_id = session.get("user_id")
-#     if check_id:
-#         del session["user_id"]
-#         flash("Logged Out.", "danger")
-#         return redirect("/")
-#     else:
-#         return redirect("/login")
 
 
 @main.route('/register', methods=['GET'])
