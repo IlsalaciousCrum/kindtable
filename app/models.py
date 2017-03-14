@@ -2,16 +2,42 @@
 
 from datetime import datetime
 from passlib.hash import bcrypt
-from . import db, login_manager, login_serializer
-from flask_login import UserMixin, login_serializer, token_loader
+from . import db, login_manager
+from flask_login import UserMixin
 import pytz
-from itsdangerous import URLSafeTimedSerializer
+import os
+from itsdangerous import URLSafeSerializer
 
-
+login_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
 
 
 ##############################################################################
 # Model definitions
+
+
+class BaseMixin(object):
+    '''Add create basic functions for all classes'''
+
+    @classmethod
+    def create_record(cls, **kw):
+        '''Creates a new instance of the class'''
+
+        obj = cls(**kw)
+        db.session.add(obj)
+        db.session.commit()
+
+    def update(self, attribute, value):
+        '''Updates the instance attribute'''
+
+        self.attribute = value
+        db.session.commit()
+
+    @classmethod
+    def delete(cls, attribute, primary_key):
+        '''Removes an instance from the database'''
+
+        cls.query.filter(cls.primary_key == value).delete()
+        db.session.commit()
 
 
 class Diet(db.Model):
@@ -34,7 +60,7 @@ class Diet(db.Model):
                                     self.ranking)
 
 
-class Profile(db.Model):
+class Profile(BaseMixin, db.Model):
     '''Information about users and their contacts'''
 
     __tablename__ = 'profiles'
@@ -79,12 +105,13 @@ class Profile(db.Model):
                                               self.last_updated)
 
 
-class User(UserMixin, db.Model):
+class User(BaseMixin, UserMixin, db.Model):
     '''Registered users of KindTable WebApp.'''
 
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    session_token = db.Column(db.String(256))
     password_hash = db.Column(db.String(128))
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                            nullable=False, unique=False)
@@ -114,47 +141,31 @@ class User(UserMixin, db.Model):
         else:
             return False
 
-    def get_auth_token(self):
+    def make_session_token(self):
         '''Encode a secure token for a cookie'''
-        
-        data = [str(self.id), self.password_hash]
+
+        data = hash([str(self.id), self.password_hash])
+        self.session_token = 
         return login_serializer.dumps(data)
 
-    @login_manager.token_loader
-    def load_token(token):
-      '''The token_loader function asks this function to take the token that was 
-    stored on the users computer, process it to check if its valid and then 
-    return a User Object if its valid or None if its not valid.'''
-
-    #The Token was encrypted using itsdangerous.URLSafeTimedSerializer which 
-    #allows us to have a max_age on the token itself.  When the cookie is stored
-    #on the users computer it also has a exipry date, but could be changed by
-    #the user, so this feature allows us to enforce the exipry date of the token
-    #server side and not rely on the users cookie to exipre. 
-    max_age = app.config["REMEMBER_COOKIE_DURATION"].total_seconds()
- 
-    #Decrypt the Security Token, data = [username, hashpass]
-    data = login_serializer.loads(token, max_age=max_age)
- 
-    #Find the User
-    user = User.get(data[0])
- 
-    #Check Password and return user or None
-    if user and data[1] == user.password:
-        return user
-    return None
-
-
-
     @login_manager.user_loader
-    def load_user(id):
-        return User.query.get(int(id))
+    def load_user(session_token):
+        '''The request_loader function asks this function to take the token that was
+        stored on the users computer, process it to check if its valid and then
+        return a User Object if its valid or None if its not valid.'''
 
-    def __repr__(self):
-        '''Provide helpful representation when printed.'''
+        data = login_serializer.loads(session_token)
 
-        return '<User user_id=%s profile_id=%s>' % (self.id,
-                                                    self.profile_id)
+        #Find the User
+        user = User.get(data[0])
+
+        #Check Password and return user or None
+        if user and data[1] == user.password_hash:
+            return user
+        return None
+
+    def get_id(self):
+        return unicode(self.session_token)
 
     def friends_list(self):
         '''Returns a nested list of a users friends'''
@@ -165,8 +176,14 @@ class User(UserMixin, db.Model):
             friends_list.append([friend.profile.profile_id, friend.profile.email, friend.profile.first_name, friend.profile.last_name])
         return friends_list
 
+    def __repr__(self):
+        '''Provide helpful representation when printed.'''
 
-class Friend(db.Model):
+        return '<User user_id=%s profile_id=%s>' % (self.id,
+                                                    self.profile_id)
+
+
+class Friend(BaseMixin, db.Model):
     '''Makes connection between the user and their contact'''
 
     __tablename__ = 'friends'
@@ -197,7 +214,7 @@ class Friend(db.Model):
                                                 self.friendship_verified_by_facebook)
 
 
-class Intolerance(db.Model):
+class Intolerance(BaseMixin, db.Model):
     '''Spoonacular's list of possible intolerances.'''
 
     __tablename__ = 'intolerances'
@@ -215,7 +232,7 @@ class Intolerance(db.Model):
                                 self.intol_description)
 
 
-class ProfileIntolerance(db.Model):
+class ProfileIntolerance(BaseMixin, db.Model):
     '''Associates the intolerances that each user has.'''
 
     __tablename__ = 'profileintolerances'
@@ -265,7 +282,7 @@ class Course(db.Model):
                                                          self.course_name)
 
 
-class IngToAvoid(db.Model):
+class IngToAvoid(BaseMixin, db.Model):
     '''Ingredients users would like to avoid.'''
 
     __tablename__ = 'avoid'
@@ -286,7 +303,7 @@ class IngToAvoid(db.Model):
                        self.reason)
 
 
-class Party(db.Model):
+class Party(BaseMixin, db.Model):
     '''Create a dinner party to store and link information about a party'''
 
     __tablename__ = 'parties'
@@ -335,7 +352,7 @@ class Party(db.Model):
                                                                self.user_id)
 
 
-class PartyGuest(db.Model):
+class PartyGuest(BaseMixin, db.Model):
     '''Associate users with a party'''
 
     #  this is a true association table now
@@ -349,7 +366,7 @@ class PartyGuest(db.Model):
                            nullable=False)
 
 
-class RecipeCard(db.Model):
+class RecipeCard(BaseMixin, db.Model):
     '''Add a recipe to a users recipe box'''
 
     __tablename__ = 'recipecard'
@@ -376,7 +393,7 @@ class RecipeCard(db.Model):
                              self.instructions)
 
 
-class RecipeBox(db.Model):
+class RecipeBox(BaseMixin, db.Model):
     '''Recipes bookmarked by a user'''
 
     __tablename__ = 'recipebox'
@@ -398,7 +415,7 @@ class RecipeBox(db.Model):
                                  self.recipe_record_id)
 
 
-class PartyRecipes(db.Model):
+class PartyRecipes(BaseMixin, db.Model):
     '''Associate a recipe with a party'''
 
     __tablename__ = 'partyrecipes'

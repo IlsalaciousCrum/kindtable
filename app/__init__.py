@@ -13,9 +13,8 @@ bootstrap = Bootstrap()
 mail = Mail()
 moment = Moment()
 
-
 login_manager = LoginManager()
-login_serializer = URLSafeTimedSerializer(app.secret_key)
+
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
 

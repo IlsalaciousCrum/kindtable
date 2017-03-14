@@ -24,12 +24,12 @@ def login():
         if user is not None and user.verify_password(form.password.data):
             print 3
             login_user(user, form.remember_me.data)
-            session['user_id'] = user.id
-            friends = user.friends_list()
-            session['friends'] = friends
-            party_query = Party.query.filter_by(user_id=user.id).all()
-            parties = [[party.party_id, party.title] for party in party_query]
-            session['parties'] = parties
+            # session['session_token'] = user.id
+            # friends = user.friends_list()
+            # session['friends'] = friends
+            # party_query = Party.query.filter_by(user_id=user.id).all()
+            # parties = [[party.party_id, party.title] for party in party_query]
+            # session['parties'] = parties
             return redirect(url_for('main.index'))
         else:
             print 4

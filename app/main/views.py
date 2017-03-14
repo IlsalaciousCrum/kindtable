@@ -37,15 +37,6 @@ def send_mail():
 def index():
     """Homepage."""
 
-    if not login_fresh():
-        user_id = current_user.get_id()
-        user = db.session.query.filter_by(user_id=user_id).first()
-        friends = user.friends_list()
-        session['friends'] = friends
-        party_query = Party.query.filter_by(user_id=user.id).all()
-        parties = [[party.party_id, party.title] for party in party_query]
-        session['parties'] = parties
-
     return render_template("kind_homepage.html")
 
 
