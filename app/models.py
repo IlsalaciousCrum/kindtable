@@ -32,11 +32,14 @@ class BaseMixin(object):
         self.attribute = value
         db.session.commit()
 
+# To Do: Add specfic delete methods for each class that needs it to cascade
+# record deletion to all dependent tables
+
     @classmethod
     def delete(cls, attribute, primary_key):
         '''Removes an instance from the database'''
 
-        cls.query.filter(cls.primary_key == value).delete()
+        cls.query.filter(cls.attribute == primary_key).delete()
         db.session.commit()
 
 
@@ -73,7 +76,6 @@ class Profile(BaseMixin, db.Model):
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
     diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'), default=10)
-    # ie, ethical, religious, general health, specific health
     diet_reason = db.Column(db.String(120), nullable=True)
     profile_notes = db.Column(db.String(300), nullable=True)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
@@ -145,8 +147,9 @@ class User(BaseMixin, UserMixin, db.Model):
         '''Encode a secure token for a cookie'''
 
         data = hash([str(self.id), self.password_hash])
-        self.session_token = 
-        return login_serializer.dumps(data)
+        self.session_token = login_serializer.dumps(data)
+
+        return self.session_token
 
     @login_manager.user_loader
     def load_user(session_token):

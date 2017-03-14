@@ -19,12 +19,12 @@ def login():
     print form.password.data
     if form.validate_on_submit():
         print 1
-        user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile == True).first()
+        user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile.isnot(None)).first()
         print 2
         if user is not None and user.verify_password(form.password.data):
             print 3
             login_user(user, form.remember_me.data)
-            # session['session_token'] = user.id
+            session['session_token'] = user.session_token
             # friends = user.friends_list()
             # session['friends'] = friends
             # party_query = Party.query.filter_by(user_id=user.id).all()
