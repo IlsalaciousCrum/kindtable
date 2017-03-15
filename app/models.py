@@ -148,6 +148,7 @@ class User(BaseMixin, UserMixin, db.Model):
 
         data = hash([str(self.id), self.password_hash])
         self.session_token = login_serializer.dumps(data)
+        db.session.commit()
 
         return self.session_token
 

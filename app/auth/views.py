@@ -7,7 +7,7 @@ from . import auth
 
 from .. import db
 
-from ..models import Profile, User, Party
+from ..models import Profile, User
 
 from .forms import LoginForm
 
@@ -19,18 +19,14 @@ def login():
     print form.password.data
     if form.validate_on_submit():
         print 1
-        user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile.isnot(None)).first()
+        user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile.is_(True)).first()
         print 2
         if user is not None and user.verify_password(form.password.data):
             print 3
             login_user(user, form.remember_me.data)
             session['session_token'] = user.session_token
-            # friends = user.friends_list()
-            # session['friends'] = friends
-            # party_query = Party.query.filter_by(user_id=user.id).all()
-            # parties = [[party.party_id, party.title] for party in party_query]
-            # session['parties'] = parties
-            return redirect(url_for('main.index'))
+            return redirect(url_for('main.index'), friends=user.friends,
+                            parties=user.parties)
         else:
             print 4
             flash('Invalid username or password.')
