@@ -44,6 +44,8 @@ def test():
 @manager.command
 def deploy():
     """Run deployment tasks."""
+
+    from flask.ext.migrate import upgrade
     from app.seed import LoadSeedData
 
     # migrate database to latest revision

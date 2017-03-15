@@ -32,6 +32,14 @@ def send_mail():
         return(str(e))
 
 
+@main.route('/.well-known/acme-challenge/BopKRv96R-TjYAFzlJLgNzplFkgAFbD3Oqp3Ge4L5O8')
+def letsencryptSSL():
+    """Acme challenge for Let's Encrypt TLS certificate"""
+
+    html = "<html><body>BopKRv96R-TjYAFzlJLgNzplFkgAFbD3Oqp3Ge4L5O8.ecIxhAtF13SyMysgf2q8wrMZCcfF9-XUpp2Mpj1Wefk</body></html>"
+    return html
+
+
 @main.route('/')
 def index():
     """Homepage."""
