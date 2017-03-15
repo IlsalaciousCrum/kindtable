@@ -48,7 +48,11 @@ def register():
     form = RegistrationForm()
     diets = Diet.query.order_by(Diet.diet_type).all()
     if form.validate_on_submit():
-        profile = User.create(email=form.email.data)
+        profile = User.create(email=form.email.data,
+                              first_name=form.first_name.data,
+                              last_name=form.last_name.data,
+                              diet_id=form.diet.data,
+                              reason=form.diet_reason.data)
         user = User.create(profile_id=profile.profile_id,
                            password=form.password.data,
                            created_by_email_owner=True,
