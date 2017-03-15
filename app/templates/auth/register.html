@@ -12,7 +12,7 @@
         <div class = "row round_hidden_div" style="padding-top: 2em">
             <form class="form form-horizontal" method='POST' role="form" name="login">
                 {{ form.csrf_token }}
-                <p>Email address:<br>{{ form.email  }}<br>
+                <p>Email address:<br>{{ form.email  }}<br><br>
                  Password:<br>{{ form.password  }}<br><br>
                  Verify Password:<br>{{ form.password2  }}<br><br>
                  
@@ -20,3 +20,4 @@
             </form>
     </div>
 </div>
+{% endblock %}
