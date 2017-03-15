@@ -24,18 +24,19 @@
             </form>
             <br><br>
             <h3>Instructions:</h3>
+            <h5>Diet selection</h5>
             <p>The diet reason field is optional, we show that information to your friends 
             so they can make better decisions about how to make you feel comfortable
             and welcome at their table.</p>
-
+            <h5>Diet Reason</h5>
             <p>We ask for your diet so that the recipes work for you, too.
-             Don't worry if your diet is actually more 
-                complex than these terms, you will get to customize this more later. 
-                (Also, you can change this information at any time.)
-                For now, just pick the diet that fits most closely with how you eat:<br><br>
-                {% for diet in diets %}
-                <strong>{{  diet.diet_type  }}:</strong> {{  diet.description  }}<br>
-                {% endfor %}</p>
+            Don't worry if your diet is actually more 
+            complex than these terms, you will get to customize this more later. 
+            (Also, you can change this information at any time.)
+            For now, just pick the diet that fits most closely with how you eat:<br><br>
+            {% for diet in diets %}
+            <strong>{{  diet.diet_type  }}:</strong> {{  diet.description  }}<br>
+            {% endfor %}</p>
 
     </div>
 </div>

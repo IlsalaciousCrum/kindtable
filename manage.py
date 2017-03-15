@@ -4,12 +4,14 @@ import os
 from app import create_app, db
 from app.models import User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
 from Flask_script import Manager, Shell, Server
-from flask_migrate import Migrate, MigrateCommand, upgrade
+from flask_migrate import Migrate, MigrateCommand
 from jinja2 import StrictUndefined
+from flask_mail import Mail
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
 migrate = Migrate(app, db)
+mail = Mail(app)
 
 # Normally, if you use an undefined variable in Jinja2, it fails silently.
 # StrictUndefined raises an error.

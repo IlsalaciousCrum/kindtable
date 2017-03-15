@@ -2,10 +2,11 @@ from flask import render_template, redirect, url_for, flash, session
 
 from flask_login import login_user, logout_user, login_required
 
-
 from . import auth
 
 from .. import db
+
+from ..email import send_email
 
 from ..models import Profile, User, Diet
 
@@ -58,8 +59,8 @@ def register():
                            created_by_email_owner=True,
                            is_user_profile=True)
         token = user.generate_confirmation_token()
-        send_email(profile.email, 'Confirm Your Account',
-                   'auth/email/confirm', profile=profile, token=token)
+        send_email(to=profile.email, subject='Confirm Your Account',
+                   template='auth/email/confirm', profile=profile, token=token)
         flash('Please check your email for instructions on completing registration.')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form, diets=diets)
