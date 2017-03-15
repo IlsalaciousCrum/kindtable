@@ -6,9 +6,10 @@ from . import db, login_manager
 from flask_login import UserMixin
 import pytz
 import os
-from itsdangerous import URLSafeSerializer
+from itsdangerous import URLSafeSerializer, JSONWebSignatureSerializer
 
 login_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
+registration_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
 
 
 ##############################################################################
@@ -88,6 +89,25 @@ class Profile(BaseMixin, db.Model):
                                    secondary='profileintolerances',
                                    backref='profiles',
                                    lazy='joined')
+
+    def generate_confirmation_token(self):
+        '''Creates an encrypted token to send via email to new user'''
+
+        return registration_serializer.dumps({'confirm': self.id})
+
+    def confirm(self, token):
+        try:
+            data = registration_serializer.loads(token)
+        except:
+            return False
+
+        if data.get('confirm') != self.id:
+            return False
+        else:
+            self.email_verified = True
+            db.session.commit()
+            return True
+
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''

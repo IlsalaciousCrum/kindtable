@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from wtforms import ValidationError
-from ..models import Profile
+from ..models import Profile, Diet
+
+diets = Diet.query.order_by(Diet.diet_type).all()
 
 
 class LoginForm(FlaskForm):
@@ -13,9 +15,13 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(1, 64),
+    first_name = StringField('first_Name', validators=[DataRequired(), Length(1, 64)])
+    last_name = StringField('last_Name', validators=[DataRequired(), Length(1, 64)])
+    diet = RadioField('Label', choices=[(diet.diet_id, diet.diet_type) for diet in diets])
+    diet_reason = StringField('diet_Reason', validators=[Length(1, 64)])
+    email = StringField('email', validators=[DataRequired(), Length(1, 64),
                                              Email()])
-    password = PasswordField('Password', validators=[DataRequired(),
+    password = PasswordField('password', validators=[DataRequired(),
                              EqualTo('password2', message='Passwords must match.')])
     password2 = PasswordField('Confirm password', validators=[DataRequired()])
     submit = SubmitField('Register')

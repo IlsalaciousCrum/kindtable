@@ -7,7 +7,7 @@ from . import auth
 
 from .. import db
 
-from ..models import Profile, User
+from ..models import Profile, User, Diet
 
 from .forms import LoginForm, RegistrationForm
 
@@ -46,15 +46,18 @@ def logout():
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
+    diets = Diet.query.order_by(Diet.diet_type).all()
     if form.validate_on_submit():
-        user = User.create(email=form.email.data,
-                           username=form.username.data,
-                           password=form.password.data)
-        db.session.add(user)
+        profile = User.create(email=form.email.data)
+        user = User.create(profile_id=profile.profile_id,
+                           password=form.password.data,
+                           created_by_email_owner=True,
+                           is_user_profile=True)
+        db.session.add(user, profile)
         db.session.commit()
         token = user.generate_confirmation_token()
-        send_email(user.email, 'Confirm Your Account',
-                   'auth/email/confirm', user=user, token=token)
-        flash('A confirmation email has been sent to you by email.')
+        send_email(profile.email, 'Confirm Your Account',
+                   'auth/email/confirm', profile=profile, token=token)
+        flash('Please check your email for instructions on completing registration.')
         return redirect(url_for('auth.login'))
-    return render_template('auth/register.html', form=form)
+    return render_template('auth/register.html', form=form, diets=diets)
