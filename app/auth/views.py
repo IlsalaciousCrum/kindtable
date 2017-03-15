@@ -1,3 +1,5 @@
+'''Views related to user management tasks'''
+
 from flask import render_template, redirect, url_for, flash, session
 
 from flask_login import login_user, logout_user, login_required
@@ -42,6 +44,18 @@ def logout():
     logout_user()
 
     return redirect(url_for('main.index'))
+
+
+@auth.route('/update')
+def temp():
+    try:
+        my_profile = Profile.query.get('1').first()
+        my_profile.update(Profile.email, "me@me.com")
+        html = "<html><body>success</body></html>"
+        return html
+    except:
+        html = "<html><body>Nope, no good</body></html>"
+        return html
 
 
 @auth.route('/register', methods=['GET', 'POST'])

@@ -1,5 +1,7 @@
 #!/usr/bin/kind_env python
 
+'''Launches the app and application tasks'''
+
 import os
 from app import create_app, db
 from app.models import User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes

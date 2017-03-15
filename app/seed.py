@@ -8,7 +8,7 @@ from datetime import datetime
 
 
 def LoadTestPeople():
-    """Load fake users and information for development purposes"""
+    """Load fake users and information in development only"""
 
     ilsa = Profile(profile_id=1, is_user_profile=True, created_by_email_owner=True, email='ilsalacious@gmail.com', email_verified=True, first_name='Ilsa', last_name='Gordon')
     db.session.add(ilsa)

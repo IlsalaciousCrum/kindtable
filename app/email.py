@@ -1,3 +1,6 @@
+'''A function for sending emails asynchronously. Will use Celery or Redis
+after initial deployment because this won't scale'''
+
 from threading import Thread
 from flask import current_app, render_template
 from flask_mail import Message

@@ -27,12 +27,6 @@ class BaseMixin(object):
         db.session.add(obj)
         db.session.commit()
 
-    def update(self, attribute, value):
-        '''Updates the instance attribute'''
-
-        self.attribute = value
-        db.session.commit()
-
 # To Do: Add specfic delete methods for each class that needs it to cascade
 # record deletion to all dependent tables
 
