@@ -36,7 +36,13 @@ from functions import (guest_intolerances, guest_avoidances,
 def index():
     """Homepage."""
 
-    return render_template("kind_homepage.html")
+    print 7
+    session_token = session.get("session_token")
+    user = User.query.filter_by(session_token=session_token).first()
+    friends = user.friends
+    parties = user.parties
+
+    return render_template("kind_homepage.html", friends=friends, parties=parties)
 
 
 # @main.route('/register', methods=['GET'])
@@ -96,27 +102,27 @@ def index():
 #         return redirect("/login")
 
 
-# @main.route('/friendprofile/<int:friend_id>', methods=['GET'])
-# @login_required
-# def show_friend_profile(friend_id):
-#     """Show logged in user's friends profile"""
+@main.route('/friendprofile/<int:friend_id>', methods=['GET'])
+@login_required
+def show_friend_profile(friend_id):
+    """Show logged in user's friends profile"""
 
-#     check_id = session.get("user_id")
-#     if check_id:
-#         this_user = User.query.get(check_id)
-#         newfriend = User.query.get(friend_id)
-#         diets = Diet.query.order_by(Diet.diet_type).all()
-#         intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
-#         parties = db.session.query(Party).filter(Party.party_id == PartyGuest.party_id, PartyGuest.user_id == newfriend.user_id).all()
-#         return render_template("/friends_profile_page.html",
-#                                newfriend=newfriend,
-#                                diets=diets,
-#                                this_user=this_user,
-#                                intol_list=intol_list,
-#                                parties=parties
-#                                )
-#     else:
-#         return redirect("/login")
+    session_token = session.get("session_token")
+    user = User.query.filter_by(session_token=session_token).first()
+    friends = user.friends
+    parties = user.parties
+
+    newfriend = Profile.query.get(friend_id)
+    diets = Diet.query.order_by(Diet.diet_type).all()
+    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+    parties = db.session.query(Party).filter(Party.party_id == PartyGuest.party_id, PartyGuest.profile_id == newfriend.profile_id).all()
+    return render_template("/friends_profile_page.html",
+                           newfriend=newfriend,
+                           diets=diets,
+                           intol_list=intol_list,
+                           parties=parties,
+                           friends=friends
+                           )
 
 
 # @main.route('/addafriend', methods=['POST'])
@@ -311,26 +317,27 @@ def index():
 #     return redirect("/friendprofile/%s" % newfriend.user_id)
 
 
-# @main.route('/party_profile/<int:party_id>')
-# @login_required
-# def show_party_profile(party_id):
-#     """Show the party profile"""
+@main.route('/party_profile/<int:party_id>')
+@login_required
+def show_party_profile(party_id):
+    """Show the party profile"""
 
-#     user_id = session.get("user_id")
-#     if user_id:
-#         session['party_id'] = party_id
-#         diets = Diet.query.order_by(Diet.diet_type).all()
-#         this_user = User.query.get(user_id)
-#         party = Party.query.get(party_id)
-#         intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+    session_token = session.get("session_token")
+    user = User.query.filter_by(session_token=session_token).first()
+    this_user = user.profile
+    friends = user.friends
+    parties = user.parties
+    session['party_id'] = party_id
+    diets = Diet.query.order_by(Diet.diet_type).all()
+    party = Party.query.get(party_id)
+    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
 
-#         return render_template("/party_profile.html", user_id=user_id,
-#                                party=party,
-#                                this_user=this_user,
-#                                diets=diets,
-#                                intol_list=intol_list)
-#     else:
-#         return redirect("/login")
+    return render_template("/party_profile.html", party=party,
+                           this_user=this_user,
+                           diets=diets,
+                           intol_list=intol_list,
+                           friends=friends,
+                           parties=parties)
 
 
 # @main.route('/addaparty', methods=['GET'])

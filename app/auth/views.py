@@ -24,9 +24,10 @@ def login():
         if user is not None and user.verify_password(form.password.data):
             print 3
             login_user(user, form.remember_me.data)
+            print 5
             session['session_token'] = user.session_token
-            return redirect(url_for('main.index'), friends=user.friends,
-                            parties=user.parties)
+            print 6
+            return redirect(url_for('main.index'))
         else:
             print 4
             flash('Invalid username or password.')
@@ -38,6 +39,7 @@ def login():
 @login_required
 def logout():
     logout_user()
+
     return redirect(url_for('main.index'))
 
 

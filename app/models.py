@@ -146,7 +146,7 @@ class User(BaseMixin, UserMixin, db.Model):
     def make_session_token(self):
         '''Encode a secure token for a cookie'''
 
-        data = hash([str(self.id), self.password_hash])
+        data = [str(self.id), self.password_hash]
         self.session_token = login_serializer.dumps(data)
         db.session.commit()
 
@@ -161,7 +161,7 @@ class User(BaseMixin, UserMixin, db.Model):
         data = login_serializer.loads(session_token)
 
         #Find the User
-        user = User.get(data[0])
+        user = User.query.get(data[0])
 
         #Check Password and return user or None
         if user and data[1] == user.password_hash:
