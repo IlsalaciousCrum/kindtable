@@ -18,18 +18,18 @@ from functions import (guest_intolerances, guest_avoidances,
                        new_guest_diet, new_spoonacular_request, spoonacular_recipe_ingredients)
 
 
-# @main.route('/send-email')
-# def send_mail():
-#     """Testing sending email through Flask-Mail and the website"""
+@main.route('/send-email')
+def send_mail():
+    """Testing sending email through Flask-Mail and the website"""
 
-#     try:
-#         msg = Message("Ilsa has sent you a Kind Table Request!",
-#                       recipients=["ilsalacious@gmail.com"])
-#         msg.body = "Ilsa (ilsalacious@gmail.com) would like you to fill out a brief dietary preference profile to make cooking for you easier."
-#         Mail.send(msg)
-#         return 'Mail sent!'
-#     except Exception, e:
-#         return(str(e))
+    try:
+        msg = Message("Ilsa has sent you a Kind Table Request!",
+                      recipients=["ilsalacious@gmail.com"])
+        msg.body = "Ilsa (ilsalacious@gmail.com) would like you to fill out a brief dietary preference profile to make cooking for you easier."
+        Mail.send(msg)
+        return 'Mail sent!'
+    except Exception, e:
+        return(str(e))
 
 
 @main.route('/')

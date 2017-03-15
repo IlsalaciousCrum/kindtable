@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}Kind Table - Register{% endblock %}
 
@@ -7,7 +6,17 @@
 <div class="page-header">
     <h1>Register</h1>
 </div>
-<div class="col-md-4">
-    {{ wtf.quick_form(form) }}
+
+<div class="row well-spaced" style="padding-top: 10em">
+    <div class="col-md-4 col-md-offset-4">
+        <div class = "row round_hidden_div" style="padding-top: 2em">
+            <form class="form form-horizontal" method='POST' role="form" name="login">
+                {{ form.csrf_token }}
+                <p>Email address:<br>{{ form.email  }}<br>
+                 Password:<br>{{ form.password  }}<br><br>
+                 Verify Password:<br>{{ form.password2  }}<br><br>
+                 
+                {{ form.submit  }}
+            </form>
+    </div>
 </div>
-{% endblock %}
