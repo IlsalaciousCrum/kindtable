@@ -318,6 +318,12 @@ class ProfileIntolerance(BaseMixin, db.Model):
     intol_id = db.Column(db.Integer, db.ForeignKey('intolerances.intol_id'),
                          nullable=False)
 
+    def remove_intolerance(self):
+        '''removes an intolerance for the profile'''
+
+        self._delete_()
+        db.session.commit()
+
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
@@ -367,6 +373,12 @@ class IngToAvoid(BaseMixin, db.Model):
     reason = db.Column(db.String(200), nullable=True)
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                            nullable=False)
+
+    def remove_avoidance(self):
+        '''removes an ingredient to avoid for the profile'''
+
+        self._delete_()
+        db.session.commit()
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -450,12 +462,22 @@ class PartyGuest(BaseMixin, db.Model):
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'),
                          nullable=False)
-    profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
-                           nullable=False)
+    friend_profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
+                                  nullable=False)
+
+    def disinvite_guest(self):
+        '''removes a guest from the party'''
+
+        bookmarked_recipes = RecipeWorksFor.query.filter_by(guest_profile_id=self.profile_id).all()
+        if bookmarked_recipes:
+            for recipe in bookmarked_recipes:
+                recipe.discard_recipe
+        self._delete_()
+        db.session.commit()
 
 
 class RecipeCard(BaseMixin, db.Model):
-    '''Add a recipe to a users recipe box'''
+    '''Saves a recipe from a Spoonacular query'''
 
     __tablename__ = 'recipecard'
 
@@ -498,6 +520,12 @@ class RecipeBox(BaseMixin, db.Model):
                                 backref='recipe_box',
                                 lazy='joined')
 
+    def discard_recipe(self):
+        '''Removes a recipe from a user's recipe box'''
+
+        self._delete_()
+        db.session.commit()
+
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
@@ -516,6 +544,11 @@ class RecipeWorksFor(BaseMixin, db.Model):
     guest_profile_id = profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                                               nullable=False)
 
+    def discard_works_for(self):
+        '''Removes a reference to a person this recipe works for'''
+
+        self._delete_()
+
 
 class PartyRecipes(BaseMixin, db.Model):
     '''Associate a recipe with a party'''
@@ -528,6 +561,17 @@ class PartyRecipes(BaseMixin, db.Model):
     recipe_record_id = db.Column(db.Integer,
                                  db.ForeignKey('recipecard.recipe_record_id'),
                                  nullable=False)
+    course_id = db.Column(db.Integer, db.ForeignKey('Course.course_id', nullable=False))
+    cuisine_id = db.Column(db.Integer, db.ForeignKey('Cuisine.cuisine_id', nullable=False))
+
+    course = db.relationship('Course', backref='party_recipes', lazy='joined')
+    cuisine = db.relationship('Cuisine', backref='party_recipes', lazy='joined')
+
+    def discard_recipe(self):
+        '''Discards a recipe saved for a party'''
+
+        self._delete_()
+        db.session.commit()
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
