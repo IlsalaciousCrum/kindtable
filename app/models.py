@@ -7,7 +7,6 @@ from flask_login import UserMixin
 import pytz
 import os
 from itsdangerous import URLSafeSerializer, JSONWebSignatureSerializer
-from sqlalchemy.ext.hybrid import hybrid_method
 
 login_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
 registration_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
@@ -18,7 +17,7 @@ registration_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'
 
 
 class BaseMixin(object):
-    '''Add create basic functions for all classes'''
+    '''Adds basic db editing for all classes, with db mechanics abstracted from view'''
 
     @classmethod
     def create_record(cls, **kw):
@@ -32,18 +31,15 @@ class BaseMixin(object):
         except:
             pass
 
-    # @hybrid_method
-    def update(self, lst):
+    def update(self, change_dict):
         '''Update any number of attributes on an instance'''
 
-        for key, value in lst:
-            self.key = value
+        for key, value in change_dict.iteritems():
+            setattr(self, key, value)
         db.session.commit()
         return self
-# To Do: Add specfic delete methods for each class that needs it to cascade
-# record deletion to all dependent tables
 
-    def delete(self):
+    def _delete_(self):
         '''Removes an instance from the database'''
 
         try:
@@ -79,8 +75,7 @@ class Profile(BaseMixin, db.Model):
     __tablename__ = 'profiles'
 
     profile_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    is_user_profile = db.Column(db.Boolean, unique=False, default=False)
-    created_by_email_owner = db.Column(db.Boolean, unique=False, default=False)
+    owned_by_user = db.Column(db.Integer)
     email = db.Column(db.String(200), nullable=False, unique=False)
     email_verified = db.Column(db.Boolean, unique=False, default=False)
     first_name = db.Column(db.String(64), nullable=True)
@@ -116,6 +111,24 @@ class Profile(BaseMixin, db.Model):
             self.email_verified = True
             db.session.commit()
             return True
+
+    def remove_profile(self):
+        '''Deletes an unofficial profile and all affected records'''
+
+        if self.friends:
+            for friend in self.friend:
+                friend.remove_friendship()
+
+        if self.intolerances:
+            for intolerance in self.intolerances:
+                intolerance._delete_()
+
+        if self.avoidances:
+            for ingredient in self.avoidances:
+                ingredient._delete_()
+
+        self._delete_()
+        db.session.commit()
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -199,14 +212,28 @@ class User(BaseMixin, UserMixin, db.Model):
     def get_id(self):
         return unicode(self.session_token)
 
-    def friends_list(self):
-        '''Returns a nested list of a users friends'''
+    def delete_user(self):
+        '''deletes a user and all records in affected tables'''
 
-        friends_query = Friend.query.filter_by(user_id=self.id).all()
-        friends_list = []
-        for friend in friends_query:
-            friends_list.append([friend.profile.profile_id, friend.profile.email, friend.profile.first_name, friend.profile.last_name])
-        return friends_list
+        if self.friends:
+            for friend in self.friends:
+                friend.remove_friendship()
+
+        if self.parties:
+            for party in self.parties:
+                party.discard_party()
+
+        if self.recipebox:
+            for recipe in self.recipebox:
+                recipe._delete_()
+
+        user_profile = self.profile
+
+        self._delete_()
+
+        user_profile.remove_profile()
+
+        db.session.commit()
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -231,8 +258,24 @@ class Friend(BaseMixin, db.Model):
     friendship_verified_by_facebook = db.Column(db.Boolean, unique=False,
                                                 default=False)
 
-    profile = db.relationship('Profile', backref='friend')
+    friend_profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
+
+    def remove_friendship(self):
+        '''Removes the friendship and all relevant records'''
+
+        guest_at_party = PartyGuest.query.filter_by(profile_id=self.profile_id).all()
+        if guest_at_party:
+            for invite in guest_at_party:
+                invite._delete_()
+
+        bookmarked = RecipeWorksFor.query.filter_by(profile_id=self.profile_id).all()
+        if bookmarked:
+            for recipe in bookmarked:
+                recipe._delete_()
+
+        self._delete_()
+        db.session.commit()
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -376,6 +419,19 @@ class Party(BaseMixin, db.Model):
         local_date_time = UTC_dt.astimezone(local_timezone)
         return local_date_time.strftime(fmt)
 
+    def discard_party(self):
+        '''Removes the party and any dependent records'''
+
+        if self.party_guests:
+            for invite in self.party_guests:
+                invite._delete_()
+        if self.recipes:
+            for party_recipe in self.recipes:
+                party_recipe._delete_()
+
+        self._delete_()
+        db.session.commit()
+
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
@@ -437,6 +493,10 @@ class RecipeBox(BaseMixin, db.Model):
                                  nullable=False)
 
     recipes = db.relationship('RecipeCard', lazy='joined')
+    works_for = db.relationship('Profile',
+                                secondary='worksfor',
+                                backref='recipe_box',
+                                lazy='joined')
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -445,6 +505,16 @@ class RecipeBox(BaseMixin, db.Model):
         recipe_record_id=%s>' % (self.record_id,
                                  self.user_id,
                                  self.recipe_record_id)
+
+
+class RecipeWorksFor(BaseMixin, db.Model):
+    '''Party Guests that this recipe has worked for'''
+    __tablename__ = 'worksfor'
+
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    recipe_box_id = db.Column(db.Integer, db.ForeignKey('RecipeBox.record_id'), nullable=False)
+    guest_profile_id = profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
+                                              nullable=False)
 
 
 class PartyRecipes(BaseMixin, db.Model):
@@ -458,7 +528,6 @@ class PartyRecipes(BaseMixin, db.Model):
     recipe_record_id = db.Column(db.Integer,
                                  db.ForeignKey('recipecard.recipe_record_id'),
                                  nullable=False)
-    works_for = db.Column(db.String(1000), nullable=True)
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
