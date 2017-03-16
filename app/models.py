@@ -7,6 +7,7 @@ from flask_login import UserMixin
 import pytz
 import os
 from itsdangerous import URLSafeSerializer, JSONWebSignatureSerializer
+from sqlalchemy.ext.hybrid import hybrid_method
 
 login_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
 registration_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
@@ -23,19 +24,33 @@ class BaseMixin(object):
     def create_record(cls, **kw):
         '''Creates a new instance of the class'''
 
-        obj = cls(**kw)
-        db.session.add(obj)
-        db.session.commit()
+        try:
+            obj = cls(**kw)
+            db.session.add(obj)
+            db.session.commit()
+            return obj
+        except:
+            pass
 
+    # @hybrid_method
+    def update(self, lst):
+        '''Update any number of attributes on an instance'''
+
+        for key, value in lst:
+            self.key = value
+        db.session.commit()
+        return self
 # To Do: Add specfic delete methods for each class that needs it to cascade
 # record deletion to all dependent tables
 
-    @classmethod
-    def delete(cls, attribute, primary_key):
+    def delete(self):
         '''Removes an instance from the database'''
 
-        cls.query.filter(cls.attribute == primary_key).delete()
-        db.session.commit()
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except:
+            pass
 
 
 class Diet(db.Model):
@@ -101,7 +116,6 @@ class Profile(BaseMixin, db.Model):
             self.email_verified = True
             db.session.commit()
             return True
-
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''

@@ -2,7 +2,7 @@
 
 from flask import render_template, redirect, url_for, flash, session
 
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 
 from . import auth
 
@@ -78,3 +78,13 @@ def register():
         flash('Please check your email for instructions on completing registration.')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form, diets=diets)
+
+
+@auth.route('/confirm/<token>')
+@login_required
+def confirm(token):
+
+    if current_user.profile.email_verified:
+        return redirect(url_for('main.index'))
+    if current_user.confirm(token):
+        flash('You have confirmed your account.Thanks!')
