@@ -49,7 +49,7 @@ class BaseMixin(object):
             pass
 
 
-class Diet(db.Model):
+class Diet(BaseMixin, db.Model):
     '''Spoonacular's diet choices.'''
 
     __tablename__ = 'diets'
@@ -75,7 +75,7 @@ class Profile(BaseMixin, db.Model):
     __tablename__ = 'profiles'
 
     profile_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    owned_by_user = db.Column(db.Integer)
+    owned_by_user_id = db.Column(db.Integer)
     email = db.Column(db.String(200), nullable=False, unique=False)
     email_verified = db.Column(db.Boolean, unique=False, default=False)
     first_name = db.Column(db.String(64), nullable=True)
@@ -333,10 +333,10 @@ class ProfileIntolerance(BaseMixin, db.Model):
                          self.intol_id)
 
 
-class Cuisine(db.Model):
+class Cuisine(BaseMixin, db.Model):
     '''Spoonacular cuisine types.'''
 
-    __tablename__ = 'cuisine'
+    __tablename__ = 'cuisines'
 
     cuisine_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     cuisine_name = db.Column(db.String(64), nullable=False)
@@ -348,7 +348,7 @@ class Cuisine(db.Model):
                                                             self.cuisine_name)
 
 
-class Course(db.Model):
+class Course(BaseMixin, db.Model):
     '''Spoonacular course types'''
 
     __tablename__ = 'courses'
@@ -540,9 +540,12 @@ class RecipeWorksFor(BaseMixin, db.Model):
     __tablename__ = 'worksfor'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    recipe_box_id = db.Column(db.Integer, db.ForeignKey('RecipeBox.record_id'), nullable=False)
-    guest_profile_id = profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
-                                              nullable=False)
+    recipe_box_id = db.Column(db.Integer,
+                              db.ForeignKey('recipebox.record_id'),
+                              nullable=False)
+    guest_profile_id = db.Column(db.Integer,
+                                 db.ForeignKey('profiles.profile_id'),
+                                 nullable=False)
 
     def discard_works_for(self):
         '''Removes a reference to a person this recipe works for'''
@@ -556,16 +559,25 @@ class PartyRecipes(BaseMixin, db.Model):
     __tablename__ = 'partyrecipes'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'),
+    party_id = db.Column(db.Integer,
+                         db.ForeignKey('parties.party_id'),
                          nullable=False)
     recipe_record_id = db.Column(db.Integer,
                                  db.ForeignKey('recipecard.recipe_record_id'),
                                  nullable=False)
-    course_id = db.Column(db.Integer, db.ForeignKey('Course.course_id', nullable=False))
-    cuisine_id = db.Column(db.Integer, db.ForeignKey('Cuisine.cuisine_id', nullable=False))
+    course_id = db.Column(db.Integer,
+                          db.ForeignKey('courses.course_id'),
+                          nullable=False)
+    cuisine_id = db.Column(db.Integer,
+                           db.ForeignKey('cuisines.cuisine_id'),
+                           nullable=False)
 
-    course = db.relationship('Course', backref='party_recipes', lazy='joined')
-    cuisine = db.relationship('Cuisine', backref='party_recipes', lazy='joined')
+    course = db.relationship('Course',
+                             backref='party_recipes',
+                             lazy='joined')
+    cuisine = db.relationship('Cuisine',
+                              backref='party_recipes',
+                              lazy='joined')
 
     def discard_recipe(self):
         '''Discards a recipe saved for a party'''
