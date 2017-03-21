@@ -1,5 +1,6 @@
 '''Models for K(i)ndTable WebApp.'''
 
+from flask import flash
 from datetime import datetime
 from passlib.hash import bcrypt
 from . import db, login_manager
@@ -7,6 +8,7 @@ from flask_login import UserMixin
 import pytz
 import os
 from itsdangerous import URLSafeSerializer, JSONWebSignatureSerializer
+from .email import send_email
 
 login_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
 registration_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
@@ -97,18 +99,30 @@ class Profile(BaseMixin, db.Model):
     def generate_confirmation_token(self):
         '''Creates an encrypted token to send via email to new user'''
 
-        return registration_serializer.dumps({'confirm': self.id})
+        return registration_serializer.dumps({'confirm': self.profile_id})
 
-    def confirm(self, token):
+    @classmethod
+    def confirm(cls, token):
+
+        print 40
         try:
+            print 41
             data = registration_serializer.loads(token)
+            print 42
+            print data
+            print 43
+            profile = Profile.query.filter_by(Profile.owned_by_user_id == data).first()
+            print 44
+            print profile
+            print 45
         except:
+            print 46
             return False
 
-        if data.get('confirm') != self.id:
+        if data.get('confirm') != profile.profile_id:
             return False
         else:
-            self.email_verified = True
+            profile.email_verified = True
             db.session.commit()
             return True
 
@@ -133,11 +147,11 @@ class Profile(BaseMixin, db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Profile profile_id=%s is_user_profile=%s email=%s email_verified=%s \
+        return '<Profile profile_id=%s owned_by_user_id=%s email=%s email_verified=%s \
         first_name=%s last_name=%s \
         diet_id=%s diet_reason=%s \
         profile_notes=%s last_updated=%s>' % (self.profile_id,
-                                              self.is_user_profile,
+                                              self.owned_by_user_id,
                                               self.email,
                                               self.email_verified,
                                               self.first_name,
@@ -199,15 +213,29 @@ class User(BaseMixin, UserMixin, db.Model):
         stored on the users computer, process it to check if its valid and then
         return a User Object if its valid or None if its not valid.'''
 
+        print 30
         data = login_serializer.loads(session_token)
+        print 31
+        print "The session token is " + str(data)
+        print 32
+        print data
+        print 33
 
         #Find the User
         user = User.query.get(data[0])
+        print 34
+        print user
+        print 35
 
         #Check Password and return user or None
         if user and data[1] == user.password_hash:
+            print 36
+            print user
+            print 37
             return user
-        return None
+            print 38
+        else:
+            return None
 
     def get_id(self):
         return unicode(self.session_token)

@@ -6,6 +6,7 @@ from flask_moment import Moment
 from flask_login import LoginManager
 from config import config
 from jinja2 import StrictUndefined
+from flask_wtf.csrf import CSRFProtect
 
 
 db = SQLAlchemy()
@@ -14,6 +15,7 @@ mail = Mail()
 moment = Moment()
 
 login_manager = LoginManager()
+login_manager.login_view = "auth.login"
 
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'auth.login'
@@ -26,6 +28,7 @@ def create_app(config_name):
 
     # bootstrap.init_app(app)
     Bootstrap(app)
+    CSRFProtect(app)
     mail.init_app(app)
     moment.init_app(app)
     db.app = app

@@ -7,14 +7,14 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
-    MAIL_SERVER = 'smtp.gmail.com',
-    MAIL_PORT = 587,
-    MAIL_USE_TLS = True,
-    MAIL_DEFAULT_SENDER = os.environ['KIND_TABLE_DEFAULT_SENDER'],
-    MAIL_USERNAME = os.environ['KIND_TABLE_EMAIL'],
-    MAIL_PASSWORD = os.environ['KIND_TABLE_EMAIL_PASSWORD'],
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_DEFAULT_SENDER = os.environ['KIND_TABLE_DEFAULT_SENDER']
+    MAIL_USERNAME = os.environ['KIND_TABLE_EMAIL']
+    MAIL_PASSWORD = os.environ['KIND_TABLE_EMAIL_PASSWORD']
     SECRET_KEY = os.environ['APP_SECRET_KEY']
-    KIND_MAIL_SUBJECT_PREFIX = '[Kind Table App]'
+    KIND_MAIL_SUBJECT_PREFIX = '[Kind Table]'
     KIND_MAIL_SENDER = 'Kind Table Admin <mail@kindtable.net>'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     KIND_ADMIN = os.environ.get('KIND_ADMIN')

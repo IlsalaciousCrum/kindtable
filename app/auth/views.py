@@ -1,8 +1,8 @@
 '''Views related to user management tasks'''
 
-from flask import render_template, redirect, url_for, flash, session
+from flask import render_template, redirect, url_for, flash, session, request
 
-from flask_login import login_user, logout_user, login_required, current_user
+from flask_login import login_user, logout_user, login_required
 
 from . import auth
 
@@ -17,30 +17,40 @@ from .forms import LoginForm, RegistrationForm
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm()
-    print form.email.data
-    print form.password.data
-    if form.validate_on_submit():
+    '''Loads the login form on GET and processes the form on POST'''
+    login_form = LoginForm(request.form)
+    print login_form.email.data
+    print login_form.password.data
+
+    if request.method == 'POST' and login_form.validate():
         print 1
-        user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, Profile.is_user_profile.is_(True)).first()
+        # user = db.session.query(User).join(Profile).filter(Profile.email == login_form.email.data, Profile.owned_by_user_id == User.profile_id).first()
+
+        user = db.session.query(User).join(Profile).filter(Profile.email == login_form.email.data, User.profile_id == Profile.profile_id).first()
+
+        print user
         print 2
-        if user is not None and user.verify_password(form.password.data):
-            print 3
-            login_user(user, form.remember_me.data)
+        if user is not None and user.verify_password(login_form.password.data):
+            login_user(user, login_form.remember_me.data)
             print 5
+            user.make_session_token()
+            print "Session token is " + str(user.session_token)
             session['session_token'] = user.session_token
             print 6
+            flash('You are now logged in', 'success')
             return redirect(url_for('main.index'))
         else:
             print 4
-            flash('Invalid username or password.')
-            render_template('auth/login.html', form=form)
-    return render_template('auth/login.html', form=form)
+            flash('Invalid username or password.', 'danger')
+            return render_template('auth/login.html', form=login_form)
+    else:
+        return render_template('auth/login.html', form=login_form)
 
 
 @auth.route('/logout')
 @login_required
 def logout():
+    session.clear()
     logout_user()
 
     return redirect(url_for('main.index'))
@@ -60,23 +70,37 @@ def temp():
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
-    form = RegistrationForm()
-    diets = Diet.query.order_by(Diet.diet_type).all()
-    if form.validate_on_submit():
-        profile = User.create(email=form.email.data,
-                              first_name=form.first_name.data,
-                              last_name=form.last_name.data,
-                              diet_id=form.diet.data,
-                              reason=form.diet_reason.data)
-        user = User.create(profile_id=profile.profile_id,
-                           password=form.password.data,
-                           created_by_email_owner=True,
-                           is_user_profile=True)
-        token = user.generate_confirmation_token()
-        send_email(to=profile.email, subject='Confirm Your Account',
+    form = RegistrationForm(request.form)
+    print 12
+
+    if request.method == 'POST' and form.validate():
+        print form.first_name.data
+        print form.last_name.data
+        print form.email.data
+        print form.diet.data
+        print form.diet_reason.data
+        print form.password.data
+
+        profile = Profile.create_record(email=form.email.data,
+                                        first_name=form.first_name.data,
+                                        last_name=form.last_name.data,
+                                        diet_id=int(form.diet.data),
+                                        diet_reason=form.diet_reason.data)
+
+        user = User.create_record(profile_id=profile.profile_id,
+                                  password=form.password.data)
+        profile.owned_by_user_id = user.id
+        db.session.commit()
+        print 15
+        token = profile.generate_confirmation_token()
+        print 16
+
+        send_email(to=profile.email, subject=' Confirm Your Account',
                    template='auth/email/confirm', profile=profile, token=token)
-        flash('Please check your email for instructions on completing registration.')
+        print 17
+        flash('Please check your email for instructions on completing registration.', "success")
         return redirect(url_for('auth.login'))
+    diets = Diet.query.order_by(Diet.diet_type).all()
     return render_template('auth/register.html', form=form, diets=diets)
 
 
@@ -84,7 +108,6 @@ def register():
 @login_required
 def confirm(token):
 
-    if current_user.profile.email_verified:
-        return redirect(url_for('main.index'))
-    if current_user.confirm(token):
-        flash('You have confirmed your account.Thanks!')
+    if Profile.confirm(token):
+        flash('You have confirmed your account.Thanks!', 'success')
+    return redirect(url_for('main.index'))

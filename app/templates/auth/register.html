@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block title %}Kind Table - Register{% endblock %}
 
@@ -7,37 +8,42 @@
     <h1>Register</h1>
 </div>
 
-<div class="row well-spaced" style="padding-top: 10em">
-    <div class="col-md-6 col-md-offset-3">
-        <div class = "row round_hidden_div" style="padding-top: 2em">
-            <form class="form form-horizontal" method='POST' role="form" name="login">
-                {{ form.csrf_token }}
-                <p>First name: {{ form.first_name }}<br><br>
-                    Last name: {{ form.last_name}}<br><br>
-                    General diet you follow: <br>{{ form.diet }}<br>
-                    Diet Reason:{{ form.diet_reason }}<br><br>
-                    Email address: {{ form.email  }}<br><br>
-                 Password: {{ form.password  }}<br><br>
-                 Verify Password: {{ form.password2  }}<br><br>
-
-                {{ form.submit  }}
+<div class="row well-spaced" style="padding-top: 1em">
+    <div class="col-md-4 col-md-offset-2">
+        <div class = "row round_hidden_div">
+            {% from "_formhelpers.html" import render_field %}
+            <form class="form form-horizontal" method="post" role="form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <dl>
+            {{ render_field(form.first_name) }}  {{ render_field(form.last_name) }}
+            {{ render_field(form.diet)  }}
+            {{ render_field(form.diet_reason)  }}
+            {{ render_field(form.email)  }}
+            {{ render_field(form.password)  }} {{ render_field(form.password2)  }}
+            </dl>
+            
+            <p><input type=submit class="btn btn-success" value=Register>
             </form>
-            <br><br>
-            <h3>Instructions:</h3>
-            <h5>Diet selection</h5>
-            <p>The diet reason field is optional, we show that information to your friends 
-            so they can make better decisions about how to make you feel comfortable
-            and welcome at their table.</p>
-            <h5>Diet Reason</h5>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class = "row round_hidden_div" style="padding-top: 2em">
+            <h4>Diet you follow:</h4>
             <p>We ask for your diet so that the recipes work for you, too.
             Don't worry if your diet is actually more 
             complex than these terms, you will get to customize this more later. 
-            (Also, you can change this information at any time.)
-            For now, just pick the diet that fits most closely with how you eat:<br><br>
+            (Also, you can change this information at any time.)</p>
+           
             {% for diet in diets %}
             <strong>{{  diet.diet_type  }}:</strong> {{  diet.description  }}<br>
             {% endfor %}</p>
-
+            <h4>Reason you follow this diet:</h4>
+            <p>The diet reason field is optional, we show that information to your friends 
+            so they can make better decisions about how to make you feel comfortable
+            and welcome at their table.
+        </div>
     </div>
 </div>
+
 {% endblock %}

@@ -1,73 +1,95 @@
 '''WTForms forms for user management'''
 
-from flask_wtf import FlaskForm
+from wtforms import Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
+from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, DataRequired
 from wtforms import ValidationError
-from ..models import Profile, Diet
+from ..models import Profile, Diet, User
+from .. import db
+from flask import flash, redirect, url_for
 
 diets = Diet.query.order_by(Diet.diet_type).all()
 
 
-class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(1, 64), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+class LoginForm(Form):
+    email = StringField('Email', validators=[InputRequired('Email address is a required field.'),
+                                             Length(1, 64),
+                                             Email('A valid email address is required.')])
+    password = PasswordField('Password',
+                             validators=[InputRequired('Please enter a valid password or reset password')])
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log in')
 
 
-class RegistrationForm(FlaskForm):
-    first_name = StringField('first_Name', validators=[DataRequired(), Length(1, 64)])
-    last_name = StringField('last_Name', validators=[DataRequired(), Length(1, 64)])
-    diet = RadioField('Label', choices=[(diet.diet_id, diet.diet_type) for diet in diets])
-    diet_reason = StringField('diet_Reason', validators=[Length(1, 64)])
-    email = StringField('email', validators=[DataRequired(), Length(1, 64),
-                                             Email()])
-    password = PasswordField('password', validators=[DataRequired(),
-                             EqualTo('password2', message='Passwords must match.')])
-    password2 = PasswordField('Confirm password', validators=[DataRequired()])
+class RegistrationForm(Form):
+    first_name = StringField('First name:', validators=[InputRequired(message="Please tell us what to you call you."),
+                                                        Length(1, 64, message="Limit 64 characters")])
+    last_name = StringField('Last name:', validators=[InputRequired(message="Please tell us a last name to use for you."),
+                                                      Length(1, 64, message="Limit 64 characters")])
+    diet = RadioField('Diet you follow:', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
+                      validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
+    diet_reason = StringField('Reason you follow this diet:', validators=[Length(1, 128, message="Limit 64 characters"),
+                                                                          Optional(strip_whitespace=True)])
+    email = StringField('Email:',
+                        validators=[InputRequired(message='We need an email address to register you with Kind Table.'),
+                                    Length(1, 64, message="Limit 64 characters"),
+                                    Email(message='Please provide a valid email address so that you can confirm your account.')])
+    password = PasswordField('Password:',
+                             validators=[InputRequired(message='Please provide a strong password'),
+                                         Length(1, 64, message="Limit 64 characters"),
+                                         EqualTo('password2', message='Passwords must match.')])
+    password2 = PasswordField('Confirm password:', validators=[InputRequired()])
     submit = SubmitField('Register')
 
     def validate_email(self, field):
-        if Profile.query.filter(Profile.is_user_profile.is_(True),
-                                Profile.email_verified.is_(True),
-                                email=field.data):
+        print "checking valid email"
+        if db.session.query(Profile).join(User).filter(Profile.email == field.data, User.profile_id == Profile.owned_by_user_id).first():
+            print "triggering the email validation but somehow not flashing"
+            flash('Email address already registered. Please log in.')
             raise ValidationError('Email address already registered. Please log in.')
+            return redirect(url_for('main.login'))
 
 
-# class ChangePasswordForm(Form):
-#     old_password = PasswordField('Old password', validators=[Required()])
-#     password = PasswordField('New password', validators=[
-#         Required(), EqualTo('password2', message='Passwords must match')])
-#     password2 = PasswordField('Confirm new password', validators=[Required()])
-#     submit = SubmitField('Update Password')
+class PasswordChangeForm(Form):
+    old_password = PasswordField('Old password:', validators=[InputRequired('Please enter your current password'),
+                                                              Length(1, 64)])
+    password = PasswordField('Password:',
+                             validators=[InputRequired(message='Please provide a strong password'),
+                                         Length(1, 64, message="Limit 64 characters"),
+                                         EqualTo('password2', message='Passwords must match.')])
+    password2 = PasswordField('Confirm password:', validators=[InputRequired()])
+    submit = SubmitField('Change Password')
 
 
-# class PasswordResetRequestForm(Form):
-#     email = StringField('Email', validators=[Required(), Length(1, 64),
-#                                              Email()])
-#     submit = SubmitField('Reset Password')
+class PasswordResetRequestForm(Form):
+    email = StringField('Email', validators=[InputRequired(), Length(1, 64),
+                                             Email()])
+    submit = SubmitField('Reset Password')
 
 
-# class PasswordResetForm(Form):
-#     email = StringField('Email', validators=[Required(), Length(1, 64),
-#                                              Email()])
-#     password = PasswordField('New Password', validators=[
-#         Required(), EqualTo('password2', message='Passwords must match')])
-#     password2 = PasswordField('Confirm password', validators=[Required()])
-#     submit = SubmitField('Reset Password')
+class PasswordResetForm(Form):
+    email = StringField('Email',
+                        validators=[InputRequired(), Length(1, 64),
+                                    Email()])
+    password = PasswordField('New Password',
+                             validators=[InputRequired(),
+                                         EqualTo('password2',
+                                                 message='Passwords must match')])
+    password2 = PasswordField('Confirm password', validators=[InputRequired()])
+    submit = SubmitField('Reset Password')
 
-#     def validate_email(self, field):
-#         if User.query.filter_by(email=field.data).first() is None:
-#             raise ValidationError('Unknown email address.')
+    def validate_email(self, field):
+        if Profile.query.filter_by(email=field.data).first() is None:
+            raise ValidationError('Unknown email address.')
 
 
-# class ChangeEmailForm(Form):
-#     email = StringField('New Email', validators=[Required(), Length(1, 64),
-#                                                  Email()])
-#     password = PasswordField('Password', validators=[Required()])
-#     submit = SubmitField('Update Email Address')
+class ChangeEmailForm(Form):
+    email = StringField('New Email', validators=[InputRequired(),
+                                                 Length(1, 64),
+                                                 Email()])
+    password = PasswordField('Password', validators=[InputRequired()])
+    submit = SubmitField('Update Email Address')
 
-#     def validate_email(self, field):
-#         if User.query.filter_by(email=field.data).first():
-#             raise ValidationError('Email already registered.')
+    def validate_email(self, field):
+        if Profile.query.filter_by(email=field.data).first():
+            raise ValidationError('Email already registered.')

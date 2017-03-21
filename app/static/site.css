@@ -15,7 +15,7 @@ body {
  }
 
  .flashed {
-    color: #DC143C;
+    color: orange;
     font-weight: 900;
 }
 

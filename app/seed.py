@@ -80,13 +80,13 @@ def LoadSeedData():
 def LoadTestPeople():
     """Load fake users and information in development only"""
 
-    ilsa_profile = Profile.create_record(profile_id=1, email='ilsalacious@gmail.com', email_verified=True, first_name='Ilsa', last_name='Gordon')
-    todd_profile = Profile.create_record(profile_id=2, email='censorydep@gmail.com', email_verified=True, first_name='Todd', last_name='Gage')
-    darrin_profile = Profile.create_record(profile_id=3, email='darrin@erin.com', email_verified=False, first_name='Darrin', last_name='Ward')
-    erin_profile = Profile.create_record(profile_id=4, email='erin@darrin.com', email_verified=False, first_name='Erin', last_name='Rosenthal')
+    ilsa_profile = Profile.create_record(email='ilsalacious@gmail.com', email_verified=True, first_name='Ilsa', last_name='Gordon')
+    todd_profile = Profile.create_record(email='censorydep@gmail.com', email_verified=True, first_name='Todd', last_name='Gage')
+    darrin_profile = Profile.create_record(email='darrin@erin.com', email_verified=False, first_name='Darrin', last_name='Ward')
+    erin_profile = Profile.create_record(email='erin@darrin.com', email_verified=False, first_name='Erin', last_name='Rosenthal')
 
-    User.create_record(id=1, password="Password!", profile_id=1)
-    User.create_record(id=2, password='No', profile_id=2)
+    User.create_record(password="Password!", profile_id=1)
+    User.create_record(password='No', profile_id=2)
 
     ilsa_profile = Profile.query.get(1)
     todd_profile = Profile.query.get(2)

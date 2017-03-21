@@ -12,10 +12,7 @@ from . import main
 from app.models import User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
 from .. import db
 from flask_mail import Mail, Message
-from flask_login import login_required, login_fresh, current_user
-from functions import (guest_intolerances, guest_avoidances,
-                       spoonacular_request, spoonacular_recipe_instructions, all_guest_diets,
-                       new_guest_diet, new_spoonacular_request, spoonacular_recipe_ingredients)
+from flask_login import login_required
 
 
 @main.route('/send-email')
@@ -46,13 +43,25 @@ def send_mail():
 def index():
     """Homepage."""
 
-    print 7
-    session_token = session.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-    friends = user.friends
-    parties = user.parties
-
-    return render_template("kind_homepage.html", friends=friends, parties=parties)
+    try:
+        print 7
+        session_token = session.get("session_token")
+        print session_token
+        print "Aye"
+        user = User.query.filter(session_token=session_token).first()
+        print "This next line is the user"
+        print user
+        print user.session_token
+        if user:
+            print user
+            print "Bee"
+            friends = user.friends
+            print friends
+            parties = user.parties
+            print parties
+            return render_template("kind_homepage.html", friends=friends, parties=parties)
+    except:
+        return render_template("kind_homepage.html", friends="", parties="")
 
 
 # @main.route('/register', methods=['GET'])

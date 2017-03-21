@@ -42,14 +42,17 @@
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
                       <ul class="dropdown-menu">
+                        {% if friends %}
                         {% for friend in friends %}
                         <li>
-                          <a href="{{ url_for('main.show_friend_profile', friend_id=friend.profile.profile_id) }}">
-                            {% if friend.profile.first_name is not none %}{{ friend.profile.first_name }}{% else %}{%endif %} {% if friend.profile.last_name is not none %}{{ friend.profile.last_name }}{% else %}{%endif %}
-                            ({{ friend.profile.email }})
+                          <a href="{{ url_for('main.show_friend_profile', friend_id=friend.friend_profile.profile_id) }}">
+                            {% if friend.friend_profile.first_name is not none %}{{ friend.friend_profile.first_name }}{% else %}{%endif %} {% if friend.friend_profile.last_name is not none %}{{ friend.friend_profile.last_name }}{% else %}{%endif %}
+                            ({{ friend.friend_profile.email }})
                           </a>
                         </li>
                         {% endfor %}
+                        {% else %}
+                        {% endif %}
                         <li role="separator" class="divider"></li>
                         <li><a href="/findfriend">Add a new friend</a></li>
                         <li><a href="/findmanyfriends">Add multiple friends</a></li>
@@ -58,9 +61,12 @@
                     <li class="dropdown">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Parties<span class="caret"></span></a>
                       <ul class="dropdown-menu">
+                        {% if parties %}
                         {% for party in parties %}
                           <li><a href="{{ url_for('main.show_party_profile', party_id = party.party_id) }}">{{  party.title  }}</a></li>
                         {% endfor %}
+                        {% else %}
+                        {% endif %}
                         <li role="separator" class="divider"></li>
                         <li><a href="/addaparty">Create a party</a></li>
                       </ul>
@@ -98,24 +104,26 @@
 
           <!-- ------------ -->
 
+
             {% block content %}
-            <div class="container-fluid">
-              {% with messages = get_flashed_messages(with_categories=true) %}
-              {% if messages %}
-              {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">{{ message }}</div>
-              {% endfor %}
-              {% endif %}
-              {% endwith %}
-              <div id="extending">
-                {% block page_content %}
-                {% endblock %}
+              <div class="container-fluid">
+                <div class="container">
+                  {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                      {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                      {% endfor %}
+                    {% endif %}
+                  {% endwith %}
+                </div>
+                <div id="extending">
+                {% block page_content %}{% endblock %}
+                </div>
               </div>
-            </div>
             {% endblock %}  <!-- /content -->
 
             {% block scripts %}
-            {{ moment.include_moment() }}
+              {{ moment.include_moment() }}
             {% endblock %}
 
             <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
