@@ -102,19 +102,10 @@ class Profile(BaseMixin, db.Model):
     @classmethod
     def confirm(cls, token):
 
-        print 40
         try:
-            print 41
             data = registration_serializer.loads(token)
-            print 42
-            print data
-            print 43
             profile = Profile.query.filter_by(Profile.owned_by_user_id == data).first()
-            print 44
-            print profile
-            print 45
         except:
-            print 46
             return False
 
         if data.get('confirm') != profile.profile_id:
@@ -216,7 +207,7 @@ class User(BaseMixin, UserMixin, db.Model):
         user = User.query.get(data[0])
         #Check Password and return user or None
         if user and data[1] == user.password_hash:
-            print "loading user " + user
+            print "loading user "
             return user
         else:
             return None

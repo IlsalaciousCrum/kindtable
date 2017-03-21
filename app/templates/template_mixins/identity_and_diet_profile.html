@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="row well-spaced" style="padding-top: 3em">
+        <div class="col-md-6 col-md-offset-3">
+            
+            <div class = "row round_div" style="padding-top: 2em">
+                <h1>{{  profile.first_name  }} {{  profile.last_name  }}</h1><br>
+                <div class="col-md-8">            
+                    <b>Email address:</b> {{ profile.email }}</b> <br>
+                    <b>Diet:</b> {{ profile.diet.diet_type }}</b><br>
+                    <b>Diet Reason:</b> {{ profile.diet_reason }}<br>
+                    <b>Intolerances:</b><br>
+                    {% if profile.intolerances %}
+                    <ul>
+                        {% for intolerance in profile.intolerances %}
+                            <li>{{ intolerance.intol_name }}</li>
+                        {% if not loop.last %}, {% endif %}{% endfor %}
+                    </ul><br>
+                    {% endif %}
+                    <b>Ingredients to avoid:</b>
+                    {% if profile.avoidances %}
+                    <ul>
+                        {% for avoid in profile.avoidances %}
+                            <li>{{ avoid.ingredient }} - (<i>{{ avoid.reason}}</i>)</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}<br><br>
+                </div>
+            </div>
+            <button type="button" class="btn btn-info pull-right" data-toggle="modal" data-target="#update">Update Profile</button>
+        </div>
+    </div>        
+
+
+<!-- Modal -->
+<div id="resetpassword" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Reset Password</h4>
+            </div>
+            <div class="modal-body">
+                <form action="/reset_password" method="POST">
+                    <div class="form-group">
+                        
+                
+                        <input type="submit" value="Reset Password" class="btn btn-success">
+                    </div>
+                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    "use strict";
+    $("#addIntol").click(function(){
+        $("#addIntol").hide();
+        $("#addIntolForm").toggle();
+        console.log("show form");
+    });
+</script>
+{% endblock %}

@@ -59,22 +59,27 @@ def index():
 def show_user_profile():
     """Show logged in user's profile"""
 
+    print 1
     session_token = session.get("session_token")
+    print 2
     user = User.query.filter(session_token == session_token).first()
-    if user:
-        friends = user.friends
-        parties = user.parties
-    profile = db.session.query(Profile).filter(User.profile_id == Profile.owned_by_user_id, User.session_token == session_token).first()
-    if profile:
-        diets = Diet.query.order_by(Diet.diet_type).all()
-        intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
-
-        return render_template("/template/mixins/identity_and_diet_profile.html",
-                               friends=friends,
-                               parties=parties,
-                               profile=profile,
-                               intol_list=intol_list,
-                               diets=diets)
+    print 3
+    friends = user.friends
+    print 4
+    parties = user.parties
+    print 5
+    profile = Profile.query.filter(Profile.owned_by_user_id == user.id).first()
+    print 6
+    diets = Diet.query.order_by(Diet.diet_type).all()
+    print 7
+    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+    print 8
+    return render_template("/template_mixins/identity_and_diet_profile.html",
+                           friends=friends,
+                           parties=parties,
+                           profile=profile,
+                           intol_list=intol_list,
+                           diets=diets)
 
 
 # @main.route('/findfriend', methods=['GET'])
