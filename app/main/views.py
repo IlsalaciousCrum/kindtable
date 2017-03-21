@@ -44,21 +44,11 @@ def index():
     """Homepage."""
 
     try:
-        print 7
         session_token = session.get("session_token")
-        print session_token
-        print "Aye"
         user = User.query.filter(session_token=session_token).first()
-        print "This next line is the user"
-        print user
-        print user.session_token
         if user:
-            print user
-            print "Bee"
             friends = user.friends
-            print friends
             parties = user.parties
-            print parties
             return render_template("kind_homepage.html", friends=friends, parties=parties)
     except:
         return render_template("kind_homepage.html", friends="", parties="")
@@ -70,19 +60,21 @@ def show_user_profile():
     """Show logged in user's profile"""
 
     session_token = session.get("session_token")
+    user = User.query.filter(session_token=session_token).first()
+    if user:
+        friends = user.friends
+        parties = user.parties
     profile = db.session.query(Profile).filter(User.profile_id == Profile.owned_by_user_id, User.session_token == session_token).first()
-    if user_id:
-        this_user = User.query.get(user_id)
+    if profile:
         diets = Diet.query.order_by(Diet.diet_type).all()
         intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
 
         return render_template("/user_profile_page.html",
-                               this_user=this_user,
+                               friends=friends,
+                               parties=parties,
+                               profile=profile,
                                intol_list=intol_list,
                                diets=diets)
-
-    else:
-        return redirect("/login")
 
 
 # @main.route('/findfriend', methods=['GET'])
