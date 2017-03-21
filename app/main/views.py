@@ -64,25 +64,25 @@ def index():
         return render_template("kind_homepage.html", friends="", parties="")
 
 
+@main.route('/userprofile', methods=['GET'])
+@login_required
+def show_user_profile():
+    """Show logged in user's profile"""
 
-# @main.route('/userprofile', methods=['GET'])
-# @login_required
-# def show_user_profile():
-#     """Show logged in user's profile"""
+    session_token = session.get("session_token")
+    profile = db.session.query(Profile).filter(User.profile_id == Profile.owned_by_user_id, User.session_token == session_token).first()
+    if user_id:
+        this_user = User.query.get(user_id)
+        diets = Diet.query.order_by(Diet.diet_type).all()
+        intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
 
-#     user_id = session.get("user_id")
-#     if user_id:
-#         this_user = User.query.get(user_id)
-#         diets = Diet.query.order_by(Diet.diet_type).all()
-#         intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+        return render_template("/user_profile_page.html",
+                               this_user=this_user,
+                               intol_list=intol_list,
+                               diets=diets)
 
-#         return render_template("/user_profile_page.html",
-#                                this_user=this_user,
-#                                intol_list=intol_list,
-#                                diets=diets)
-
-#     else:
-#         return redirect("/login")
+    else:
+        return redirect("/login")
 
 
 # @main.route('/findfriend', methods=['GET'])
