@@ -64,14 +64,6 @@ def index():
         return render_template("kind_homepage.html", friends="", parties="")
 
 
-# @main.route('/register', methods=['GET'])
-# def show_register_form():
-#     """Show form for user signup."""
-
-#     diets = Diet.query.order_by(Diet.diet_type).all()
-
-#     return render_template("register_form.html", diets=diets)
-
 
 # @main.route('/userprofile', methods=['GET'])
 # @login_required
@@ -565,57 +557,6 @@ def show_party_profile(party_id):
 #     else:
 #         return redirect("/login")
 
-
-# @main.route('/registered', methods=['POST'])
-# @login_required
-# def add_register_users():
-#     """Process registration."""
-
-#     password = request.form.get("password")
-#     first_name = request.form.get("first_name")
-#     last_name = request.form.get("last_name")
-#     email = request.form.get("email")
-#     diet_id = request.form.get("diet_type")
-#     diet_reason = request.form.get("diet_reason")
-#     verified = True
-#     user = User.query.filter_by(email=email).first()
-#     if user:
-#         flash("You are already registered here, please log in.", "info")
-#         return redirect("/login")
-#     else:
-#         make_user(email, password, diet_id, first_name, last_name,
-#                   diet_reason, verified)
-
-#         user = User.query.filter_by(email=email).first()
-#         user_id = user.user_id
-#         session["user_id"] = user_id
-
-#         flash("Welcome to Kind Table, %s." % first_name, "success")
-#         return redirect("/userprofile")
-
-
-# @main.route('/loggedin', methods=['POST'])
-# @login_required
-# def add_login_process():
-#     """Process login."""
-
-#     # Get form variables
-#     email = request.form["email"]
-#     password = request.form["password"]
-
-#     user = User.query.filter_by(email=email).first()
-
-#     if user:
-#         if user.verify_password(password) is False:
-#             flash("Incorrect password", "danger")
-#             return redirect("/login")
-#         else:
-#             session["user_id"] = user.user_id
-#             flash("Logged in", "success")
-#             return redirect("/userprofile")
-#     elif not user:
-#         flash("You seem to be new here. Would you like to register? If not, please check your email address", "info")
-#         return redirect("/register")
 
 
 # @main.route('/intolerance_added', methods=['POST'])

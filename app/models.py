@@ -1,6 +1,5 @@
 '''Models for K(i)ndTable WebApp.'''
 
-from flask import flash
 from datetime import datetime
 from passlib.hash import bcrypt
 from . import db, login_manager
@@ -8,7 +7,6 @@ from flask_login import UserMixin
 import pytz
 import os
 from itsdangerous import URLSafeSerializer, JSONWebSignatureSerializer
-from .email import send_email
 
 login_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
 registration_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
