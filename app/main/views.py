@@ -60,7 +60,7 @@ def show_user_profile():
     """Show logged in user's profile"""
 
     session_token = session.get("session_token")
-    user = User.query.filter(session_token=session_token).first()
+    user = User.query.filter(session_token == session_token).first()
     if user:
         friends = user.friends
         parties = user.parties
@@ -69,7 +69,7 @@ def show_user_profile():
         diets = Diet.query.order_by(Diet.diet_type).all()
         intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
 
-        return render_template("/user_profile_page.html",
+        return render_template("/template/mixins/identity_and_diet_profile.html",
                                friends=friends,
                                parties=parties,
                                profile=profile,

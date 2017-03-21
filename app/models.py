@@ -211,27 +211,13 @@ class User(BaseMixin, UserMixin, db.Model):
         stored on the users computer, process it to check if its valid and then
         return a User Object if its valid or None if its not valid.'''
 
-        print 30
         data = login_serializer.loads(session_token)
-        print 31
-        print "The session token is " + str(data)
-        print 32
-        print data
-        print 33
-
         #Find the User
         user = User.query.get(data[0])
-        print 34
-        print user
-        print 35
-
         #Check Password and return user or None
         if user and data[1] == user.password_hash:
-            print 36
-            print user
-            print 37
+            print "loading user " + user
             return user
-            print 38
         else:
             return None
 
