@@ -82,7 +82,6 @@ class Profile(BaseMixin, db.Model):
     last_name = db.Column(db.String(64), nullable=True)
     diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'), default=10)
     diet_reason = db.Column(db.String(120), nullable=True)
-    profile_notes = db.Column(db.String(300), nullable=True)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
     diet = db.relationship('Diet', backref='profiles', lazy='joined')
@@ -260,6 +259,7 @@ class Friend(BaseMixin, db.Model):
                                              default=False)
     friendship_verified_by_facebook = db.Column(db.Boolean, unique=False,
                                                 default=False)
+    profile_notes = db.Column(db.String(300), nullable=True)
 
     friend_profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
@@ -403,6 +403,7 @@ class Party(BaseMixin, db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
                         nullable=False)
     datetime_of_party = db.Column(db.DateTime(timezone=True), nullable=True)
+    profile_notes = db.Column(db.String(300), nullable=True)
     guest_profiles = db.relationship('Profile',
                                      secondary='party_guests',
                                      lazy='joined',
@@ -467,6 +468,7 @@ class PartyGuest(BaseMixin, db.Model):
                          nullable=False)
     friend_profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                                   nullable=False)
+    profile_notes = db.Column(db.String(300), nullable=True)
 
     def disinvite_guest(self):
         '''removes a guest from the party'''
@@ -516,6 +518,7 @@ class RecipeBox(BaseMixin, db.Model):
     recipe_record_id = db.Column(db.Integer,
                                  db.ForeignKey('recipecard.recipe_record_id'),
                                  nullable=False)
+    profile_notes = db.Column(db.String(300), nullable=True)
 
     recipes = db.relationship('RecipeCard', lazy='joined')
     works_for = db.relationship('Profile',
@@ -574,6 +577,7 @@ class PartyRecipes(BaseMixin, db.Model):
     cuisine_id = db.Column(db.Integer,
                            db.ForeignKey('cuisines.cuisine_id'),
                            nullable=False)
+    profile_notes = db.Column(db.String(300), nullable=True)
 
     course = db.relationship('Course',
                              backref='party_recipes',
