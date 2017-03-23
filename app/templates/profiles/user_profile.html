@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <div class="row well-spaced" style="padding-top: 3em">
+        <div class="col-md-8 col-md-offset-2">
+            
+            <div class = "row round_div" style="padding-top: 2em">
+                <h1>{{  profile.first_name  }} {{  profile.last_name  }}</h1><br>
+                <div class="row">
+                    <div class="col-md-8">            
+                        <b>Email address:</b>&ensp; {{ profile.email }}<br>
+                        <b>Diet:</b>&ensp; {{ profile.diet.diet_type }}</b><br>
+                        <b>Diet reason:</b>&ensp; {{ profile.diet_reason }}<br>
+                        <b>Allergies/intolerances:</b>
+                        {% if profile.intolerances %}
+                        <ul>{% for intolerance in profile.intolerances %}<li>{{ intolerance.intol_name }}</li>{% if not loop.last %}, {% endif %}{% endfor %}
+                        </ul><br>
+                        {% endif %}<br><br>
+                        <b>Ingredients to avoid</b>
+                        {% if profile.avoidances %}
+                        <ul>
+                            {% for avoid in profile.avoidances %}
+                                <li>{{ avoid.ingredient }} - (<i>{{ avoid.reason}}</i>)</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}<br><br></p>
+                    </div>
+                    <div class="col-md-3"> 
+                        <h4>Update:</h4>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#firstName">first name</button>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#lastName">last name</button>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#email">email address</button>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#diet">diet</button>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#dietReason">diet reason</button>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#intols">allergies/intolerances</button>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">ingredients to avoid</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> 
+
+
+    <div class="row well-spaced" style="padding-top: 3em">
+        <div class="col-md-8 col-md-offset-2">      
+            <div class = "row round_div" style="padding-top: 2em">
+                <h1>{{  profile.first_name  }} {{  profile.last_name  }}</h1><br>
+                    <div class="col-md-8">            
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Email address:</b>&ensp; {{ profile.email }}<br>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Diet:</b>&ensp; {{ profile.diet.diet_type }}</b><br>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Diet reason:</b>&ensp; {{ profile.diet_reason }}<br>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Allergies/intolerances:</b>
+                        {% if profile.intolerances %}
+                        <ul>{% for intolerance in profile.intolerances %}<li>{{ intolerance.intol_name }}</li>{% if not loop.last %}, {% endif %}{% endfor %}
+                        </ul><br>
+                        {% endif %}<br><br>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Ingredients to avoid</b>
+                        {% if profile.avoidances %}
+                        <ul>
+                            {% for avoid in profile.avoidances %}
+                                <li>{{ avoid.ingredient }} - (<i>{{ avoid.reason}}</i>)</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}<br><br></p>
+                    </div>
+            </div>
+        </div>
+    </div> 
+
+
+
+
+<!-- Modal -->
+<div id="firstName" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update First Name</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update first name modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div id="lastName" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Last Name</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update last name modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- Modal -->
+<div id="email" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Email Address</h4>
+            </div>
+            <div class="modal-body">
+                        
+                {% block email %}
+
+
+                {% endblock %}
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="diet" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Diet</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update diet modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="dietReason" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Diet Reason</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update diet reason modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="intols" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Allergies/Intolerances</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update intolerances modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="avoid" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Ingredients To Avoid</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update avoidances modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    "use strict";
+    $("#addIntol").click(function(){
+        $("#addIntol").hide();
+        $("#addIntolForm").toggle();
+        console.log("show form");
+    });
+</script>
+{% endblock %}

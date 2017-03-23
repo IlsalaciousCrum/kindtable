@@ -42,8 +42,8 @@ def create_app(config_name):
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
-    from .datacollection import datacollection as datacollection_blueprint
-    app.register_blueprint(datacollection_blueprint, url_prefix='/profiles')
+    from .profiles import profiles as profiles_blueprint
+    app.register_blueprint(profiles_blueprint, url_prefix='/profiles')
 
     db.app = app
 
