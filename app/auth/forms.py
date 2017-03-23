@@ -8,8 +8,6 @@ from ..models import Profile, Diet, User
 from .. import db
 from flask import flash, redirect, url_for
 
-diets = Diet.query.order_by(Diet.diet_type).all()
-
 
 class LoginForm(Form):
     email = StringField('Email', validators=[InputRequired('Email address is a required field.'),
@@ -26,6 +24,7 @@ class RegistrationForm(Form):
                                                         Length(1, 64, message="Limit 64 characters")])
     last_name = StringField('Last name:', validators=[InputRequired(message="Please tell us a last name to use for you."),
                                                       Length(1, 64, message="Limit 64 characters")])
+    diets = Diet.query.order_by(Diet.diet_type).all()
     diet = RadioField('Diet you follow:', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
                       validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
     diet_reason = StringField('Reason you follow this diet:', validators=[Length(1, 128, message="Limit 64 characters"),
