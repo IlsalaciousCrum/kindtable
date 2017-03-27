@@ -135,19 +135,17 @@ class Profile(BaseMixin, db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<Profile profile_id=%s owned_by_user_id=%s email=%s email_verified=%s \
-        first_name=%s last_name=%s \
-        diet_id=%s diet_reason=%s \
-        profile_notes=%s last_updated=%s>' % (self.profile_id,
-                                              self.owned_by_user_id,
-                                              self.email,
-                                              self.email_verified,
-                                              self.first_name,
-                                              self.last_name,
-                                              self.diet_id,
-                                              self.diet_reason,
-                                              self.profile_notes,
-                                              self.last_updated)
+        return '<Profile profile_id=%s owned_by_user_id=%s email=%s \
+        email_verified=%s first_name=%s last_name=%s diet_id=%s diet_reason=%s \
+        last_updated=%s>' % (self.profile_id,
+                             self.owned_by_user_id,
+                             self.email,
+                             self.email_verified,
+                             self.first_name,
+                             self.last_name,
+                             self.diet_id,
+                             self.diet_reason,
+                             self.last_updated)
 
 
 class User(BaseMixin, UserMixin, db.Model):
