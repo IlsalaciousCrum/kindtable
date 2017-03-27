@@ -23,7 +23,7 @@ def login():
     if request.method == 'POST' and login_form.validate():
         user = db.session.query(User).join(Profile).filter(Profile.email == login_form.email.data, User.profile_id == Profile.profile_id).first()
         if user is not None and user.verify_password(login_form.password.data):
-            login_user(user, login_form.remember_me.data)
+            login_user(user, remember=login_form.remember_me.data)
             user.make_session_token()
             session['session_token'] = user.session_token
             flash('You are now logged in', 'success')

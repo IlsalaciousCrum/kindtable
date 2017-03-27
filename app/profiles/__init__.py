@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-profiles = Blueprint('datacollection', __name__)
+profiles = Blueprint('profiles', __name__)
 
 from . import views

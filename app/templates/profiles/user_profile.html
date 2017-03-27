@@ -1,67 +1,140 @@
 {% extends 'base.html' %}
 {% block content %}
 
+
     <div class="row well-spaced" style="padding-top: 3em">
-        <div class="col-md-8 col-md-offset-2">
-            
+        <div class="col-md-4 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
-                <h1>{{  profile.first_name  }} {{  profile.last_name  }}</h1><br>
-                <div class="row">
-                    <div class="col-md-8">            
-                        <b>Email address:</b>&ensp; {{ profile.email }}<br>
-                        <b>Diet:</b>&ensp; {{ profile.diet.diet_type }}</b><br>
-                        <b>Diet reason:</b>&ensp; {{ profile.diet_reason }}<br>
-                        <b>Allergies/intolerances:</b>
+                <h1>My Profile</h1><br>
+                    <div class="col">            
+
+                        <a href="#" data-toggle="modal" data-target="#firstName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a> &emsp;<strong>First Name:</strong>&emsp;{{  profile.first_name  }}  <br>
+
+                        <a href="#" data-toggle="modal" data-target="#lastName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }} <br>
+
+                        <a href="#" data-toggle="modal" data-target="#email"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}<br>
+
+                        <a href="#" data-toggle="modal" data-target="#dietType"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet type:</strong>&emsp;{{  profile.diet.diet_type  }}<br>
+
+                        <a href="#" data-toggle="modal" data-target="#dietReason"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet reason:</strong>&emsp;{{  profile.diet_reason  }}<br><br>
+
+                        
                         {% if profile.intolerances %}
-                        <ul>{% for intolerance in profile.intolerances %}<li>{{ intolerance.intol_name }}</li>{% if not loop.last %}, {% endif %}{% endfor %}
+                        <a href="#" data-toggle="modal" data-target="#intols"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Allergies/intolerances:</strong>
+                        {% if profile.intolerances %}
+                        <ul>{% for intolerance in profile.intolerances %}<li><b>{{ intolerance.intol_name }}</b></li>{% if not loop.last %}, {% endif %}{% endfor %}
                         </ul><br>
                         {% endif %}<br><br>
-                        <b>Ingredients to avoid</b>
+                        {% else %}
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#intols">add</button>&emsp;<span class="text-muted strong">No allergies/intolerances added yet</span><br> 
+                        {% endif %}
+
+
+                        {% if profile.avoidances %}
+                        <a href="#" data-toggle="modal" data-target="#avoids"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp;<strong>Ingredients to avoid:</strong> 
                         {% if profile.avoidances %}
                         <ul>
                             {% for avoid in profile.avoidances %}
-                                <li>{{ avoid.ingredient }} - (<i>{{ avoid.reason}}</i>)</li>
+                                <li><b>{{ avoid.ingredient }}</b> - (<i>{{ avoid.reason}}</i>)</li>
                             {% endfor %}
                         </ul>
-                        {% endif %}<br><br></p>
+                        {% endif %}<br><br>
+                        {% else %}
+                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#avoids">add</button>&emsp;<span class="text-muted strong">No ingredients to avoid added yet</span> 
+                        {% endif %}
+
+                        <h3>Friends</h3>
+                        {% if friends %}
+                        <ul>{% for friend in friends %}
+                            <li>
+                                <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.friend_profile.profile_id) }}">{{ friend.friend_profile.first_name }} {{friend.friend_profile.last_name  }}</a> <span class="text-muted">({{  friend.friend_profile.email  }})</span></li>{% if not loop.last %} {% endif %}{% endfor %}
+                        </ul>
+                        {% endif %}
+
+                        <h3>Bookmarked recipes</h3>
+                        {% if recipes %}
+                        <ul>
+                            {% for recipe in recipes %}
+                            <li>
+                                <a href="{{ url_for('profiles.show_recipe_profile', recipe_id=recipe.recipes.recipe_record_id) }}">{{ recipe.recipes.title }}
+                            </li>
+                            {% if not loop.last %} {% endif %}{% endfor %}
+                        </ul><br>
+                        {% else %}
+                        <span class="text-muted strong">No recipes bookmarked yet</span>
+
+                        {% endif %}<br><br>
                     </div>
-                    <div class="col-md-3"> 
-                        <h4>Update:</h4>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#firstName">first name</button>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#lastName">last name</button>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#email">email address</button>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#diet">diet</button>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#dietReason">diet reason</button>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#intols">allergies/intolerances</button>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">ingredients to avoid</button>
-                    </div>
-                </div>
             </div>
         </div>
-    </div> 
 
-
-    <div class="row well-spaced" style="padding-top: 3em">
-        <div class="col-md-8 col-md-offset-2">      
+        <div class="col-md-5 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
-                <h1>{{  profile.first_name  }} {{  profile.last_name  }}</h1><br>
-                    <div class="col-md-8">            
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Email address:</b>&ensp; {{ profile.email }}<br>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Diet:</b>&ensp; {{ profile.diet.diet_type }}</b><br>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Diet reason:</b>&ensp; {{ profile.diet_reason }}<br>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Allergies/intolerances:</b>
-                        {% if profile.intolerances %}
-                        <ul>{% for intolerance in profile.intolerances %}<li>{{ intolerance.intol_name }}</li>{% if not loop.last %}, {% endif %}{% endfor %}
-                        </ul><br>
-                        {% endif %}<br><br>
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#avoid">edit</button>&ensp;<b>Ingredients to avoid</b>
-                        {% if profile.avoidances %}
-                        <ul>
-                            {% for avoid in profile.avoidances %}
-                                <li>{{ avoid.ingredient }} - (<i>{{ avoid.reason}}</i>)</li>
+                <h1>Parties</h1>
+                    <div class="col">
+                        {% if parties %}
+                            {% for party in parties %}
+                                <h3><a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">{{ party.title}}</a></h3>
+                                <strong>Date:</strong>&emsp; {{ moment(party.datetime_of_party).format('LLLL') }}<br>
+
+                                <strong>Friends invited:</strong>&emsp;
+                                {% if party.guest_profiles %}
+                                <ul>
+                                    {% for guest in party.guest_profiles %}
+                                        {% if guest.first_name %}
+                                            <li>{{  guest.first_name  }} {{  guest.last_name  }}</li>
+                                        {% else %}
+                                            <li>{{  guest.email  }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                    <span class="text-muted strong">No guests invited yet</span>
+                                {% endif %}<br>
+                                <strong>Cuisine:</strong>&emsp;{% if party.cuisine %}{{  party.cuisine  }}{% else %}<span class="text-muted strong">None</span>{% endif %}<br>
+                                <strong>Diets:</strong>
+                                {% if party.guest_profiles %} 
+                                    {% for guest in party.guest_profiles %}
+                                        {{ guest.diet.diet_type }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted strong">None</span>
+                                {% endif %}<br>
+                                
+                                <strong>Ingredients to avoid:</strong>
+                                {% if party.guest_profiles %} 
+                                    {% for guest in party.guest_profiles %}
+                                        {% for avoid in guest.avoidances %}
+                                            {{ avoid.ingredient }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted strong">None</span>
+                                {% endif %}<br>
+                                <strong>Allergies/Intolerances:</strong>{% if party.guest_profiles %} 
+                                    {% for guest in party.guest_profiles %}
+                                        {% for intol in guest.intolerances %}
+                                            {{ intol.intol_name }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted strong">None</span>
+                                {% endif %}<br>
+                                <strong>Party recipes:</strong>
+                                {% if party.recipes %}
+                                    <ul>
+                                    {% for recipe in party.recipes %}
+                                        <li><a href="{{ url_for('profiles.show_recipe_profile', recipe_id=recipe.recipe_record_id) }}">{{ recipe.title}}</a></li>
+                                    <ul>
+                                    {% endfor %}
+                                {% else %}
+                                <span class="text-muted strong">No recipes bookmarked yet</span>
+                                {% endif %}<br>
+                                <hr>
                             {% endfor %}
-                        </ul>
-                        {% endif %}<br><br></p>
+                        {% else %}
+                                <span class="text-muted strong">No parties created yet</span>
+                        {% endif %}
                     </div>
             </div>
         </div>

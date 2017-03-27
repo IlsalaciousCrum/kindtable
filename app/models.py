@@ -400,13 +400,14 @@ class Party(BaseMixin, db.Model):
     title = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
                         nullable=False)
+    cuisine_id = db.Column(db.Integer, db.ForeignKey('cuisines.cuisine_id'), nullable=True)
     datetime_of_party = db.Column(db.DateTime(timezone=True), nullable=True)
     profile_notes = db.Column(db.String(300), nullable=True)
     guest_profiles = db.relationship('Profile',
                                      secondary='party_guests',
                                      lazy='joined',
                                      backref='party')
-
+    cuisine = db.relationship('Cuisine', backref='parties')
     recipes = db.relationship('RecipeCard',
                               secondary='partyrecipes',
                               backref='parties',
