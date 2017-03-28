@@ -1,7 +1,7 @@
 '''WTForms forms for app data collection'''
 
 from wtforms import Form, widgets, SelectMultipleField
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, HiddenField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, DataRequired
 from wtforms import ValidationError
 from ..models import Profile, Diet, User, Intolerance
@@ -10,8 +10,9 @@ from flask import flash, redirect, url_for
 
 
 class FirstNameForm(Form):
-    first_name = StringField('First name:', validators=[InputRequired(message="Please tell us what to you call you."),
-                                                        Length(1, 64, message="Limit 64 characters")])
+    profile_id = HiddenField(validators=[InputRequired()])
+    first_name = StringField('Change first name to:', validators=[InputRequired(message="Please tell us what to you call you."),
+                                                                  Length(1, 64, message="Limit 64 characters")])
     submit = SubmitField('Update')
 
 
@@ -42,7 +43,7 @@ class MultiCheckboxField(SelectMultipleField):
 class IntoleranceForm(Form):
 
     intolerance_query = Intolerance.query.order_by(Intolerance.intol_name).all()
-    intolerances = [(intol.name, intol.description) for intol in intolerance_query]
+    intolerances = [(intol.intol_name, intol.intol_description) for intol in intolerance_query]
     example = MultiCheckboxField('Label', choices=intolerances)
 
 

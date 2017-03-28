@@ -425,6 +425,7 @@ class Party(BaseMixin, db.Model):
         naive = datetime.datetime.strptime(plaintext, "%Y-%m-%d %H:%M:%S")
         local_dt = local.localize(naive, is_dst=None)
         self.datetime_of_party = local_dt.astimezone(pytz.utc)
+        db.session.commit
 
     def party_in_local_time(self, local_timezone):
         """Converts the stored UTC time to the local time of the user"""

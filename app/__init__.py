@@ -7,8 +7,9 @@ from flask_login import LoginManager
 from config import config
 from jinja2 import StrictUndefined
 from flask_wtf.csrf import CSRFProtect
+from flask_jsglue import JSGlue
 
-
+jsglue = JSGlue()
 db = SQLAlchemy()
 bootstrap = Bootstrap()
 mail = Mail()
@@ -31,6 +32,7 @@ def create_app(config_name):
     CSRFProtect(app)
     mail.init_app(app)
     moment.init_app(app)
+    jsglue.init_app(app)
     db.app = app
     db.init_app(app)
     login_manager.init_app(app)

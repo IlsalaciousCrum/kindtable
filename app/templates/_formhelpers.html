@@ -10,3 +10,15 @@
   {% endif %}
   </dd>
 {% endmacro %}
+
+
+{% macro render_inline_field(field) %}
+  {{ field.label }}&emsp;{{ field(**kwargs)|safe }}
+  {% if field.errors %}
+    <ul class=errors>
+    {% for error in field.errors %}
+      <li><font style="color:red;">{{ error }}</font></li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endmacro %}

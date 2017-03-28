@@ -5,10 +5,12 @@
     <div class="row well-spaced" style="padding-top: 3em">
         <div class="col-md-4 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
-                <h1>My Profile</h1><br>
+                <h3>My Profile</h3>
+                    <span class="text-muted small">Last updated {{ moment(profile.last_updated).format('LLLL') }}</span><br><br>
+
                     <div class="col">            
 
-                        <a href="#" data-toggle="modal" data-target="#firstName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a> &emsp;<strong>First Name:</strong>&emsp;{{  profile.first_name  }}  <br>
+                        <div id="first"><a href="#" data-toggle="modal" data-target="#firstName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a> &emsp;<strong>First Name:</strong>&emsp;{{  profile.first_name  }}</div>
 
                         <a href="#" data-toggle="modal" data-target="#lastName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }} <br>
 
@@ -141,8 +143,6 @@
     </div> 
 
 
-
-
 <!-- Modal -->
 <div id="firstName" class="modal fade" role="dialog">
     <div class="modal-dialog">
@@ -153,8 +153,15 @@
                 <h4 class="modal-title">Update First Name</h4>
             </div>
             <div class="modal-body">
-                        
-                <p>This is a placeholder for the update first name modal</p>
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% from "_formhelpers.html" import render_inline_field %}
+                    <form action="{{ url_for('profiles.changefirstname') }}" class="form form-horizontal" method="post" role="form" id="changeFirstName">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_inline_field(first_name_form.first_name) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                </div>
+                <script src="/static/js/firstName.js"></script>      
             </div>
         </div>
     </div>

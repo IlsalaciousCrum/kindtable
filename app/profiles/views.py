@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, session, request
+from flask import render_template, redirect, url_for, flash, session, request, jsonify
 
 from . import profiles
 
@@ -8,27 +8,26 @@ from ..models import User, Profile, Diet, Intolerance, RecipeBox, Party, PartyGu
 
 from flask_login import login_required
 
+from .forms import FirstNameForm, LastNameForm, DietForm, DietReasonForm, IntoleranceForm, AvoidForm, FriendEmailForm, AddNewFriendForm
 
-@profiles.route('/userprofile', methods=['GET'])
+from datetime import datetime
+
+
+@profiles.route('/dashboard', methods=['GET'])
 @login_required
-def show_user_profile():
+def show_dashboard():
     """Show logged in user's profile"""
 
-    print 1
+    first_name_form = FirstNameForm(request.form)
+
+    print "loading dashboard"
     session_token = session.get("session_token")
-    print session_token
     user = User.query.filter(session_token == session_token).first()
-    print user
     friends = user.friends
-    print friends
     parties = user.parties
-    print parties
-    profile = Profile.query.filter(Profile.owned_by_user_id == user.id).first()
-    print profile
+    profile = user.profile
     diets = Diet.query.order_by(Diet.diet_type).all()
-    print diets
     intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
-    print intol_list
     recipes = RecipeBox.query.filter_by(user_id=user.id).all()
     return render_template("/profiles/user_profile.html",
                            friends=friends,
@@ -36,7 +35,8 @@ def show_user_profile():
                            profile=profile,
                            intol_list=intol_list,
                            diets=diets,
-                           recipes=recipes)
+                           recipes=recipes,
+                           first_name_form=first_name_form)
 
 
 @profiles.route('/friendprofile/<int:friend_id>', methods=['GET'])
@@ -83,3 +83,23 @@ def show_party_profile(party_id):
                            intol_list=intol_list,
                            friends=friends,
                            parties=parties)
+
+
+@profiles.route('/changefirstname.json', methods=['POST'])
+@login_required
+def changefirstname():
+    """Takes an Ajax request and changes a profiles first name"""
+
+    form = FirstNameForm(request.form)
+    print 1
+
+    if form.validate():
+        print 2
+        profile = Profile.query.get(form.profile_id.data)
+        print 3
+        profile.update({"first_name": form.first_name.data, "last_updated": datetime.utcnow()})
+        print 4
+        return jsonify(data={'message': 'First name updated', 'first_name': profile.first_name})
+    else:
+        print 5
+        return jsonify(data=form.errors)
