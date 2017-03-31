@@ -162,6 +162,7 @@
                     <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
                         {{ render_inline_field(first_name_form.first_name) }}
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                    </form>
                 </div>
                 <script src="/static/js/firstName.js"></script>      
             </div>
@@ -183,10 +184,11 @@
                  <div class = "row round_hidden_div" style="padding-top: 2em">
                     {% from "_formhelpers.html" import render_inline_field %}
                     <form action="{{ url_for('profiles.changelastname') }}" class="form form-horizontal" method="post" role="form" id="changeLastName">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_inline_field(last_name_form.last_name) }}
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                            {{ render_inline_field(last_name_form.last_name) }}
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                    </form>
                 </div>
                 <script src="/static/js/lastName.js"></script>     
             </div>

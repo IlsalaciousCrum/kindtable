@@ -1,8 +1,8 @@
 '''WTForms forms for app data collection'''
 
 from wtforms import Form, widgets, SelectMultipleField
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, HiddenField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, DataRequired
+from wtforms import StringField, SubmitField, RadioField, HiddenField
+from wtforms.validators import InputRequired, Length, Email, Optional, DataRequired
 from wtforms import ValidationError
 from ..models import Profile, Diet, User, Intolerance
 from .. import db
@@ -17,12 +17,14 @@ class FirstNameForm(Form):
 
 
 class LastNameForm(Form):
+    profile_id = HiddenField(validators=[InputRequired()])
     last_name = StringField('Last name:', validators=[InputRequired(message="Please tell us a last name to use for you."),
                                                       Length(1, 64, message="Limit 64 characters")])
     submit = SubmitField('Update')
 
 
 class DietForm(Form):
+    profile_id = HiddenField(validators=[InputRequired()])
     diets = Diet.query.order_by(Diet.diet_type).all()
     diet = RadioField('Diet you follow:', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
                       validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
@@ -30,6 +32,7 @@ class DietForm(Form):
 
 
 class DietReasonForm(Form):
+    profile_id = HiddenField(validators=[InputRequired()])
     diet_reason = StringField('Reason you follow this diet:', validators=[Length(1, 128, message="Limit 64 characters"),
                                                                           Optional(strip_whitespace=True)])
     submit = SubmitField('Register')
@@ -41,13 +44,14 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class IntoleranceForm(Form):
-
+    profile_id = HiddenField(validators=[InputRequired()])
     intolerance_query = Intolerance.query.order_by(Intolerance.intol_name).all()
     intolerances = [(intol.intol_name, intol.intol_description) for intol in intolerance_query]
     example = MultiCheckboxField('Label', choices=intolerances)
 
 
 class AvoidForm(Form):
+    profile_id = HiddenField(validators=[InputRequired()])
     avoidance = StringField('Last name:', validators=[InputRequired(message="Please tell us a last name to use for you."),
                                                       Length(1, 64, message="Limit 64 characters")])
     submit = SubmitField('Update')

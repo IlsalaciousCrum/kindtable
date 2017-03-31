@@ -19,6 +19,7 @@ def show_dashboard():
     """Show logged in user's profile"""
 
     first_name_form = FirstNameForm(request.form)
+    last_name_form = LastNameForm(request.form)
     session_token = session.get("session_token")
     user = User.query.filter_by(session_token=session_token).first()
     friends = user.friends
@@ -34,7 +35,8 @@ def show_dashboard():
                            intol_list=intol_list,
                            diets=diets,
                            recipes=recipes,
-                           first_name_form=first_name_form)
+                           first_name_form=first_name_form,
+                           last_name_form=last_name_form)
 
 
 @profiles.route('/friendprofile/<int:friend_id>', methods=['GET'])
@@ -89,15 +91,23 @@ def changefirstname():
     """Takes an Ajax request and changes a profiles first name"""
 
     form = FirstNameForm(request.form)
-    print 1
-
     if form.validate():
-        print 2
         profile = Profile.query.get(form.profile_id.data)
-        print 3
         profile.update({"first_name": form.first_name.data, "last_updated": datetime.utcnow()})
-        print 4
         return jsonify(data={'message': 'First name updated', 'first_name': profile.first_name})
     else:
-        print 5
+        return jsonify(data=form.errors)
+
+
+@profiles.route('/changelastname.json', methods=['POST'])
+@login_required
+def changelastname():
+    """Takes an Ajax request and changes a profiles last name"""
+
+    form = LastNameForm(request.form)
+    if form.validate():
+        profile = Profile.query.get(form.profile_id.data)
+        profile.update({"last_name": form.last_name.data, "last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Last name updated', 'last_name': profile.last_name})
+    else:
         return jsonify(data=form.errors)
