@@ -25,7 +25,8 @@ def login():
     reset_password_request_form = PasswordResetRequestForm(request.form, prefix="a")
 
     if request.method == 'POST' and login_form.validate():
-        user = db.session.query(User).join(Profile).filter(Profile.email == login_form.email.data, User.profile_id == Profile.profile_id).first()
+        email = login_form.email.data
+        user = db.session.query(User).join(Profile).filter(Profile.email == email.lower(), User.profile_id == Profile.profile_id).first()
         if user is not None and user.verify_password(login_form.password.data):
             login_user(user, remember=login_form.remember_me.data)
             session['session_token'] = user.session_token
@@ -48,7 +49,8 @@ def process_reset():
         if not current_user.is_anonymous:
             print "a user is already logged in"
             return redirect(url_for('main.index'))
-        user = db.session.query(User).join(Profile).filter(Profile.email == reset_password_request_form.email.data, User.profile_id == Profile.profile_id).first()
+        email = reset_password_request_form.email.data
+        user = db.session.query(User).join(Profile).filter(Profile.email == email.lower(), User.profile_id == Profile.profile_id).first()
         profile = user.profile
         if user:
             token = profile.generate_confirmation_token()
@@ -70,7 +72,8 @@ def password_reset(token):
         return redirect(url_for('main.index'))
     form = PasswordResetForm(request.form)
     if request.method == 'POST' and form.validate():
-        user = db.session.query(User).join(Profile).filter(Profile.email == form.email.data, User.profile_id == Profile.profile_id).first()
+        email = form.email.data
+        user = db.session.query(User).join(Profile).filter(Profile.email == email.lower(), User.profile_id == Profile.profile_id).first()
         if user is None:
             flash('You have entered an incorrect email address. Please follow the link from your email again')
             return redirect(url_for('main.index'))
@@ -97,7 +100,8 @@ def register():
     form = RegistrationForm(request.form)
 
     if request.method == 'POST' and form.validate():
-        profile = Profile.create_record(email=form.email.data,
+        email = form.email.data
+        profile = Profile.create_record(email=email.lower(),
                                         first_name=form.first_name.data,
                                         last_name=form.last_name.data,
                                         diet_id=int(form.diet.data),
@@ -133,23 +137,33 @@ def confirm(token):
     return redirect(url_for('main.index'))
 
 
-@auth.route('/changeemail', methods=['POST'])
+@auth.route('/change_email', methods=['GET', 'POST'])
 @login_required
 def change_email():
     """Takes an Ajax request and changes a user's email address, requires the user to reconfim their account"""
 
     form = ChangeEmailForm(request.form)
-    if form.validate() and form.password.data == current_user.verify_password(form.password.data):
-        profile = Profile.query.get(form.profile_id.data)
-        profile.update({'email': form.email.data,
-                        'email_verified': False,
-                        'last_updated': datetime.utcnow()})
-        token = profile.generate_confirmation_token()
-        send_email(to=profile.email, subject=' Reset your password',
-                   template='auth/email/reset_password', profile=profile, token=token)
-
-        flash('An email with instructions to reset your password has been sent to you.', "success")
-        return redirect(url_for('auth.login'))
-    else:
-        flash('Your password was entered incorrectly. Please try again.')
-        return redirect(url_for('profiles.dashboard'))
+    if request.method == 'POST' and form.validate():
+        print "The form validates"
+        if current_user.verify_password(form.password.data):
+            print "verified the password"
+            profile = current_user.profile
+            email = form.email.data
+            profile.update({'email': email.lower(),
+                            'email_verified': False,
+                            'last_updated': datetime.utcnow()})
+            token = profile.generate_confirmation_token()
+            send_email(to=profile.email, subject='Confirm your new email address',
+                       template='auth/email/confirm', profile=profile, token=token)
+            session.clear()
+            logout_user()
+            flash('An email with instructions to reset your password has been sent to you.', "success")
+            return redirect(url_for('auth.login'))
+        else:
+            flash('Incorrect password. Please reenter your password.')
+            render_template('auth/change_email.html',
+                            form=form,
+                            profile_id=current_user.profile.profile_id)
+    return render_template('auth/change_email.html',
+                           form=form,
+                           profile_id=current_user.profile.profile_id)

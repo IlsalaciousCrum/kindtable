@@ -2,8 +2,7 @@
 
 from wtforms import Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, DataRequired
-from wtforms import ValidationError
+from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, DataRequired, ValidationError
 from ..models import Profile, Diet, User
 from .. import db
 from flask import flash, redirect, url_for
@@ -86,6 +85,8 @@ class PasswordResetForm(Form):
 
 class ChangeEmailForm(Form):
     email = StringField('New Email:', validators=[InputRequired(),
+                                                  Length(1, 64),
+                                                  Email(),
                                                   EqualTo('email2',
                                                           message='Email addresses must match')])
     email2 = StringField('Confirm new email:',
@@ -97,4 +98,4 @@ class ChangeEmailForm(Form):
 
     def validate_email(self, field):
         if db.session.query(User).join(Profile).filter(Profile.email == field.data, User.profile_id == Profile.profile_id).first():
-            raise ValidationError('That email address is already registered. Reset password to get access to that account.')
+            raise ValidationError('That email address is already registered.')

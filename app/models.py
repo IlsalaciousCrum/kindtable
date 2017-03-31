@@ -111,7 +111,8 @@ class Profile(BaseMixin, db.Model):
                 except BadData:
                     print "bad data"
 
-        if data['confirm'] != self.profile_id and data['email'] != self.email:
+        if data['profile_id'] != self.profile_id and data['email'] != self.email:
+            print "The profile ids or the email adress don't match"
             return False
         else:
             self.email_verified = True

@@ -14,7 +14,7 @@
 
                         <div id="last"><a href="#" data-toggle="modal" data-target="#lastName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }}</div>
 
-                        <a href="#" data-toggle="modal" data-target="#email"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}<br>
+                        <a href="{{  url_for('auth.change_email')  }}" ><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}<br>
 
                         <a href="#" data-toggle="modal" data-target="#dietType"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet type:</strong>&emsp;{{  profile.diet.diet_type  }}<br>
 
@@ -196,32 +196,6 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div id="email" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Update Email Address</h4>
-            </div>
-            <div class="modal-body">
-                 <div class = "row round_hidden_div" style="padding-top: 2em">
-                    <h5>Changing your email address will require you to confirm your account again, through the new email address you enter below.</h5>
-                    {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('auth.change_email') }}" class="form form-horizontal" method="post" role="form" id="changeEmail">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                            {{ render_field(change_email_form.email) }}
-                            {{ render_field(change_email_form.email2) }}
-                            {{ render_field(change_email_form.password) }}<br>
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                    </form>
-                </div>   
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Modal -->
 <div id="diet" class="modal fade" role="dialog">

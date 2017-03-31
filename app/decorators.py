@@ -7,7 +7,7 @@ def email_confirmation_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.profile.email_verified:
-            flash("Please check your email and confirm your email address.")
+            flash("Please check your email and confirm your email address to view this page.", "danger")
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
