@@ -13,20 +13,23 @@ from app.models import User, Profile, Friend, ProfileIntolerance, Intolerance, D
 from .. import db
 from flask_mail import Mail, Message
 from flask_login import login_required
+from ..decorators import email_confirmation_required
 
 
-@main.route('/send-email')
-def send_mail():
-    """Testing sending email through Flask-Mail and the website"""
+# @main.route('/send-email')
+# @login_required
+# @email_confirmation_required
+# def send_mail():
+#     """Testing sending email through Flask-Mail and the website"""
 
-    try:
-        msg = Message("Ilsa has sent you a Kind Table Request!",
-                      recipients=["ilsalacious@gmail.com"])
-        msg.body = "Ilsa (ilsalacious@gmail.com) would like you to fill out a brief dietary preference profile to make cooking for you easier."
-        Mail.send(msg)
-        return 'Mail sent!'
-    except Exception, e:
-        return(str(e))
+#     try:
+#         msg = Message("Ilsa has sent you a Kind Table Request!",
+#                       recipients=["ilsalacious@gmail.com"])
+#         msg.body = "Ilsa (ilsalacious@gmail.com) would like you to fill out a brief dietary preference profile to make cooking for you easier."
+#         Mail.send(msg)
+#         return 'Mail sent!'
+#     except Exception, e:
+#         return(str(e))
 
 
 # I got ahead of myself. Will have to wait until it's ready to deploy to add SSL.

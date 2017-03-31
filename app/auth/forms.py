@@ -85,12 +85,16 @@ class PasswordResetForm(Form):
 
 
 class ChangeEmailForm(Form):
-    email = StringField('New Email', validators=[InputRequired(),
-                                                 Length(1, 64),
-                                                 Email()])
+    email = StringField('New Email:', validators=[InputRequired(),
+                                                  EqualTo('email2',
+                                                          message='Email addresses must match')])
+    email2 = StringField('Confirm new email:',
+                         validators=[InputRequired(),
+                                     Length(1, 64),
+                                     Email()])
     password = PasswordField('Password', validators=[InputRequired()])
     submit = SubmitField('Update Email Address')
 
     def validate_email(self, field):
-        if Profile.query.filter_by(email=field.data).first():
-            raise ValidationError('Email already registered.')
+        if db.session.query(User).join(Profile).filter(Profile.email == field.data, User.profile_id == Profile.profile_id).first():
+            raise ValidationError('That email address is already registered. Reset password to get access to that account.')

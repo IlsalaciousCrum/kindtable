@@ -12,7 +12,9 @@ from ..email import send_email
 
 from ..models import Profile, User, Diet
 
-from .forms import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm
+from .forms import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
+
+from datetime import datetime
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -119,12 +121,6 @@ def register():
 @login_required
 def confirm(token):
 
-    print "the view thinks the token is " + token
-    print "the view thinks the secret key is " + current_app.config['SECRET_KEY']
-    print current_user
-    print current_user.profile
-    print "we are hitting the confirmaton page"
-    print "the view thinks the token is " + token
     if current_user.profile.email_verified:
         print "thinks the user is already confirmed"
         return redirect(url_for('main.index'))
@@ -135,3 +131,25 @@ def confirm(token):
         flash('The confirmation link is invalid.', 'danger')
 
     return redirect(url_for('main.index'))
+
+
+@auth.route('/changeemail', methods=['POST'])
+@login_required
+def change_email():
+    """Takes an Ajax request and changes a user's email address, requires the user to reconfim their account"""
+
+    form = ChangeEmailForm(request.form)
+    if form.validate() and form.password.data == current_user.verify_password(form.password.data):
+        profile = Profile.query.get(form.profile_id.data)
+        profile.update({'email': form.email.data,
+                        'email_verified': False,
+                        'last_updated': datetime.utcnow()})
+        token = profile.generate_confirmation_token()
+        send_email(to=profile.email, subject=' Reset your password',
+                   template='auth/email/reset_password', profile=profile, token=token)
+
+        flash('An email with instructions to reset your password has been sent to you.', "success")
+        return redirect(url_for('auth.login'))
+    else:
+        flash('Your password was entered incorrectly. Please try again.')
+        return redirect(url_for('profiles.dashboard'))

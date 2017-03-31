@@ -10,16 +10,22 @@ from flask_login import login_required
 
 from .forms import FirstNameForm, LastNameForm, DietForm, DietReasonForm, IntoleranceForm, AvoidForm, FriendEmailForm, AddNewFriendForm
 
+from ..auth.forms import ChangeEmailForm
+
 from datetime import datetime
+
+from ..decorators import email_confirmation_required
 
 
 @profiles.route('/dashboard', methods=['GET'])
 @login_required
+@email_confirmation_required
 def show_dashboard():
     """Show logged in user's profile"""
 
     first_name_form = FirstNameForm(request.form)
     last_name_form = LastNameForm(request.form)
+    change_email_form = ChangeEmailForm(request.form)
     session_token = session.get("session_token")
     user = User.query.filter_by(session_token=session_token).first()
     friends = user.friends
@@ -36,11 +42,13 @@ def show_dashboard():
                            diets=diets,
                            recipes=recipes,
                            first_name_form=first_name_form,
-                           last_name_form=last_name_form)
+                           last_name_form=last_name_form,
+                           change_email_form=change_email_form)
 
 
 @profiles.route('/friendprofile/<int:friend_id>', methods=['GET'])
 @login_required
+@email_confirmation_required
 def show_friend_profile(friend_id):
     """Show logged in user's friends profile"""
 
@@ -64,6 +72,7 @@ def show_friend_profile(friend_id):
 
 @profiles.route('/party_profile/<int:party_id>')
 @login_required
+@email_confirmation_required
 def show_party_profile(party_id):
     """Show the party profile"""
 
@@ -87,6 +96,7 @@ def show_party_profile(party_id):
 
 @profiles.route('/changefirstname.json', methods=['POST'])
 @login_required
+@email_confirmation_required
 def changefirstname():
     """Takes an Ajax request and changes a profiles first name"""
 
@@ -101,6 +111,7 @@ def changefirstname():
 
 @profiles.route('/changelastname.json', methods=['POST'])
 @login_required
+@email_confirmation_required
 def changelastname():
     """Takes an Ajax request and changes a profiles last name"""
 
