@@ -28,7 +28,7 @@ def show_dashboard():
     diets = Diet.query.order_by(Diet.diet_type).all()
     intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
     recipes = RecipeBox.query.filter_by(user_id=user.id).all()
-    return render_template("/profiles/user_profile.html",
+    return render_template("/profiles/dashboard.html",
                            friends=friends,
                            parties=parties,
                            profile=profile,
