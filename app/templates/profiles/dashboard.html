@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <div class="row well-spaced" style="padding-top: 3em">
+        <div class="col-md-4 col-md-offset-1">      
+            <div class = "row round_div" style="padding-top: 2em">
+                <h3>My Profile</h3>
+                    <span class="text-muted small">Last updated {{ moment(profile.last_updated).format('LLLL') }}</span><br><br>
+
+                    <div class="col">            
+
+                        <div id="first"><a href="#" data-toggle="modal" data-target="#firstName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a> &emsp;<strong>First Name:</strong>&emsp;{{  profile.first_name  }}</div>
+
+                        <div id="last"><a href="#" data-toggle="modal" data-target="#lastName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }}</div>
+
+                        <a href="#" data-toggle="modal" data-target="#email"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}<br>
+
+                        <a href="#" data-toggle="modal" data-target="#dietType"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet type:</strong>&emsp;{{  profile.diet.diet_type  }}<br>
+
+                        <a href="#" data-toggle="modal" data-target="#dietReason"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet reason:</strong>&emsp;{{  profile.diet_reason  }}<br><br>
+
+                        
+                        {% if profile.intolerances %}
+                        <a href="#" data-toggle="modal" data-target="#intols"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Allergies/intolerances:</strong>
+                        {% if profile.intolerances %}
+                        <ul>{% for intolerance in profile.intolerances %}<li><b>{{ intolerance.intol_name }}</b></li>{% if not loop.last %}, {% endif %}{% endfor %}
+                        </ul><br>
+                        {% endif %}<br><br>
+                        {% else %}
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#intols">add</button>&emsp;<span class="text-muted strong">No allergies/intolerances added yet</span><br> 
+                        {% endif %}
+
+
+                        {% if profile.avoidances %}
+                        <a href="#" data-toggle="modal" data-target="#avoids"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp;<strong>Ingredients to avoid:</strong> 
+                        {% if profile.avoidances %}
+                        <ul>
+                            {% for avoid in profile.avoidances %}
+                                <li><b>{{ avoid.ingredient }}</b> - (<i>{{ avoid.reason}}</i>)</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}<br><br>
+                        {% else %}
+                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#avoids">add</button>&emsp;<span class="text-muted strong">No ingredients to avoid added yet</span> 
+                        {% endif %}
+
+                        <h3>Friends</h3>
+                        {% if friends %}
+                        <ul>{% for friend in friends %}
+                            <li>
+                                <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.friend_profile.profile_id) }}">{{ friend.friend_profile.first_name }} {{friend.friend_profile.last_name  }}</a> <span class="text-muted">({{  friend.friend_profile.email  }})</span></li>{% if not loop.last %} {% endif %}{% endfor %}
+                        </ul>
+                        {% else %}
+                        <span class="text-muted strong">No friends added yet.</span>
+                        {% endif %}
+
+                        <h3>Bookmarked recipes</h3>
+                        {% if recipes %}
+                        <ul>
+                            {% for recipe in recipes %}
+                            <li>
+                                <a href="{{ url_for('profiles.show_recipe_profile', recipe_id=recipe.recipes.recipe_record_id) }}">{{ recipe.recipes.title }}
+                            </li>
+                            {% if not loop.last %} {% endif %}{% endfor %}
+                        </ul><br>
+                        {% else %}
+                        <span class="text-muted strong">No recipes bookmarked yet</span>
+
+                        {% endif %}<br><br>
+                    </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-md-offset-1">      
+            <div class = "row round_div" style="padding-top: 2em">
+                <h1>Parties</h1>
+                    <div class="col">
+                        {% if parties %}
+                            {% for party in parties %}
+                                <h3><a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">{{ party.title}}</a></h3>
+                                <strong>Date:</strong>&emsp; {{ moment(party.datetime_of_party).format('LLLL') }}<br>
+
+                                <strong>Friends invited:</strong>&emsp;
+                                {% if party.guest_profiles %}
+                                <ul>
+                                    {% for guest in party.guest_profiles %}
+                                        {% if guest.first_name %}
+                                            <li>{{  guest.first_name  }} {{  guest.last_name  }}</li>
+                                        {% else %}
+                                            <li>{{  guest.email  }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                    <span class="text-muted strong">No guests invited yet</span>
+                                {% endif %}<br>
+                                <strong>Cuisine:</strong>&emsp;{% if party.cuisine %}{{  party.cuisine  }}{% else %}<span class="text-muted strong">None</span>{% endif %}<br>
+                                <strong>Diets:</strong>
+                                {% if party.guest_profiles %} 
+                                    {% for guest in party.guest_profiles %}
+                                        {{ guest.diet.diet_type }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted strong">None</span>
+                                {% endif %}<br>
+                                
+                                <strong>Ingredients to avoid:</strong>
+                                {% if party.guest_profiles %} 
+                                    {% for guest in party.guest_profiles %}
+                                        {% for avoid in guest.avoidances %}
+                                            {{ avoid.ingredient }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted strong">None</span>
+                                {% endif %}<br>
+                                <strong>Allergies/Intolerances:</strong>{% if party.guest_profiles %} 
+                                    {% for guest in party.guest_profiles %}
+                                        {% for intol in guest.intolerances %}
+                                            {{ intol.intol_name }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted strong">None</span>
+                                {% endif %}<br>
+                                <strong>Party recipes:</strong>
+                                {% if party.recipes %}
+                                    <ul>
+                                    {% for recipe in party.recipes %}
+                                        <li><a href="{{ url_for('profiles.show_recipe_profile', recipe_id=recipe.recipe_record_id) }}">{{ recipe.title}}</a></li>
+                                    <ul>
+                                    {% endfor %}
+                                {% else %}
+                                <span class="text-muted strong">No recipes bookmarked yet</span>
+                                {% endif %}<br>
+                                <hr>
+                            {% endfor %}
+                        {% else %}
+                                <span class="text-muted strong">No parties created yet</span>
+                        {% endif %}
+                    </div>
+            </div>
+        </div>
+    </div> 
+
+
+<!-- Modal -->
+<div id="firstName" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update First Name</h4>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% from "_formhelpers.html" import render_inline_field %}
+                    <form action="{{ url_for('profiles.changefirstname') }}" class="form form-horizontal" method="post" role="form" id="changeFirstName">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_inline_field(first_name_form.first_name) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                    </form>
+                </div>
+                <script src="/static/js/firstName.js"></script>      
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div id="lastName" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Last Name</h4>
+            </div>
+            <div class="modal-body">
+                 <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% from "_formhelpers.html" import render_inline_field %}
+                    <form action="{{ url_for('profiles.changelastname') }}" class="form form-horizontal" method="post" role="form" id="changeLastName">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                            {{ render_inline_field(last_name_form.last_name) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                    </form>
+                </div>
+                <script src="/static/js/lastName.js"></script>     
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="email" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Email Address</h4>
+            </div>
+            <div class="modal-body">
+                 <div class = "row round_hidden_div" style="padding-top: 2em">
+                    <h5>Changing your email address will require you to confirm your account again, through the new email address you enter below.</h5>
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('auth.change_email') }}" class="form form-horizontal" method="post" role="form" id="changeEmail">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                            {{ render_field(change_email_form.email) }}
+                            {{ render_field(change_email_form.email2) }}
+                            {{ render_field(change_email_form.password) }}<br>
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                    </form>
+                </div>   
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="diet" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Diet</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update diet modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="dietReason" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Diet Reason</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update diet reason modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="intols" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Allergies/Intolerances</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update intolerances modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="avoid" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Update Ingredients To Avoid</h4>
+            </div>
+            <div class="modal-body">
+                        
+                <p>This is a placeholder for the update avoidances modal</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    "use strict";
+    $("#addIntol").click(function(){
+        $("#addIntol").hide();
+        $("#addIntolForm").toggle();
+        console.log("show form");
+    });
+</script>
+{% endblock %}
