@@ -16,7 +16,7 @@ class LoginForm(Form):
     password = PasswordField('Password',
                              validators=[InputRequired('Please enter a valid password or reset password')])
     remember_me = BooleanField('Keep me logged in')
-    submit = SubmitField('Log in')
+    submit1 = SubmitField('Log in')
 
 
 class RegistrationForm(Form):
@@ -42,7 +42,8 @@ class RegistrationForm(Form):
 
     def validate_email(self, field):
         print "checking valid email"
-        if db.session.query(Profile).join(User).filter(Profile.email == field.data, User.profile_id == Profile.owned_by_user_id).first():
+
+        if db.session.query(User).join(Profile).filter(Profile.email == field.data, User.profile_id == Profile.profile_id).first():
             print "triggering the email validation but somehow not flashing"
             flash('Email address already registered. Please log in.')
             raise ValidationError('Email address already registered. Please log in.')
@@ -63,7 +64,7 @@ class PasswordChangeForm(Form):
 class PasswordResetRequestForm(Form):
     email = StringField('Email', validators=[InputRequired(), Length(1, 64),
                                              Email()])
-    submit = SubmitField('Reset Password')
+    submit2 = SubmitField('Reset Password')
 
 
 class PasswordResetForm(Form):
@@ -78,7 +79,8 @@ class PasswordResetForm(Form):
     submit = SubmitField('Reset Password')
 
     def validate_email(self, field):
-        if Profile.query.filter_by(email=field.data).first() is None:
+        print "checking valid email/user/profile"
+        if db.session.query(User).join(Profile).filter(Profile.email == field.data, User.profile_id == Profile.profile_id).first() is None:
             raise ValidationError('Unknown email address.')
 
 

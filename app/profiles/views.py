@@ -19,10 +19,8 @@ def show_dashboard():
     """Show logged in user's profile"""
 
     first_name_form = FirstNameForm(request.form)
-
-    print "loading dashboard"
     session_token = session.get("session_token")
-    user = User.query.filter(session_token == session_token).first()
+    user = User.query.filter_by(session_token=session_token).first()
     friends = user.friends
     parties = user.parties
     profile = user.profile

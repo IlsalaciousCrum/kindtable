@@ -109,9 +109,7 @@
 
           <!-- ------------ -->
 
-
-            {% block content %}
-              <div class="container-fluid">
+            <div class="container-fluid">
                 <div class="container">
                   {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
@@ -120,11 +118,16 @@
                       {% endfor %}
                     {% endif %}
                   {% endwith %}
-                </div>
+                </div></div>
+
+            {% block content %}
+
+
+
                 <div id="extending">
                 {% block page_content %}{% endblock %}
                 </div>
-              </div>
+              
             {% endblock %}  <!-- /content -->
 
             {% block scripts %}

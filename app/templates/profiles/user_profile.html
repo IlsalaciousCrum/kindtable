@@ -12,7 +12,7 @@
 
                         <div id="first"><a href="#" data-toggle="modal" data-target="#firstName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a> &emsp;<strong>First Name:</strong>&emsp;{{  profile.first_name  }}</div>
 
-                        <a href="#" data-toggle="modal" data-target="#lastName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }} <br>
+                        <div id="last"><a href="#" data-toggle="modal" data-target="#lastName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }}</div>
 
                         <a href="#" data-toggle="modal" data-target="#email"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}<br>
 
@@ -51,6 +51,8 @@
                             <li>
                                 <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.friend_profile.profile_id) }}">{{ friend.friend_profile.first_name }} {{friend.friend_profile.last_name  }}</a> <span class="text-muted">({{  friend.friend_profile.email  }})</span></li>{% if not loop.last %} {% endif %}{% endfor %}
                         </ul>
+                        {% else %}
+                        <span class="text-muted strong">No friends added yet.</span>
                         {% endif %}
 
                         <h3>Bookmarked recipes</h3>
@@ -178,8 +180,15 @@
                 <h4 class="modal-title">Update Last Name</h4>
             </div>
             <div class="modal-body">
-                        
-                <p>This is a placeholder for the update last name modal</p>
+                 <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% from "_formhelpers.html" import render_inline_field %}
+                    <form action="{{ url_for('profiles.changelastname') }}" class="form form-horizontal" method="post" role="form" id="changeLastName">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_inline_field(last_name_form.last_name) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                </div>
+                <script src="/static/js/lastName.js"></script>     
             </div>
         </div>
     </div>

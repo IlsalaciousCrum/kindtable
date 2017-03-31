@@ -5,12 +5,8 @@ from passlib.hash import bcrypt
 from . import db, login_manager
 from flask_login import UserMixin
 import pytz
-import os
-from itsdangerous import URLSafeSerializer, JSONWebSignatureSerializer
-
-login_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
-registration_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
-
+from itsdangerous import URLSafeSerializer, URLSafeTimedSerializer, BadSignature, BadData
+from flask import current_app
 
 ##############################################################################
 # Model definitions
@@ -96,21 +92,29 @@ class Profile(BaseMixin, db.Model):
     def generate_confirmation_token(self):
         '''Creates an encrypted token to send via email to new user'''
 
-        return registration_serializer.dumps({'confirm': self.profile_id})
+        registration_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        return registration_serializer.dumps({'profile_id': self.profile_id, 'email': self.email})
 
-    @classmethod
-    def confirm(cls, token):
+    def confirm(self, token):
 
+        registration_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
         try:
-            data = registration_serializer.loads(token)
-            profile = Profile.query.filter_by(Profile.owned_by_user_id == data).first()
-        except:
-            return False
+            data = registration_serializer.loads(token, max_age=3600)
+        except BadSignature, e:
+            print "Bad Signature"
+            encoded_payload = e.payload
+            if encoded_payload is not None:
+                print "data is not nothing"
+                try:
+                    d = registration_serializer.load_payload(encoded_payload)
+                    print d
+                except BadData:
+                    print "bad data"
 
-        if data.get('confirm') != profile.profile_id:
+        if data['confirm'] != self.profile_id and data['email'] != self.email:
             return False
         else:
-            profile.email_verified = True
+            self.email_verified = True
             db.session.commit()
             return True
 
@@ -184,11 +188,29 @@ class User(BaseMixin, UserMixin, db.Model):
         else:
             return False
 
+    def reset_password(self, token, new_password):
+        registration_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        try:
+            data = registration_serializer.loads(str(token))
+        except:
+            print "can't load token"
+            return False
+
+        if data['profile_id'] != self.profile.profile_id and data['email'] != self.profile.email:
+            print "user_id did not match"
+            return False
+        else:
+            print "I'm happy to change your password"
+            self.password = new_password
+            db.session.commit()
+            return True
+
     def make_session_token(self):
         '''Encode a secure token for a cookie'''
 
-        data = [str(self.id), self.password_hash]
-        self.session_token = login_serializer.dumps(data)
+        login_serializer = URLSafeSerializer(current_app.config['SECRET_KEY'])
+
+        self.session_token = login_serializer.dumps([self.id])
         db.session.commit()
 
         return self.session_token
@@ -199,11 +221,15 @@ class User(BaseMixin, UserMixin, db.Model):
         stored on the users computer, process it to check if its valid and then
         return a User Object if its valid or None if its not valid.'''
 
+        login_serializer = URLSafeSerializer(current_app.config['SECRET_KEY'])
+
         data = login_serializer.loads(session_token)
+        print "id is " + str(data[0])
         #Find the User
         user = User.query.get(data[0])
+        print user
         #Check Password and return user or None
-        if user and data[1] == user.password_hash:
+        if user:
             print "loading user "
             return user
         else:
