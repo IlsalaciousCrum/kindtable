@@ -10,8 +10,6 @@ from flask_login import login_required
 
 from .forms import FirstNameForm, LastNameForm, DietForm, DietReasonForm, IntoleranceForm, AvoidForm, FriendEmailForm, AddNewFriendForm
 
-from ..auth.forms import ChangeEmailForm
-
 from datetime import datetime
 
 from ..decorators import email_confirmation_required
@@ -25,7 +23,8 @@ def show_dashboard():
 
     first_name_form = FirstNameForm(request.form)
     last_name_form = LastNameForm(request.form)
-    change_email_form = ChangeEmailForm(request.form)
+    diet_form = DietForm(request.form)
+    diet_reason_form = DietReasonForm(request.form)
     session_token = session.get("session_token")
     user = User.query.filter_by(session_token=session_token).first()
     friends = user.friends
@@ -43,7 +42,8 @@ def show_dashboard():
                            recipes=recipes,
                            first_name_form=first_name_form,
                            last_name_form=last_name_form,
-                           change_email_form=change_email_form)
+                           diet_form=diet_form,
+                           diet_reason_form=diet_reason_form)
 
 
 @profiles.route('/friendprofile/<int:friend_id>', methods=['GET'])
@@ -120,5 +120,35 @@ def changelastname():
         profile = Profile.query.get(form.profile_id.data)
         profile.update({"last_name": form.last_name.data, "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Last name updated', 'last_name': profile.last_name})
+    else:
+        return jsonify(data=form.errors)
+
+
+@profiles.route('/changediet.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def changediet():
+    """Takes an Ajax request and changes diet"""
+
+    form = DietForm(request.form)
+    if form.validate():
+        profile = Profile.query.get(form.profile_id.data)
+        profile.update({"diet_id": form.diet.data, "last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Diet updated', 'diet': profile.diet_id})
+    else:
+        return jsonify(data=form.errors)
+
+
+@profiles.route('/changedietreason.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def changedietreason():
+    """Takes an Ajax request and changes diet reason"""
+
+    form = DietReasonForm(request.form)
+    if form.validate():
+        profile = Profile.query.get(form.profile_id.data)
+        profile.update({"diet_reason": form.diet_reason.data, "last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Diet reason updated', 'diet_reason': profile.diet_reason})
     else:
         return jsonify(data=form.errors)

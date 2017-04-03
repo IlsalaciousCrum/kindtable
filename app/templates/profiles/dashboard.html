@@ -14,11 +14,11 @@
 
                         <div id="last"><a href="#" data-toggle="modal" data-target="#lastName"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }}</div>
 
-                        <a href="{{  url_for('auth.change_email')  }}" ><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}<br>
+                        <div id="email"><a href="{{  url_for('auth.change_email')  }}" ><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}</div>
 
-                        <a href="#" data-toggle="modal" data-target="#dietType"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet type:</strong>&emsp;{{  profile.diet.diet_type  }}<br>
+                        <div id="diet"><a href="#" data-toggle="modal" data-target="#diet"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet type:</strong>&emsp;{{  profile.diet.diet_type  }}</div>
 
-                        <a href="#" data-toggle="modal" data-target="#dietReason"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet reason:</strong>&emsp;{{  profile.diet_reason  }}<br><br>
+                        <div id="dietReason"><a href="#" data-toggle="modal" data-target="#dietReason"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet reason:</strong>&emsp;{{  profile.diet_reason  }}</div>
 
                         
                         {% if profile.intolerances %}
@@ -207,8 +207,16 @@
                 <h4 class="modal-title">Update Diet</h4>
             </div>
             <div class="modal-body">
-                        
-                <p>This is a placeholder for the update diet modal</p>
+                 <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% from "_formhelpers.html" import render_inline_field %}
+                    <form action="{{ url_for('profiles.changediet') }}" class="form form-horizontal" method="post" role="form" id="changeDiet">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                            {{ render_inline_field(diet_form.diet) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                    </form>
+                </div>
+                <script src="/static/js/diet.js"></script>                           
             </div>
         </div>
     </div>
@@ -225,7 +233,18 @@
             </div>
             <div class="modal-body">
                         
-                <p>This is a placeholder for the update diet reason modal</p>
+                <div class="modal-body">
+                    <div class = "row round_hidden_div" style="padding-top: 2em">
+                        {% from "_formhelpers.html" import render_inline_field %}
+                        <form action="{{ url_for('profiles.changediet') }}" class="form form-horizontal" method="post" role="form" id="changeDietReason">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                                {{ render_inline_field(diet_form.diet) }}
+                            <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        </form>
+                    </div>
+                    <script src="/static/js/dietReason.js"></script>                           
+                </div>
             </div>
         </div>
     </div>
