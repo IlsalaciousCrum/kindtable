@@ -1,8 +1,9 @@
 '''WTForms forms for user management'''
 
 from wtforms import Form
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, TextField
 from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, DataRequired, ValidationError
+from wtforms.widgets import TextArea
 from ..models import Profile, Diet, User
 from .. import db
 from flask import flash, redirect, url_for
@@ -26,8 +27,8 @@ class RegistrationForm(Form):
     diets = Diet.query.order_by(Diet.diet_type).all()
     diet = RadioField('Diet you follow:', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
                       validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
-    diet_reason = StringField('Reason you follow this diet:', validators=[Length(1, 128, message="Limit 64 characters"),
-                                                                          Optional(strip_whitespace=True)])
+    diet_reason = TextField('Reason you follow this diet:', widget=TextArea(), validators=[Length(1, 128, message="Limit 64 characters"),
+                            Optional(strip_whitespace=True)])
     email = StringField('Email:',
                         validators=[InputRequired(message='We need an email address to register you with Kind Table.'),
                                     Length(1, 64, message="Limit 64 characters"),

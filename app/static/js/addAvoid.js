@@ -1,19 +1,20 @@
-function showCurrentDiet(results) {
+function showCurrentAvoid(results) {
     console.dir(results); // for debugging
+    $("#avoid").load(location.href + " #avoid");
     $(".modal.in").modal("hide");
-    $("#dietType").load(location.href + " #dietType");
+    $('#addavoid').modal('show');
 }
 
 
 $(document).ready(function() {
-    $('#changeDiet').on('submit', (function(event) {
+    $('#addAvoidForm').on('submit', (function(event) {
         event.preventDefault();
-        var url = $('#changeDiet').attr('action');
+        var url = $('#addAvoidForm').attr('action');
         $.ajax({
             type: "POST",
             url: url,
-            data: $('#changeDiet').serialize(),
-            success: showCurrentDiet
+            data: $('#addAvoidForm').serialize(),
+            success: showCurrentAvoid
         });
     }));
 

@@ -4,7 +4,7 @@ from . import profiles
 
 from .. import db
 
-from ..models import User, Profile, Diet, Intolerance, RecipeBox, Party, PartyGuest
+from ..models import User, Profile, Diet, Intolerance, RecipeBox, Party, PartyGuest, IngToAvoid
 
 from flask_login import login_required
 
@@ -25,6 +25,7 @@ def show_dashboard():
     last_name_form = LastNameForm(request.form)
     diet_form = DietForm(request.form)
     diet_reason_form = DietReasonForm(request.form)
+    avoid_form = AvoidForm(request.form)
     session_token = session.get("session_token")
     user = User.query.filter_by(session_token=session_token).first()
     friends = user.friends
@@ -43,7 +44,8 @@ def show_dashboard():
                            first_name_form=first_name_form,
                            last_name_form=last_name_form,
                            diet_form=diet_form,
-                           diet_reason_form=diet_reason_form)
+                           diet_reason_form=diet_reason_form,
+                           avoid_form=avoid_form)
 
 
 @profiles.route('/friendprofile/<int:friend_id>', methods=['GET'])
@@ -104,7 +106,7 @@ def changefirstname():
     if form.validate():
         profile = Profile.query.get(form.profile_id.data)
         profile.update({"first_name": form.first_name.data, "last_updated": datetime.utcnow()})
-        return jsonify(data={'message': 'First name updated', 'first_name': profile.first_name})
+        return jsonify(data={'message': 'First name updated'})
     else:
         return jsonify(data=form.errors)
 
@@ -119,7 +121,7 @@ def changelastname():
     if form.validate():
         profile = Profile.query.get(form.profile_id.data)
         profile.update({"last_name": form.last_name.data, "last_updated": datetime.utcnow()})
-        return jsonify(data={'message': 'Last name updated', 'last_name': profile.last_name})
+        return jsonify(data={'message': 'Last name updated'})
     else:
         return jsonify(data=form.errors)
 
@@ -134,7 +136,7 @@ def changediet():
     if form.validate():
         profile = Profile.query.get(form.profile_id.data)
         profile.update({"diet_id": form.diet.data, "last_updated": datetime.utcnow()})
-        return jsonify(data={'message': 'Diet updated', 'diet': profile.diet_id})
+        return jsonify(data={'message': 'Diet updated'})
     else:
         return jsonify(data=form.errors)
 
@@ -149,6 +151,57 @@ def changedietreason():
     if form.validate():
         profile = Profile.query.get(form.profile_id.data)
         profile.update({"diet_reason": form.diet_reason.data, "last_updated": datetime.utcnow()})
-        return jsonify(data={'message': 'Diet reason updated', 'diet_reason': profile.diet_reason})
+        return jsonify(data={'message': 'Diet reason updated'})
     else:
         return jsonify(data=form.errors)
+
+
+@profiles.route('/addavoid.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def addavoid():
+    """Takes an Ajax request and changes ingredients to avoid"""
+
+    form = AvoidForm(request.form)
+    if form.validate():
+        profile = Profile.query.get(form.profile_id.data)
+        IngToAvoid.create_record(ingredient=form.avoidance.data,
+                                 reason=form.reason.data,
+                                 profile_id=profile.profile_id)
+        profile.update({"last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Ingredients to avoid updated'})
+    else:
+        return jsonify(data=form.errors)
+
+
+@profiles.route('/updateavoid.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def updateavoid():
+    """Takes an Ajax request and updates an existing ingredient to avoid"""
+
+    form = AvoidForm(request.form)
+    if form.validate():
+        profile = Profile.query.get(form.profile_id.data)
+        IngToAvoid.create_record(ingredient=form.avoidance.data,
+                                 reason=form.reason.data,
+                                 profile_id=profile.profile_id)
+        profile.update({"last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Ingredients to avoid updated'})
+    else:
+        return jsonify(data=form.errors)
+
+
+# @profiles.route('/changeintols.json', methods=['POST'])
+# @login_required
+# @email_confirmation_required
+# def changeintols():
+#     """Takes an Ajax request and changes diet reason"""
+
+#     form = DietReasonForm(request.form)
+#     if form.validate():
+#         profile = Profile.query.get(form.profile_id.data)
+#         profile.update({"diet_reason": form.diet_reason.data, "last_updated": datetime.utcnow()})
+#         return jsonify(data={'message': 'Diet reason updated', 'diet_reason': profile.diet_reason})
+#     else:
+#         return jsonify(data=form.errors)

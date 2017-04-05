@@ -1,9 +1,10 @@
 '''WTForms forms for app data collection'''
 
 from wtforms import Form, widgets, SelectMultipleField
-from wtforms import StringField, SubmitField, RadioField, HiddenField
+from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField
 from wtforms.validators import InputRequired, Length, Email, Optional, DataRequired
 from wtforms import ValidationError
+from wtforms.widgets import TextArea
 from ..models import Profile, Diet, User, Intolerance
 from .. import db
 from flask import flash, redirect, url_for
@@ -32,10 +33,11 @@ class DietForm(Form):
 
 
 class DietReasonForm(Form):
-    profile_id = HiddenField(validators=[InputRequired()])
-    diet_reason = StringField('Reason you follow this diet:', validators=[Length(1, 128, message="Limit 64 characters"),
-                                                                          Optional(strip_whitespace=True)])
-    submit = SubmitField('Register')
+    profile_id = HiddenField()
+    diet_reason = TextField('Reason you follow this diet:',
+                            widget=TextArea(),
+                            validators=[Length(1, 128, message="Limit 64 characters"), DataRequired(message='Please enter a reason or exit the window')])
+    submit = SubmitField('Update')
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -44,16 +46,21 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class IntoleranceForm(Form):
-    profile_id = HiddenField(validators=[InputRequired()])
+    profile_id = HiddenField()
     intolerance_query = Intolerance.query.order_by(Intolerance.intol_name).all()
     intolerances = [(intol.intol_name, intol.intol_description) for intol in intolerance_query]
     example = MultiCheckboxField('Label', choices=intolerances)
 
 
 class AvoidForm(Form):
-    profile_id = HiddenField(validators=[InputRequired()])
-    avoidance = StringField('Last name:', validators=[InputRequired(message="Please tell us a last name to use for you."),
-                                                      Length(1, 64, message="Limit 64 characters")])
+    profile_id = HiddenField()
+    avoid_id = HiddenField()
+    avoidance = StringField('Change ingredient to avoid:',
+                            validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
+                                        Length(1, 64, message="Limit 64 characters")])
+    reason = TextField('Change the reason you avoid this ingredient:',
+                       widget=TextArea(),
+                       validators=[Length(1, 128, message="Limit 128 characters")])
     submit = SubmitField('Update')
 
 
