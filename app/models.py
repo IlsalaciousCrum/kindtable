@@ -77,7 +77,7 @@ class Profile(BaseMixin, db.Model):
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
     diet_id = db.Column(db.Integer, db.ForeignKey('diets.diet_id'), default=10)
-    diet_reason = db.Column(db.String(120), nullable=True)
+    diet_reason = db.Column(db.String(128), nullable=True)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
     diet = db.relationship('Diet', backref='profiles', lazy='joined')

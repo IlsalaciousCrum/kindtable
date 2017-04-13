@@ -15,11 +15,13 @@
             <form class="form form-horizontal" method="post" role="form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <dl>
-            {{ render_field(form.first_name) }}  {{ render_field(form.last_name) }}
+            {{ render_field(form.first_name, cols="40", rows="1", maxlength=64) }}
+            {{ render_field(form.last_name, cols="40", rows="1", maxlength=64) }}
             {{ render_field(form.diet)  }}
-            {{ render_field(form.diet_reason)  }}
-            {{ render_field(form.email)  }}
-            {{ render_field(form.password)  }} {{ render_field(form.password2)  }}
+            {{ render_field(form.diet_reason, cols="55", rows="4", maxlength=128)  }}
+            {{ render_field(form.email, cols="40", rows="1")  }}
+            {{ render_field(form.password, cols="40", rows="1", maxlength=50)   }}
+            {{ render_field(form.password2, cols="40", rows="1", maxlength=50)   }}
             </dl>
             
             <p><input type=submit class="btn btn-success" value=Register>

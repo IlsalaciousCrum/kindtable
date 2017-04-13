@@ -1,12 +1,12 @@
-function showCurrentAvoid(results) {
+function showCurrentAvoids(results) {
+    "use strict";
     console.dir(results); // for debugging
-    $("#avoid").load(location.href + " #avoid");
-    $(".modal.in").modal("hide");
-    $('#addavoid').modal('show');
+    $(".avoids").load(location.href + " #avoids");
+    $(".modal.in").find('form')[0].reset();
 }
 
-
 $(document).ready(function() {
+    "use strict";
     $('#addAvoidForm').on('submit', (function(event) {
         event.preventDefault();
         var url = $('#addAvoidForm').attr('action');
@@ -14,7 +14,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#addAvoidForm').serialize(),
-            success: showCurrentAvoid
+            success: showCurrentAvoids
         });
     }));
 

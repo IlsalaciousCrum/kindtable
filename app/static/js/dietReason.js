@@ -1,11 +1,14 @@
 function showCurrentDietReason(results) {
+    "use strict";
     console.dir(results); // for debugging
     $(".modal.in").modal("hide");
-    $("#dietReason").load(location.href + " #dietReason");
+    $("#dietReasonModal").find('form')[0].reset();
+    $(".dietReason").load(location.href + " #dietReason");
 }
 
 
 $(document).ready(function() {
+    "use strict";
     $('#changeDietReason').on('submit', (function(event) {
         event.preventDefault();
         var url = $('#changeDietReason').attr('action');

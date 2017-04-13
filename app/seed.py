@@ -14,8 +14,8 @@ def LoadSeedData():
     Diet.create_record(diet_id=4, diet_type="ovo vegetarian", description="vegetarianism which allows for the consumption of eggs but not dairy products", ranking=4)
     Diet.create_record(diet_id=5, diet_type="lacto vegetarian", description="vegetarian who abstains from eating meat and eggs, but who eats dairy products", ranking=5)
     Diet.create_record(diet_id=6, diet_type="pescatarian", description="does not eat meat but does eat fish.", ranking=6)
-    Diet.create_record(diet_id=7, diet_type="paleo", description="it's complex, but basically dairy, no gluten, corn, sugar or processed foods", ranking=7)
-    Diet.create_record(diet_id=8, diet_type="primal", description="it's complex, but basically no gluten, corn, sugar or processed foods", ranking=8)
+    Diet.create_record(diet_id=7, diet_type="paleo", description="it's complex, but basically no dairy, no gluten, no corn, no sugar nor processed foods", ranking=7)
+    Diet.create_record(diet_id=8, diet_type="primal", description="it's complex, but basically no gluten, no corn, no sugar nor processed foods", ranking=8)
     Diet.create_record(diet_id=9, diet_type="whole 30", description="It's complex. No processed foods and few ingredients", ranking=9)
     Diet.create_record(diet_id=10, diet_type="any", description="does not follow any limiting diet", ranking=10)
 

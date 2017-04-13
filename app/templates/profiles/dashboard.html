@@ -1,382 +1,330 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block content %}  
+
+<!-- Modals -->
+
+<div class="modal fade" id="firstNameModal" tabindex="-1" role="dialog" aria-labelledby="changeFirstNameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeFirstNameModalLabel">Change First Name</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.changefirstname') }}" class="form form-horizontal" method="post" role="form" id="changeFirstName">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_field(first_name_form.first_name, cols="40", rows="1") }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>  
+            </div>
+        </div>
+        <script src="../static/js/firstName.js"></script>
+    </div>
+</div>
+
+<div class="modal fade" id="lastNameModal" tabindex="-1" role="dialog" aria-labelledby="changeLastNameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeLastNameModalLabel">Change Last Name</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.changelastname') }}" class="form form-horizontal" method="post" role="form" id="changeLastName">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_field(last_name_form.last_name, cols="40", rows="1") }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>  
+            </div>
+        </div>
+    </div>
+    <script src="../static/js/lastName.js"></script>
+</div>
+
+<div class="modal fade" id="dietModal" tabindex="-1" role="dialog" aria-labelledby="changeDietModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeDietModalLabel">Change Diet Type</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.changediet') }}" class="form form-horizontal" method="post" role="form" id="changeDiet">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_field(diet_form.diet) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>  
+            </div>
+        </div>
+    </div>
+    <script src="../static/js/diet.js"></script>
+</div>
 
 
+<div class="modal fade" id="dietReasonModal" tabindex="-1" role="dialog" aria-labelledby="changeDietReasonModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changeDietReasonModalLabel">Change Diet Reason</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.changedietreason') }}" class="form form-horizontal" method="post" role="form" id="changeDietReason">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_field(diet_reason_form.diet_reason, cols="65", rows="4", maxlength=128) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                    </form>
+                    <script src="/static/js/dietReason.js"></script>
+                </div>             
+            </div>
+        </div>
+    </div>            
+</div>
+
+
+<div class="modal fade" id="addAvoidModal" tabindex="-1" role="dialog" aria-labelledby="addAvoidModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAvoidModalLabel">Add an Ingredient to Avoid</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.addavoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_field(add_avoid_form.avoidance, cols="40", rows="1") }}
+                        {{ render_field(add_avoid_form.reason, cols="65", rows="4", maxlength=128) }}
+                        <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
+                            Close
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/addAvoid.js"></script>
+</div>
+
+<div class="modal fade" id="updateAvoidModal" tabindex="-1" role="dialog" aria-labelledby="addAvoidModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addAvoidModalLabel">Add an Ingredient to Avoid</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.addavoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_field(add_avoid_form.avoidance, cols="40", rows="1") }}
+                        {{ render_field(add_avoid_form.reason, cols="65", rows="4", maxlength=128) }}
+                        <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
+                            close
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/static/js/addAvoid.js"></script>
+</div>
+
+
+<!-- Begin content -->
+
+    
     <div class="row well-spaced" style="padding-top: 3em">
         <div class="col-md-4 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
-                <h3>My Profile</h3>
-                    <span class="text-muted small">Last updated {{ moment(profile.last_updated).format('LLLL') }}</span><br><br>
+                <h3>Profile</h3>
+                <div class='lastUpdated'>
+                    <div id='lastUpdated' class="text-muted small" style='padding-bottom: 1em'>
+                        Last updated {{ moment(profile.last_updated).format('LLLL') }}
+                    </div>
+                </div>
+                <div class="first">
+                    <div id="first">
+                        <a href="#" data-toggle="modal" data-target="#firstNameModal">
+                            <span class="glyphicon glyphicon-pencil text-info" title="Change your first name" aria-hidden="true"></span>
+                        </a>&emsp; <strong>First Name:</strong>&emsp;{{  profile.first_name  }}
+                    </div>
+                </div>
+                <div class="last">
+                    <div id="last">
+                        <a href="#" data-toggle="modal" title="Change your last name" data-target="#lastNameModal">
+                            <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
+                        </a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }}
+                    </div>
+                </div>
 
-                    <div class="col">            
+                <div id="email">
+                    <a href="{{  url_for('auth.change_email')  }}" >
+                        <span class="glyphicon glyphicon-pencil text-info" title="Change your email address. Caution: This is also how your friends find you on KindTable" aria-hidden="true"></span>
+                    </a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}
+                </div>
 
+                <div class="dietType">
+                    <div id="dietType">
+                        <a href="#" data-toggle="modal" data-target="#dietModal">
+                            <span class="glyphicon glyphicon-pencil text-info" title="Change the diet you follow" aria-hidden="true"></span>
+                        </a>&emsp; <strong>Diet you generally follow:</strong>&emsp;{{  profile.diet.diet_type  }}
+                    </div>
+                </div>
 
-                        
+                <div class="dietReason">
+                    <div id="dietReason">
+                        <a href="#" data-toggle="modal" data-target="#dietReasonModal">
+                            <span class="glyphicon glyphicon-pencil text-info" title="Change the reason you follow this diet. This information is shown to hosts to help them decide what to make for other guests." aria-hidden="true"></span>
+                        </a>&emsp; <strong>Diet reason:</strong>&emsp;{{  profile.diet_reason  }}
+                    </div>
+                </div>
 
-                        <div id="first"><a href="#" data-toggle="modal" data-target="#firstNameModal"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a> &emsp;<strong>First Name:</strong>&emsp;{{  profile.first_name  }}</div>
-
-                        <div id="last"><a href="#" data-toggle="modal" data-target="#lastNameModal"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }}</div>
-
-                        <div id="email"><a href="{{  url_for('auth.change_email')  }}" ><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}</div>
-
-                        <div id="dietType"><a href="#" data-toggle="modal" data-target="#dietModal"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet type:</strong>&emsp;{{  profile.diet.diet_type  }}</div>
-
-                        <div id="dietReason"><a href="#" data-toggle="modal" data-target="#dietReasonModal"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Diet reason:</strong>&emsp;{{  profile.diet_reason  }}<br><br></div>
-
-                        
+                <div class='intols'>
+                    <div id='intols' style="padding-top: 1em">
                         {% if profile.intolerances %}
-                        <a href="#" data-toggle="modal" data-target="#intols"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&emsp; <strong>Allergies/intolerances:</strong>
-                        {% if profile.intolerances %}
-                        <ul>{% for intolerance in profile.intolerances %}<li style="list-style: none;"><b>{{ intolerance.intol_name }}</b></li>{% if not loop.last %}, {% endif %}{% endfor %}
-                        </ul><br>
-                        {% endif %}<br><br>
+                            <a href="#" data-toggle="modal" data-target="#addIntols">
+                                <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
+                            </a>&emsp; <strong>Allergies/intolerances:</strong>
+                            <ul>
+                                {% for intolerance in profile.intolerances %}
+                                    <li style="list-style: none;">
+                                        <b>{{ intolerance.intol_name }}</b>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         {% else %}
-                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#intols">add</button>&emsp;<span class="text-muted strong">No allergies/intolerances added yet</span><br><br> 
-                        {% endif %}
-
-                        <div id="avoid">
-                        {% if profile.avoidances %}
-                         <a href="#" data-toggle="modal" data-target="#addavoid"><span class="glyphicon glyphicon-plus text-info" aria-hidden="true"></span></a>
-                        </a>&emsp;<strong>Ingredients to avoid:</strong> 
-                        {% if profile.avoidances %}
-                        <ul>
-                            {% for avoid in profile.avoidances %}
-                                <div id="avoid{{ avoid.avoid_id  }}"><li style="list-style: none;"><a href="#" data-toggle="modal" data-target="#updateavoid{{ avoid.avoid_id  }}"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></a>&ensp;<strong>{{ avoid.ingredient }}</strong> - (<i>{{ avoid.reason}}</i>)</li></div>
-                            {% endfor %}
-                        </ul>
-                        {% endif %}
-                        {% else %}
-                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addavoid">add</button>&emsp;<span class="text-muted strong">No ingredients to avoid added yet</span> 
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addIntols">add</button>&emsp;<span class="text-muted strong">No allergies/intolerances added yet</span>
                         {% endif %}
                     </div>
+                </div>
 
-                        <h3>Friends</h3>
-                        {% if friends %}
-                        <ul>{% for friend in friends %}
-                            <li>
-                                <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.friend_profile.profile_id) }}">{{ friend.friend_profile.first_name }} {{friend.friend_profile.last_name  }}</a> <span class="text-muted">({{  friend.friend_profile.email  }})</span></li>{% if not loop.last %} {% endif %}{% endfor %}
-                        </ul>
+                <div class='avoids'>
+                    <div id="avoids" style="padding-top: 1em">
+                        {% if profile.avoidances %}
+                            <a href="#" data-toggle="modal" data-target="#addAvoidModal" title="Add another ingredient to avoid">
+                                <span class="glyphicon glyphicon-plus text-info" aria-hidden="true"></span>
+                            </a>&emsp;<strong>Ingredients to avoid:</strong> 
+                            <ul>
+                                {% for avoid in profile.avoidances %}
+                                    <li style="list-style: none;">
+                                        <a href="#" data-toggle="modal" data-target="#updateAvoid{{ avoid.avoid_id  }}">
+                                            <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
+                                        </a>&ensp;<strong>{{ avoid.ingredient }}</strong> - (<i>{{ avoid.reason}}</i>)
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         {% else %}
-                        <span class="text-muted strong">No friends added yet.</span>
+                            <button type="button" class="btn btn-sm btn-default" title="Add some ingredients you would like to avoid" data-toggle="modal" data-target="#addAvoidModal">add</button>&emsp;<span class="text-muted strong">No ingredients to avoid added yet</span> 
                         {% endif %}
-
-                        <h3>Bookmarked recipes</h3>
-                        {% if recipes %}
-                        <ul>
-                            {% for recipe in recipes %}
-                            <li>
-                                <a href="{{ url_for('profiles.show_recipe_profile', recipe_id=recipe.recipes.recipe_record_id) }}">{{ recipe.recipes.title }}
-                            </li>
-                            {% if not loop.last %} {% endif %}{% endfor %}
-                        </ul><br>
-                        {% else %}
-                        <span class="text-muted strong">No recipes bookmarked yet</span>
-
-                        {% endif %}<br><br>
                     </div>
+                </div>
+
             </div>
         </div>
 
         <div class="col-md-5 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
-                <h1>Parties</h1>
-                    <div class="col">
-                        {% if parties %}
-                            {% for party in parties %}
-                                <h3><a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">{{ party.title}}</a></h3>
-                                <strong>Date:</strong>&emsp; {{ moment(party.datetime_of_party).format('LLLL') }}<br>
-
-                                <strong>Friends invited:</strong>&emsp;
-                                {% if party.guest_profiles %}
-                                <ul>
-                                    {% for guest in party.guest_profiles %}
-                                        {% if guest.first_name %}
-                                            <li>{{  guest.first_name  }} {{  guest.last_name  }}</li>
-                                        {% else %}
-                                            <li>{{  guest.email  }}</li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-                                {% else %}
-                                    <span class="text-muted strong">No guests invited yet</span>
-                                {% endif %}<br>
-                                <strong>Cuisine:</strong>&emsp;{% if party.cuisine %}{{  party.cuisine  }}{% else %}<span class="text-muted strong">None</span>{% endif %}<br>
-                                <strong>Diets:</strong>
-                                {% if party.guest_profiles %} 
-                                    {% for guest in party.guest_profiles %}
-                                        {{ guest.diet.diet_type }}{% if not loop.last %}, {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    <span class="text-muted strong">None</span>
-                                {% endif %}<br>
-                                
-                                <strong>Ingredients to avoid:</strong>
-                                {% if party.guest_profiles %} 
-                                    {% for guest in party.guest_profiles %}
-                                        {% for avoid in guest.avoidances %}
-                                            {{ avoid.ingredient }}{% if not loop.last %}, {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                {% else %}
-                                    <span class="text-muted strong">None</span>
-                                {% endif %}<br>
-                                <strong>Allergies/Intolerances:</strong>{% if party.guest_profiles %} 
-                                    {% for guest in party.guest_profiles %}
-                                        {% for intol in guest.intolerances %}
-                                            {{ intol.intol_name }}{% if not loop.last %}, {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                {% else %}
-                                    <span class="text-muted strong">None</span>
-                                {% endif %}<br>
-                                <strong>Party recipes:</strong>
-                                {% if party.recipes %}
-                                    <ul>
-                                    {% for recipe in party.recipes %}
-                                        <li><a href="{{ url_for('profiles.show_recipe_profile', recipe_id=recipe.recipe_record_id) }}">{{ recipe.title}}</a></li>
-                                    <ul>
-                                    {% endfor %}
-                                {% else %}
-                                <span class="text-muted strong">No recipes bookmarked yet</span>
-                                {% endif %}<br>
-                                <hr>
+                <div id="friends">
+                    <h3>Friends</h3>
+                    {% if friends %}
+                        <ul>
+                            {% for friend in friends %}
+                                <li>
+                                    <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.friend_profile.profile_id) }}">
+                                        {{ friend.friend_profile.first_name }} {{friend.friend_profile.last_name  }}
+                                    </a> <span class="text-muted">({{  friend.friend_profile.email  }})</span>
+                                </li>
                             {% endfor %}
-                        {% else %}
-                                <span class="text-muted strong">No parties created yet</span>
-                        {% endif %}
-                    </div>
-            </div>
-        </div>
-    </div> 
-
-
-<!-- Modal -->
-<div id="firstNameModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Update First Name</h4>
-            </div>
-            <div class="modal-body">
-                <div class = "row round_hidden_div" style="padding-top: 2em">
-                    {% from "_formhelpers.html" import render_inline_field %}
-                    <form action="{{ url_for('profiles.changefirstname') }}" class="form form-horizontal" method="post" role="form" id="changeFirstName">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_inline_field(first_name_form.first_name) }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                    </form>
+                        </ul>
+                    {% else %}
+                        <span class="text-muted strong">No friends added yet.</span>
+                    {% endif %}
                 </div>
-                <script src="/static/js/firstName.js"></script>      
-            </div>
-        </div>
-    </div>
-</div>
 
-
-<!-- Modal -->
-<div id="lastNameModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Update Last Name</h4>
-            </div>
-            <div class="modal-body">
-                 <div class = "row round_hidden_div" style="padding-top: 2em">
-                    {% from "_formhelpers.html" import render_inline_field %}
-                    <form action="{{ url_for('profiles.changelastname') }}" class="form form-horizontal" method="post" role="form" id="changeLastName">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                            {{ render_inline_field(last_name_form.last_name) }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                    </form>
+                <div id="recipes">
+                <h3>Bookmarked recipes</h3>
+                    {% if recipes %}
+                        <ul>
+                            {% for recipe in recipes %}
+                                <li>
+                                    <a href="{{ url_for('profiles.show_recipe_profile', recipe_id=recipe.recipes.recipe_record_id) }}">{{ recipe.recipes.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted strong">No recipes bookmarked yet</span>
+                    {% endif %}
                 </div>
-                <script src="/static/js/lastName.js"></script>     
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Modal -->
-<div id="dietModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" class="modal-title" id="updateDietModal">Update Diet</h4>
-            </div>
-            <div class="modal-body">
-                 <div class = "row round_hidden_div" style="padding-top: 2em">
-                    {% from "_formhelpers.html" import render_inline_field %}
-                    <form action="{{ url_for('profiles.changediet') }}" class="form form-horizontal" method="post" role="form" id="changeDiet">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                            {{ render_inline_field(diet_form.diet) }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                    </form>
+                <h3>Upcoming Parties</h3>
+                <div id="upcomingparties">
+                    {% if upcoming_parties %}
+                        <ul>
+                            {% for party in upcoming_parties %}
+                                <li>
+                                    <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
+                                        <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted strong">No upcoming parties. Time to plan some!</span>
+                    {% endif %}
                 </div>
-                <script src="/static/js/diet.js"></script>                           
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Modal -->
-<div id="dietReasonModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Update Diet Reason</h4>
-            </div>
-            <div class="modal-body">
-                        
-                <div class="modal-body">
-                    <div class = "row round_hidden_div" style="padding-top: 2em">
-                        {% from "_formhelpers.html" import render_field %}
-                        <form action="{{ url_for('profiles.changedietreason') }}" class="form form-horizontal" method="post" role="form" id="changeDietReason">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                                {{ render_field(diet_reason_form.diet_reason, cols="65", rows="5", maxlength=128) }}
-                            <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                        </form>
-                    </div>
-                    <script src="/static/js/dietReason.js"></script>                           
+                <h3>Past Parties</h3>
+                <div id="pastparties">
+                    {% if past_parties %}
+                        <ul>
+                            {% for party in past_parties %}
+                                <li>
+                                    <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
+                                        <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted strong">No past parties</span>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal -->
-
-<!-- Modal -->
-<div id="intols" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Update Allergies/Intolerances</h4>
-            </div>
-            <div class="modal-body">
-                        
-                <p>This is a placeholder for the update avoidances modal</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="addavoid" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Add Ingredients To Avoid</h4>
-            </div>
-            <div class="modal-body">        
-                <div class = "row round_hidden_div" style="padding: 2em">
-                    <span style="padding-bottom: 2em"><b>Please add one new ingredient you would like to avoid at a time.</b><br><br>
-                        <form action="{{ url_for('profiles.addavoid') }}" class="form form-horizontal" method="post" role="form" id="addAvoidForm">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}">
-                                {{ render_field(avoid_form.avoidance) }}
-                                {{ render_field(avoid_form.reason, cols="65", rows="5", maxlength=128) }}
-
-                                 <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
-                            <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                        </form>
-                    </div>
-                    <script src="/static/js/addavoid.js"></script>                           
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{% for avoid in profile.avoidances %}
-<div id="updateavoid{{  avoid.avoid_id  }}" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Update an Ingredient to Avoid</h4>
-            </div>
-            <div class="modal-body">        
-                <div class = "row round_hidden_div" style="padding-top: 2em">
-                        
-                   
-                        {% from "_formhelpers.html" import render_field %}
-                        <form action="{{ url_for('profiles.updateavoid') }}" class="form form-horizontal" method="post" role="form" id="updateAvoidForm{{  avoid.avoid_id  }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                            <input type="hidden" name="avoid_id" value="{{  avoid.avoid_id  }}"/>
-
-                                {% set f = avoid_form.reason.process_data(avoid.reason) %}
-
-                                {{ render_field(avoid_form.avoidance, value=avoid.ingredient) }}
-                                {{ render_field(avoid_form.reason, cols="50", rows="3", maxlength=128) }}
-
-                                <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
-                            <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                        </form>
-                    </div>
-                    <script>
-
-                        function showCurrentAvoid(results) {
-                            console.dir(results); // for debugging
-                            $("#avoid{{  avoid.avoid_id  }}").load(location.href + " #avoid{{ avoid.avoid_id  }}");
-                            $(".modal.in").modal("hide");
-                        }
-
-
-                        $(document).ready(function() {
-                            $('#updateAvoidForm{{ avoid.avoid_id  }}').on('submit', (function(event) {
-                                event.preventDefault();
-                                var url = $('#avoid{{  avoid.avoid_id  }}').attr('action');
-                                $.ajax({
-                                    type: "POST",
-                                    url: url,
-                                    data: $('##avoid{{  avoid.avoid_id  }}').serialize(),
-                                    success: showCurrentAvoid
-                                });
-                            }));
-
-                        $.ajaxSetup({
-                            beforeSend: function(xhr, settings) {
-                                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
-                                }
-                            }
-                        });
-                    });
-
-
-                    </script>                           
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endfor %}
-
-
-<script>
-    "use strict";
-    $("#addIntol").click(function(){
-        $("#addIntol").hide();
-        $("#addIntolForm").toggle();
-        console.log("show form");
-    });
-</script>
 {% endblock %}

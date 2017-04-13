@@ -1,11 +1,14 @@
 function showCurrentDiet(results) {
+    "use strict";
     console.dir(results); // for debugging
     $(".modal.in").modal("hide");
-    $("#dietType").load(location.href + " #dietType");
+    $("#dietModal").find('form')[0].reset();
+    $(".dietType").load(location.href + " #dietType");
 }
 
 
 $(document).ready(function() {
+    "use strict";
     $('#changeDiet').on('submit', (function(event) {
         event.preventDefault();
         var url = $('#changeDiet').attr('action');

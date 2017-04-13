@@ -1,11 +1,14 @@
 function showCurrentLastName(results) {
+    "use strict";
     console.dir(results); // for debugging
     $(".modal.in").modal("hide");
-    $("#last").load(location.href + " #last");
+    $("#lastNameModal").find('form')[0].reset();
+    $(".last").load(location.href + " #last");
 }
 
 
 $(document).ready(function() {
+    "use strict";
     $('#changeLastName').on('submit', (function(event) {
         event.preventDefault();
         var url = $('#changeLastName').attr('action');

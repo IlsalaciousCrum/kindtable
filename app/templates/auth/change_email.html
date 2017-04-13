@@ -16,9 +16,9 @@
             {% from "_formhelpers.html" import render_field %}
             <form class="form form-horizontal" method="post" role="form" id="changeEmail">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    {{ render_field(form.email) }}
-                    {{ render_field(form.email2) }}
-                    {{ render_field(form.password) }}<br>
+                    {{ render_field(form.email, cols="40", rows="1", maxlength=200) }}
+                    {{ render_field(form.email2, cols="40", rows="1", maxlength=200) }}
+                    {{ render_field(form.password, cols="40", rows="1") }}<br>
                 <input type="submit" class="btn btn-sm btn-default" value="Submit">
             </form>
         </div>   

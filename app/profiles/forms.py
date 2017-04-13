@@ -12,22 +12,27 @@ from flask import flash, redirect, url_for
 
 class FirstNameForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
-    first_name = StringField('Change first name to:', validators=[InputRequired(message="Please tell us what to you call you."),
-                                                                  Length(1, 64, message="Limit 64 characters")])
+    first_name = StringField('Change first name to:',
+                             widget=TextArea(),
+                             validators=[InputRequired(message="Please tell us what to you call you."),
+                                         Length(1, 64, message="Limit 64 characters")])
     submit = SubmitField('Update')
 
 
 class LastNameForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
-    last_name = StringField('Last name:', validators=[InputRequired(message="Please tell us a last name to use for you."),
-                                                      Length(1, 64, message="Limit 64 characters")])
+    last_name = StringField('Last name:',
+                            widget=TextArea(),
+                            validators=[InputRequired(message="Please tell us a last name to use for you."),
+                                        Length(1, 64, message="Limit 64 characters")])
     submit = SubmitField('Update')
 
 
 class DietForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     diets = Diet.query.order_by(Diet.diet_type).all()
-    diet = RadioField('Diet you follow:', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
+    diet = RadioField('Diet you follow:',
+                      choices=[(diet.diet_id, '{} - <span class="text-muted small">{}</span>'.format(diet.diet_type, diet.description)) for diet in diets],
                       validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
     submit = SubmitField('Update')
 
@@ -45,22 +50,42 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = widgets.CheckboxInput()
 
 
-class IntoleranceForm(Form):
+class AddIntoleranceForm(Form):
     profile_id = HiddenField()
     intolerance_query = Intolerance.query.order_by(Intolerance.intol_name).all()
     intolerances = [(intol.intol_name, intol.intol_description) for intol in intolerance_query]
     example = MultiCheckboxField('Label', choices=intolerances)
 
 
-class AvoidForm(Form):
+class AddAvoidForm(Form):
+    profile_id = HiddenField()
+    avoid_id = HiddenField()
+    avoidance = StringField('Ingredient to avoid:',
+                            widget=TextArea(),
+                            validators=[InputRequired(message="Please enter an ingredient to avoid."),
+                                        Length(1, 64, message="Limit 64 characters")])
+    reason = TextField('Reason you would like to avoid this ingredient:',
+                       widget=TextArea(),
+                       validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
+    submit = SubmitField('Update')
+
+
+class UpdateAvoidForm(Form):
     profile_id = HiddenField()
     avoid_id = HiddenField()
     avoidance = StringField('Change ingredient to avoid:',
+                            widget=TextArea(),
                             validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
                                         Length(1, 64, message="Limit 64 characters")])
     reason = TextField('Change the reason you avoid this ingredient:',
                        widget=TextArea(),
-                       validators=[Length(1, 128, message="Limit 128 characters")])
+                       validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
+    submit = SubmitField('Update')
+
+
+class DeleteAvoidForm(Form):
+    profile_id = HiddenField()
+    avoid_id = HiddenField()
     submit = SubmitField('Update')
 
 

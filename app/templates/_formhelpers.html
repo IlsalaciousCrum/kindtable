@@ -25,6 +25,13 @@
 {% endmacro %}
 
 
+{% macro render_checkbox_field(field) %}
+<div class="form-check">
+  <label class="form-check-label">
+    {{ field(type='checkbox', **kwargs) }} {{ field.label }}
+  </label>
+</div>
+{%- endmacro %}
 
 <!-- http://bear-z.com/python/render-bootstrap-3-forms-with-wtforms-and-jinja/
  -->

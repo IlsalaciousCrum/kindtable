@@ -59,10 +59,10 @@ def process_reset():
             flash('An email with instructions to reset your password has been sent to you.', "success")
             return redirect(url_for('auth.login'))
         else:
-            flash('That email is not registered, please try another email address or register.')
+            flash('That email is not registered, please try another email address or register.', "danger")
             return redirect(url_for('auth.login'))
     else:
-        flash('That email is not registered, please try another email address or register.')
+        flash('That email is not registered, please try another email address or register.', "danger")
         return redirect(url_for('auth.login'))
 
 
@@ -81,7 +81,7 @@ def password_reset(token):
             flash('Your password has been updated.', 'success')
             return redirect(url_for('auth.login'))
         else:
-            flash("Something weird has happened")
+            flash("Something weird has happened", "danger")
             return redirect(url_for('main.index'))
     return render_template('auth/reset_password.html', form=form)
 
@@ -160,7 +160,7 @@ def change_email():
             flash('An email with instructions to reset your password has been sent to you.', "success")
             return redirect(url_for('auth.login'))
         else:
-            flash('Incorrect password. Please reenter your password.')
+            flash('Incorrect password. Please reenter your password.', "danger")
             render_template('auth/change_email.html',
                             form=form,
                             profile_id=current_user.profile.profile_id)

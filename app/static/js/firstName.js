@@ -1,11 +1,14 @@
 function showCurrentFirstName(results) {
+    "use strict";
     console.dir(results); // for debugging
     $(".modal.in").modal("hide");
-    $("#first").load(location.href + " #first");
+    $("#firstNameModal").find('form')[0].reset();
+    $(".first").load(location.href + " #first");
 }
 
 
 $(document).ready(function() {
+    "use strict";
     $('#changeFirstName').on('submit', (function(event) {
         event.preventDefault();
         var url = $('#changeFirstName').attr('action');
