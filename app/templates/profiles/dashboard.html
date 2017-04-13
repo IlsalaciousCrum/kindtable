@@ -147,11 +147,12 @@
             <div class="modal-body">
                 <div class = "row round_hidden_div" style="padding-top: 2em">
                 {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('profiles.addavoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
+                    <form action="{{ url_for('profiles.updateavoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_field(add_avoid_form.avoidance, cols="40", rows="1") }}
-                        {{ render_field(add_avoid_form.reason, cols="65", rows="4", maxlength=128) }}
+                        <input type="hidden" name="avoid_id" value="null"/>
+                        {{ render_field(update_avoid_form.avoidance, cols="40", rows="1", value="null") }}
+                        {{ render_field(update_avoid_form.reason, cols="65", rows="4", maxlength=128, value="null") }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
@@ -164,7 +165,6 @@
     </div>
     <script src="/static/js/addAvoid.js"></script>
 </div>
-
 
 <!-- Begin content -->
 
@@ -180,47 +180,47 @@
                 </div>
                 <div class="first">
                     <div id="first">
-                        <a href="#" data-toggle="modal" data-target="#firstNameModal">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#firstNameModal">
                             <span class="glyphicon glyphicon-pencil text-info" title="Change your first name" aria-hidden="true"></span>
-                        </a>&emsp; <strong>First Name:</strong>&emsp;{{  profile.first_name  }}
+                        </button>&emsp; <strong>First Name:</strong>&emsp;{{  profile.first_name  }}
                     </div>
                 </div>
                 <div class="last">
                     <div id="last">
-                        <a href="#" data-toggle="modal" title="Change your last name" data-target="#lastNameModal">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change your last name" data-target="#lastNameModal">
                             <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
-                        </a>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }}
+                        </button>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }}
                     </div>
                 </div>
 
                 <div id="email">
-                    <a href="{{  url_for('auth.change_email')  }}" >
+                    <button type="button" class="btn btn-sm btn-default" href="{{  url_for('auth.change_email')  }}" >
                         <span class="glyphicon glyphicon-pencil text-info" title="Change your email address. Caution: This is also how your friends find you on KindTable" aria-hidden="true"></span>
-                    </a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}
+                    </button>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}
                 </div>
 
                 <div class="dietType">
                     <div id="dietType">
-                        <a href="#" data-toggle="modal" data-target="#dietModal">
+                        <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#dietModal">
                             <span class="glyphicon glyphicon-pencil text-info" title="Change the diet you follow" aria-hidden="true"></span>
-                        </a>&emsp; <strong>Diet you generally follow:</strong>&emsp;{{  profile.diet.diet_type  }}
+                        </button>&emsp; <strong>Diet you generally follow:</strong>&emsp;{{  profile.diet.diet_type  }}
                     </div>
                 </div>
 
                 <div class="dietReason">
                     <div id="dietReason">
-                        <a href="#" data-toggle="modal" data-target="#dietReasonModal">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#dietReasonModal">
                             <span class="glyphicon glyphicon-pencil text-info" title="Change the reason you follow this diet. This information is shown to hosts to help them decide what to make for other guests." aria-hidden="true"></span>
-                        </a>&emsp; <strong>Diet reason:</strong>&emsp;{{  profile.diet_reason  }}
+                        </button>&emsp; <strong>Diet reason:</strong>&emsp;{{  profile.diet_reason  }}
                     </div>
                 </div>
 
                 <div class='intols'>
                     <div id='intols' style="padding-top: 1em">
                         {% if profile.intolerances %}
-                            <a href="#" data-toggle="modal" data-target="#addIntols">
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addIntols">
                                 <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
-                            </a>&emsp; <strong>Allergies/intolerances:</strong>
+                            </button>&emsp; <strong>Allergies/intolerances:</strong>
                             <ul>
                                 {% for intolerance in profile.intolerances %}
                                     <li style="list-style: none;">
@@ -237,15 +237,15 @@
                 <div class='avoids'>
                     <div id="avoids" style="padding-top: 1em">
                         {% if profile.avoidances %}
-                            <a href="#" data-toggle="modal" data-target="#addAvoidModal" title="Add another ingredient to avoid">
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addAvoidModal" title="Add another ingredient to avoid">
                                 <span class="glyphicon glyphicon-plus text-info" aria-hidden="true"></span>
-                            </a>&emsp;<strong>Ingredients to avoid:</strong> 
+                            </button>&emsp;<strong>Ingredients to avoid:</strong> 
                             <ul>
                                 {% for avoid in profile.avoidances %}
                                     <li style="list-style: none;">
-                                        <a href="#" data-toggle="modal" data-target="#updateAvoid{{ avoid.avoid_id  }}">
+                                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#exampleModal" data-whatever="{{ avoid.avoid_id  }}">
                                             <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
-                                        </a>&ensp;<strong>{{ avoid.ingredient }}</strong> - (<i>{{ avoid.reason}}</i>)
+                                        </button>&ensp;<strong>{{ avoid.ingredient }}</strong> - (<i>{{ avoid.reason}}</i>)
                                     </li>
                                 {% endfor %}
                             </ul>

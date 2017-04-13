@@ -231,6 +231,17 @@ def addavoid():
         return jsonify(data=form.errors)
 
 
+@profiles.route('/getavoid.json', methods=['GET'])
+@login_required
+@email_confirmation_required
+def getavoid():
+    """Takes an Ajax request and returns avoidance information"""
+
+    avoid_id = request.args.get("id")
+    avoidance = IngToAvoid.query.get(avoid_id)
+    return jsonify(data={'ingredient': avoidance.ingredient, 'reason': avoidance.reason})
+
+
 @profiles.route('/updateavoid.json', methods=['POST'])
 @login_required
 @email_confirmation_required
