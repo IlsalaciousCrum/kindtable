@@ -8,7 +8,7 @@ from ..models import User, Profile, Diet, Intolerance, RecipeBox, Party, PartyGu
 
 from flask_login import login_required, current_user
 
-from .forms import FirstNameForm, LastNameForm, DietForm, DietReasonForm, AddAvoidForm, FriendEmailForm, AddNewFriendForm, UpdateAvoidForm, DeleteAvoidForm, AddIntoleranceForm
+from .forms import FirstNameForm, LastNameForm, DietForm, DietReasonForm, AddAvoidForm, FriendEmailForm, AddNewFriendForm, UpdateAvoidForm, DeleteAvoidForm, IntoleranceForm
 
 from datetime import datetime
 
@@ -36,7 +36,11 @@ def show_dashboard():
     diet_reason_form.diet_reason.data = profile.diet_reason
     add_avoid_form = AddAvoidForm(request.form)
     update_avoid_form = UpdateAvoidForm(request.form)
-    add_intol_form = AddIntoleranceForm
+    intol_form = IntoleranceForm
+
+    intolerances = db.session.query(Intolerance.intol_id).filter(Intolerance.intol_id == ProfileIntolerance.intol_id, ProfileIntolerance.profil_id == profile.profile_id).all()
+    print intolerances
+    intol_form.intolerances.data = intolerances
 
     friends = user.friends
     past_parties = db.session.query(Party).filter(Party.user_id == current_user.id, Party.datetime_of_party < datetime.utcnow()).all()
@@ -44,12 +48,11 @@ def show_dashboard():
     upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id, Party.datetime_of_party >= datetime.utcnow()).all()
     print upcoming_parties
     diets = Diet.query.order_by(Diet.diet_type).all()
-    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
     recipes = RecipeBox.query.filter_by(user_id=user.id).all()
     return render_template("/profiles/dashboard.html",
                            friends=friends,
                            profile=profile,
-                           intol_list=intol_list,
+                           intol_form=intol_form,
                            diets=diets,
                            recipes=recipes,
                            first_name_form=first_name_form,
@@ -58,7 +61,7 @@ def show_dashboard():
                            diet_reason_form=diet_reason_form,
                            add_avoid_form=add_avoid_form,
                            update_avoid_form=update_avoid_form,
-                           add_intol_form=add_intol_form,
+                           intol_form=add_intol_form,
                            past_parties=past_parties,
                            upcoming_parties=upcoming_parties)
 
@@ -187,20 +190,30 @@ def changedietreason():
         return jsonify(data=form.errors)
 
 
-@profiles.route('/addintol.json', methods=['POST'])
+@profiles.route('/intol.json', methods=['POST'])
 @login_required
 @email_confirmation_required
-def addintol():
-    """Takes an Ajax request and adds and intolerance"""
+def intol():
+    """Takes an Ajax request and updates intolerances"""
 
-    form = AddIntoleranceForm(request.form)
+    form = IntoleranceForm(request.form)
     if form.validate():
         profile = Profile.query.get(form.profile_id.data)
-        ProfileIntolerance.create_record(ingredient=form.avoidance.data,
-                                         reason=form.reason.data,
-                                         profile_id=profile.profile_id)
-        profile.update({"last_updated": datetime.utcnow()})
-        return jsonify(data={'message': 'Ingredients to avoid added'})
+        profile_intolerances = ProfileIntolerances.query(profile_id).filter(ProfileIntolerances.profile_id == profile.profile_id).all()
+        print profile_intolerances
+        print form.intolerance.data
+        for intolerance in form.intolerance.data:
+            if intolerance in profile_intolerances:
+                pass
+            elif intolerance not in profile_intolerances:
+                ProfileIntolerance.create_record(profile_id=profile.profile_id, intol_id=intolerance)
+                profile.update({"last_updated": datetime.utcnow()})
+        for profile_intolerance in profile_intolerances:
+            if profile_intolerance not in form.intolerance.data:
+                intol = ProfileIntolerance.query.get(profile_intolerance)
+                intol.remove_intolerance()
+                profile.update({"last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Intolerances updated'})
     else:
         for error in errors:
             flash(u"Error in the %s field - %s" % (

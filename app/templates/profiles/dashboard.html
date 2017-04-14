@@ -106,7 +106,7 @@
 
 
 <div class="modal fade" id="addAvoidModal" tabindex="-1" role="dialog" aria-labelledby="addAvoidModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addAvoidModalLabel">Add an Ingredient to Avoid</h5>
@@ -170,6 +170,36 @@
     <script src="/static/js/updateAvoid.js"></script>
 </div>
 
+<div class="modal fade" id="IntolModal" tabindex="-1" role="dialog" aria-labelledby="addIntolModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addIntolModalLabel">Change Allergy/Intolerance Groups</h5>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.intol') }}" class="form form-horizontal" method="POST" role="form" id="IntolForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        {{ render_field(intol_form.intolerances) }}
+                        <p class = "text-muted">Selecting the allergy/intolerance groups that apply to you can help make sure that KindTable recipes will be safe for you. For example, gluten can be found in many <a href="https://celiac.org/live-gluten-free/glutenfreediet/sources-of-gluten/" title="The Celiac Disease Foundation's list of sources of gluten" target="_blank">non-wheat ingredients</a> and if you select gluten, we will be sure that recipes will not include those ingredients. But if you are sensitive only to wheat itself and not ingredients such as soy sauce, selecting "wheat" instead of "gluten" gives you and your hosts more options.</p>
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
+                            Close
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script src="/static/js/Intol.js"></script>
+    </div>
+</div>
+
 <!-- Begin content -->
 
     
@@ -222,18 +252,18 @@
                 <div class='intols'>
                     <div id='intols' style="padding-top: 1em">
                         {% if profile.intolerances %}
-                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addIntols">
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add another allergy/intolerance group" data-target="#IntolModal">
                                 <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
                             </button>&emsp; <strong>Allergies/intolerances:</strong>
                             <ul>
-                                {% for intolerance in profile.intolerances %}
+                                {% for intolerance in profile.intolerances|sort(attribute='intol_name') %}
                                     <li style="list-style: none;">
                                         <b>{{ intolerance.intol_name }}</b>
                                     </li>
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addIntols">add</button>&emsp;<span class="text-muted strong">No allergy/intolerance groups added yet</span>
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add an allergy/intolerance group" data-target="#IntolModal">add</button>&emsp;<span class="text-muted strong">No allergy/intolerance groups added yet</span>
                         {% endif %}
                     </div>
                 </div>

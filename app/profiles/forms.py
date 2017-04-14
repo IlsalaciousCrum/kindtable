@@ -1,7 +1,7 @@
 '''WTForms forms for app data collection'''
 
 from wtforms import Form, widgets, SelectMultipleField
-from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField
+from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField, SelectField
 from wtforms.validators import InputRequired, Length, Email, Optional, DataRequired
 from wtforms import ValidationError
 from wtforms.widgets import TextArea
@@ -50,11 +50,13 @@ class MultiCheckboxField(SelectMultipleField):
     option_widget = widgets.CheckboxInput()
 
 
-class AddIntoleranceForm(Form):
+class IntoleranceForm(Form):
     profile_id = HiddenField()
-    intolerance_query = Intolerance.query.order_by(Intolerance.intol_name).all()
-    intolerances = [(intol.intol_name, intol.intol_description) for intol in intolerance_query]
-    example = MultiCheckboxField('Label', choices=intolerances)
+    intol_query = Intolerance.query.order_by(Intolerance.intol_name).all()
+    intolerances = SelectField('Select all allergies and intolerance groups that apply to you',
+                               choices=[(intol.intol_id, '{} - <span class="text-muted small">{}</span>'.format(intol.intol_name, intol.intol_description)) for intol in intol_query],
+                               validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
+    submit = SubmitField('Update')
 
 
 class AddAvoidForm(Form):
@@ -80,12 +82,6 @@ class UpdateAvoidForm(Form):
     update_avoid_reason = TextField('Change the reason you avoid this ingredient:',
                                     widget=TextArea(),
                                     validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
-    submit = SubmitField('Update')
-
-
-class DeleteAvoidForm(Form):
-    profile_id = HiddenField()
-    avoid_id = HiddenField()
     submit = SubmitField('Update')
 
 

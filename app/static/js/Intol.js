@@ -1,30 +1,27 @@
-function showCurrentAvoid(results) {
+function showCurrentIntols(results) {
     "use strict";
     console.dir(results); // for debugging
-    $("#avoid").load(location.href + " #avoid");
-    $("#deleteAvoidForm")[0].reset();
+    $(".avoids").load(location.href + " #avoids");
     $(".modal.in").modal("hide");
-
 }
-
 
 $(document).ready(function() {
     "use strict";
-    $('#deleteAvoidForm').on('submit', (function(event) {
+    $('#intolForm').on('submit', (function(event) {
         event.preventDefault();
-        var url = $('#deleteAvoidForm').attr('action');
+        var url = $('#intolForm').attr('action');
         $.ajax({
             type: "POST",
             url: url,
-            data: $('#deleteAvoidForm').serialize(),
-            success: showCurrentAvoid
+            data: $('#intolForm').serialize(),
+            success: showCurrentIntols
         });
     }));
 
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", "{{ deleteAvoidForm.csrf_token._value() }}");
+                xhr.setRequestHeader("X-CSRFToken", "{{ form.csrf_token._value() }}");
             }
         }
     });
