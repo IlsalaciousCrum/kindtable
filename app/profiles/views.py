@@ -23,21 +23,26 @@ from datetime import datetime
 def show_dashboard():
     """Show logged in user's profile"""
 
+    session_token = session.get("session_token")
+    user = User.query.filter_by(session_token=session_token).first()
+    profile = user.profile
+
     first_name_form = FirstNameForm(request.form)
+    first_name_form.first_name.data = profile.first_name
     last_name_form = LastNameForm(request.form)
+    last_name_form.last_name.data = profile.last_name
     diet_form = DietForm(request.form)
     diet_reason_form = DietReasonForm(request.form)
+    diet_reason_form.diet_reason.data = profile.diet_reason
     add_avoid_form = AddAvoidForm(request.form)
     update_avoid_form = UpdateAvoidForm(request.form)
     add_intol_form = AddIntoleranceForm
-    session_token = session.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
+
     friends = user.friends
     past_parties = db.session.query(Party).filter(Party.user_id == current_user.id, Party.datetime_of_party < datetime.utcnow()).all()
     print past_parties
     upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id, Party.datetime_of_party >= datetime.utcnow()).all()
     print upcoming_parties
-    profile = user.profile
     diets = Diet.query.order_by(Diet.diet_type).all()
     intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
     recipes = RecipeBox.query.filter_by(user_id=user.id).all()
@@ -212,14 +217,14 @@ def addavoid():
 
     form = AddAvoidForm(request.form)
     if form.validate():
-        already_added = db.session.query(IngToAvoid).filter(IngToAvoid.ingredient == form.avoidance.data).all()
+        already_added = db.session.query(IngToAvoid).filter(IngToAvoid.ingredient == form.add_avoid_ingredient.data).all()
         if already_added:
             flash("We already know about that ingredient to avoid. Would you like to add a different one?", "warning")
             return redirect(url_for('profiles.show_dashboard'))
         else:
             profile = Profile.query.get(form.profile_id.data)
-            IngToAvoid.create_record(ingredient=form.avoidance.data,
-                                     reason=form.reason.data,
+            IngToAvoid.create_record(ingredient=form.add_avoid_ingredient.data,
+                                     reason=form.add_avoid_reason.data,
                                      profile_id=profile.profile_id)
             profile.update({"last_updated": datetime.utcnow()})
             return jsonify(data={'message': 'Ingredients to avoid added'})
@@ -252,10 +257,10 @@ def updateavoid():
     profile = Profile.query.get(form.profile_id.data)
     if form.validate():
         avoid = IngToAvoid.query.get(form.avoid_id.data)
-        if form.avoidance:
-            avoid.update({'ingredient': form.avoidance.data})
-        if form.reason:
-            avoid.update({'reason': form.reason.data})
+        if form.update_avoid_ingredient:
+            avoid.update({'ingredient': form.update_avoid_ingredient.data})
+        if form.update_avoid_reason:
+            avoid.update({'reason': form.update_avoid_reason.data})
         profile.update({"last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Ingredients to avoid updated'})
     else:
@@ -273,15 +278,10 @@ def updateavoid():
 def deleteavoid():
     """Takes an Ajax request and removes an existing ingredient to avoid"""
 
-    form = DeleteAvoidForm(request.form)
+    form = UpdateAvoidForm(request.form)
     profile = Profile.query.get(form.profile_id.data)
-    print "The profile is below"
-    print profile
-    print "avoid is is " + str(form.avoid_id.data)
     if form.validate():
         avoid = IngToAvoid.query.get(form.avoid_id.data)
-        print "The avoid object is below"
-        print avoid
         avoid.remove_avoidance()
         profile.update({"last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Ingredients to avoid updated'})

@@ -18,7 +18,7 @@
                     <form action="{{ url_for('profiles.changefirstname') }}" class="form form-horizontal" method="post" role="form" id="changeFirstName">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_field(first_name_form.first_name, cols="40", rows="1") }}
+                        {{ render_field(first_name_form.first_name,  cols="40", rows="1") }}
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
@@ -110,6 +110,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addAvoidModalLabel">Add an Ingredient to Avoid</h5>
+                <div id="flashedalert"></div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -120,8 +121,8 @@
                     <form action="{{ url_for('profiles.addavoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_field(add_avoid_form.avoidance, cols="40", rows="1") }}
-                        {{ render_field(add_avoid_form.reason, cols="65", rows="4", maxlength=128) }}
+                        {{ render_field(add_avoid_form.add_avoid_ingredient, cols="40", rows="1") }}
+                        {{ render_field(add_avoid_form.add_avoid_reason, cols="65", rows="4", maxlength=128) }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
@@ -131,39 +132,42 @@
                 </div>
             </div>
         </div>
+        <script src="/static/js/addAvoid.js"></script>
     </div>
-    <script src="/static/js/addAvoid.js"></script>
 </div>
 
-<div class="modal fade" id="updateAvoidModal" tabindex="-1" role="dialog" aria-labelledby="addAvoidModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateAvoidModal" tabindex="-1" role="dialog" aria-labelledby="updateAvoidModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" role="document">
             <div class="modal-header">
-                <h5 class="modal-title" id="addAvoidModalLabel">Add an Ingredient to Avoid</h5>
+                <h5 class="modal-title" id="updateAvoidModalLabel">Update an Ingredient You Would Like To Avoid</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <div class = "row round_hidden_div" style="padding-top: 2em">
+
+
                 {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('profiles.updateavoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
+                    <form action="{{ url_for('profiles.updateavoid') }}" class="form form-horizontal" method="POST" role="form" id="updateAvoidForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        <input type="hidden" name="avoid_id" value="null"/>
-                        {{ render_field(update_avoid_form.avoidance, cols="40", rows="1", value="null") }}
-                        {{ render_field(update_avoid_form.reason, cols="65", rows="4", maxlength=128, value="null") }}
+                        <input type="hidden" id="updateAvoidFormAvoidId" name="avoid_id"/>
+                        {{ render_field(update_avoid_form.update_avoid_ingredient, cols="40", rows="1") }}
+                        {{ render_field(update_avoid_form.update_avoid_reason, cols="65", rows="4", maxlength=128) }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
-                            close
-                        </button>
+                        <input type="submit" class="btn btn-sm btn-success" value="Submit">&emsp;
+                        <button type="button" class="btn btn-sm btn-warning" data-dismiss="modal" aria-label="Close">
+                            Cancel
+                        </button>&emsp;
+                        <button type="button" class="btn btn-sm btn-danger" id="deleteavoid" data-avoidID="">Delete This Ingredient To Avoid</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    <script src="/static/js/addAvoid.js"></script>
+    <script src="/static/js/updateAvoid.js"></script>
 </div>
 
 <!-- Begin content -->
@@ -194,9 +198,9 @@
                 </div>
 
                 <div id="email">
-                    <button type="button" class="btn btn-sm btn-default" href="{{  url_for('auth.change_email')  }}" >
+                    <a href="{{  url_for('auth.change_email')  }}" class="btn btn-sm btn-default">
                         <span class="glyphicon glyphicon-pencil text-info" title="Change your email address. Caution: This is also how your friends find you on KindTable" aria-hidden="true"></span>
-                    </button>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}
+                    </a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}
                 </div>
 
                 <div class="dietType">
@@ -229,7 +233,7 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addIntols">add</button>&emsp;<span class="text-muted strong">No allergies/intolerances added yet</span>
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addIntols">add</button>&emsp;<span class="text-muted strong">No allergy/intolerance groups added yet</span>
                         {% endif %}
                     </div>
                 </div>
@@ -239,11 +243,11 @@
                         {% if profile.avoidances %}
                             <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addAvoidModal" title="Add another ingredient to avoid">
                                 <span class="glyphicon glyphicon-plus text-info" aria-hidden="true"></span>
-                            </button>&emsp;<strong>Ingredients to avoid:</strong> 
+                            </button>&emsp;<strong>Ingredients you would like to avoid:</strong> 
                             <ul>
-                                {% for avoid in profile.avoidances %}
+                                {% for avoid in profile.avoidances|sort(attribute='ingredient') %}
                                     <li style="list-style: none;">
-                                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#exampleModal" data-whatever="{{ avoid.avoid_id  }}">
+                                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#updateAvoidModal" data-whatever="{{ avoid.avoid_id  }}">
                                             <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
                                         </button>&ensp;<strong>{{ avoid.ingredient }}</strong> - (<i>{{ avoid.reason}}</i>)
                                     </li>

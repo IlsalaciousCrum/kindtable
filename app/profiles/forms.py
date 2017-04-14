@@ -60,26 +60,26 @@ class AddIntoleranceForm(Form):
 class AddAvoidForm(Form):
     profile_id = HiddenField()
     avoid_id = HiddenField()
-    avoidance = StringField('Ingredient to avoid:',
-                            widget=TextArea(),
-                            validators=[InputRequired(message="Please enter an ingredient to avoid."),
-                                        Length(1, 64, message="Limit 64 characters")])
-    reason = TextField('Reason you would like to avoid this ingredient:',
-                       widget=TextArea(),
-                       validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
+    add_avoid_ingredient = StringField('Ingredient to avoid:',
+                                       widget=TextArea(),
+                                       validators=[InputRequired(message="Please enter an ingredient to avoid."),
+                                                   Length(1, 64, message="Limit 64 characters")])
+    add_avoid_reason = TextField('Reason you would like to avoid this ingredient:',
+                                 widget=TextArea(),
+                                 validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
 
 
 class UpdateAvoidForm(Form):
     profile_id = HiddenField()
     avoid_id = HiddenField()
-    avoidance = StringField('Change ingredient to avoid:',
-                            widget=TextArea(),
-                            validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
-                                        Length(1, 64, message="Limit 64 characters")])
-    reason = TextField('Change the reason you avoid this ingredient:',
-                       widget=TextArea(),
-                       validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
+    update_avoid_ingredient = StringField('Change ingredient to avoid:',
+                                          widget=TextArea(),
+                                          validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
+                                                      Length(1, 64, message="Limit 64 characters")])
+    update_avoid_reason = TextField('Change the reason you avoid this ingredient:',
+                                    widget=TextArea(),
+                                    validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
 
 

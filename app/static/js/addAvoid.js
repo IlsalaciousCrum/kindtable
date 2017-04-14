@@ -3,6 +3,7 @@ function showCurrentAvoids(results) {
     console.dir(results); // for debugging
     $(".avoids").load(location.href + " #avoids");
     $(".modal.in").find('form')[0].reset();
+    $("#flashedalert").html('<div class="alert alert-success"><strong>Success!</strong> Would you like to add another ingredient?</div>');
 }
 
 $(document).ready(function() {
