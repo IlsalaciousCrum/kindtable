@@ -170,9 +170,9 @@
     <script src="/static/js/updateAvoid.js"></script>
 </div>
 
-<div class="modal fade" id="IntolModal" tabindex="-1" role="dialog" aria-labelledby="addIntolModalLabel" aria-hidden="true">
+<div class="modal fade" id="intolModal" tabindex="-1" role="dialog" aria-labelledby="addIntolModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+        <div class="modal-content" role="document">
             <div class="modal-header">
                 <h5 class="modal-title" id="addIntolModalLabel">Change Allergy/Intolerance Groups</h5>
                 <div id="flashedalert"></div>
@@ -183,7 +183,7 @@
             <div class="modal-body">
                 <div class = "row round_hidden_div" style="padding-top: 2em">
                 {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('profiles.intol') }}" class="form form-horizontal" method="POST" role="form" id="IntolForm">
+                    <form action="{{ url_for('profiles.intol') }}" class="form form-horizontal" method="POST" role="form" id="intolsForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
                         {{ render_field(intol_form.intolerances) }}
@@ -252,18 +252,18 @@
                 <div class='intols'>
                     <div id='intols' style="padding-top: 1em">
                         {% if profile.intolerances %}
-                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add another allergy/intolerance group" data-target="#IntolModal">
-                                <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add another allergy/intolerance group" data-target="#intolModal">
+                                <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>&ensp; <span class="glyphicon glyphicon-plus text-info" aria-hidden="true"></span>
                             </button>&emsp; <strong>Allergies/intolerances:</strong>
                             <ul>
                                 {% for intolerance in profile.intolerances|sort(attribute='intol_name') %}
-                                    <li style="list-style: none;">
-                                        <b>{{ intolerance.intol_name }}</b>
+                                    <li>
+                                        <strong>{{ intolerance.intol_name }}</strong> - (<i>{{  intolerance.intol_description  }}</i>)
                                     </li>
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add an allergy/intolerance group" data-target="#IntolModal">add</button>&emsp;<span class="text-muted strong">No allergy/intolerance groups added yet</span>
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add an allergy/intolerance group" data-target="#intolModal">add</button>&emsp;<span class="text-muted strong">No allergy/intolerance groups added yet</span>
                         {% endif %}
                     </div>
                 </div>
@@ -295,7 +295,10 @@
         <div class="col-md-5 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
                 <div id="friends">
-                    <h3>Friends</h3>
+                    <h3>Friends&emsp; <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#firstNameModal">
+                            <span class="glyphicon glyphicon-plus text-info" title="Add friends" aria-hidden="true"></span>
+                    </button></h3>
+                    
                     {% if friends %}
                         <ul>
                             {% for friend in friends %}
@@ -325,7 +328,9 @@
                         <span class="text-muted strong">No recipes bookmarked yet</span>
                     {% endif %}
                 </div>
-                <h3>Upcoming Parties</h3>
+                <h3>Upcoming Parties&emsp; <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#firstNameModal">
+                            <span class="glyphicon glyphicon-plus text-info" title="Add a new party" aria-hidden="true"></span>
+                    </button></h3>
                 <div id="upcomingparties">
                     {% if upcoming_parties %}
                         <ul>

@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% block content %}  
+
+
+<!-- Modals -->
+
+
+<div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="inviteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="inviteModalLabel">Invite {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend.friend_profile.email }}{%endif %} To A Party</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% if upcoming_parties %}
+                        <strong>Parties already invited to:</strong>
+                        <ul>
+                            {% for party in upcoming_parties %}
+                                <li>
+                                    <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
+                                        <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.add_to_party') }}" class="form form-horizontal" method="POST" role="form" id="inviteForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
+                        {{ render_field(invite_form.parties) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
+                            Close
+                        </button>
+                    </form>
+                    <script src="/static/js/inviteFriendToParties.js"></script>
+                    {% else %}
+                    <span class="text-danger">Whoops! You will need to add at least one new party first before adding guests.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="modal fade" id="removeFriend" tabindex="-1" role="dialog" aria-labelledby="removeFriendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="removeFriendModalLabel">Remove a Friend</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                        
+                    <div class="alert alert-warning" role="alert">    
+                        <span class="text-danger">Caution: Are you sure this is what you want to do? All information you have saved about this friend will
+                            be permanently deleted. You can still add them again later as a new friend with a fresh start.
+                        </span>
+                    </div>
+
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.add_to_party') }}" class="form form-horizontal" method="POST" role="form" id="inviteForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
+                        <input type="submit" class="btn btn-lg btn-danger" value="Delete Friend"><br><br>
+                        
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
+                            Close
+                        </button>
+                    </form>
+                    <script src="/static/js/inviteFriendToParties.js"></script>
+                    
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Begin Content -->
+    
+    <div class="row well-spaced" style="padding-top: 3em">
+        <div class="col-md-4 col-md-offset-1">      
+            <div class = "row round_div" style="padding-top: 2em">
+                <h3>Profile</h3>
+                <div class='lastUpdated'>
+                    <div id='lastUpdated' class="text-muted small" style='padding-bottom: 1em'>
+                        Last updated {{ moment(friend_profile.last_updated).format('LLLL') }}
+                    </div>
+                </div>
+                <div class="first">
+                    <div id="first">
+                        <strong>First Name:</strong>&emsp;{{  friend_profile.first_name  }}
+                    </div>
+                </div>
+                <div class="last">
+                    <div id="last">
+                        <strong>Last Name:</strong>&emsp;{{  friend_profile.last_name  }}
+                    </div>
+                </div>
+
+                <div id="email">
+                    <strong>Email address:</strong>&emsp;{{  friend_profile.email  }}
+                </div>
+
+                <div class="dietType">
+                    <div id="dietType">
+                        <strong>Diet they generally follow:</strong>&emsp;{{  friend_profile.diet.diet_type  }}
+                    </div>
+                </div>
+
+                <div class="dietReason">
+                    <div id="dietReason">
+                        <strong>Diet reason:</strong>&emsp;{{  friend_profile.diet_reason  }}
+                    </div>
+                </div>
+
+                <div class='intols'>
+                    <div id='intols' style="padding-top: 1em">
+                        {% if friend_profile.intolerances %}
+                            <strong>Allergies/intolerances:</strong>
+                            <ul>
+                                {% for intolerance in friend_profile.intolerances|sort(attribute='intol_name') %}
+                                    <li>
+                                        <strong>{{ intolerance.intol_name }}</strong> - (<i>{{  intolerance.intol_description  }}</i>)
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-muted strong">No allergy/intolerance groups</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class='avoids'>
+                    <div id="avoids" style="padding-top: 1em">
+                        {% if friend_profile.avoidances %}
+                            <strong>Ingredients they would like to avoid:</strong> 
+                            <ul>
+                                {% for avoid in profile.avoidances|sort(attribute='ingredient') %}
+                                    <li style="list-style: none;">
+                                        <strong>{{ avoid.ingredient }}</strong> - (<i>{{ avoid.reason}}</i>)
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-muted strong">No ingredients to avoid</span> 
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div id="remove" style="padding-top: 1em">
+                    <button type="button" class="btn btn-sm btn-warning" href="#" data-toggle="modal" data-target="#removeFriend">
+                        Remove Friend
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-md-offset-1">      
+            <div class = "row round_div" style="padding-top: 2em">
+                
+                <h3>Upcoming Parties Invited To</h3>
+                <div class="upcomingParties">
+                    <div id="upcomingParties">
+                        <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#inviteModal">
+                                Invite To Parties
+                        </button><br><br>
+                        {% if upcoming_parties %}
+                            <ul>
+                                {% for party in upcoming_parties %}
+                                    <li>
+                                        <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
+                                            <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-muted strong">No upcoming parties.</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <h3>Past Parties Invited To</h3>
+                <div id="pastParties">
+                    {% if past_parties %}
+                        <ul>
+                            {% for party in past_parties %}
+                                <li>
+                                    <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
+                                        <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="text-muted strong">No past parties</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

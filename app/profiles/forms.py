@@ -1,11 +1,11 @@
 '''WTForms forms for app data collection'''
 
-from wtforms import Form, widgets, SelectMultipleField
-from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField, SelectField
+from wtforms import Form, widgets
+from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField, SelectMultipleField
 from wtforms.validators import InputRequired, Length, Email, Optional, DataRequired
 from wtforms import ValidationError
 from wtforms.widgets import TextArea
-from ..models import Profile, Diet, User, Intolerance
+from ..models import Profile, Diet, User, Intolerance, Party
 from .. import db
 from flask import flash, redirect, url_for
 
@@ -53,9 +53,9 @@ class MultiCheckboxField(SelectMultipleField):
 class IntoleranceForm(Form):
     profile_id = HiddenField()
     intol_query = Intolerance.query.order_by(Intolerance.intol_name).all()
-    intolerances = SelectField('Select all allergies and intolerance groups that apply to you',
-                               choices=[(intol.intol_id, '{} - <span class="text-muted small">{}</span>'.format(intol.intol_name, intol.intol_description)) for intol in intol_query],
-                               validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
+    intolerances = MultiCheckboxField('Select all allergies and intolerance groups that apply to you',
+                                      choices=[(intol.intol_id, '{} - <span class="text-muted small">{}</span>'.format(intol.intol_name, intol.intol_description)) for intol in intol_query],
+                                      coerce=int)
     submit = SubmitField('Update')
 
 
@@ -115,3 +115,19 @@ class AddNewFriendForm(Form):
             flash('Email address already registered. Please log in.')
             raise ValidationError('Email address already registered. Please log in.')
             return redirect(url_for('main.login'))
+
+
+class AddToPartiesForm(Form):
+    profile_id = HiddenField()
+    friend_profile_id = HiddenField()
+    party_query = Party.query.all()
+    parties = MultiCheckboxField('Invite to upcoming parties:',
+                                 choices=[(party.party_id, '{} - <span class="text-muted small">{}</span>'.format(party.title, party.datetime_of_party)) for party in party_query],
+                                 coerce=int)
+    submit = SubmitField('Update')
+
+
+class DeleteFriendForm(Form):
+    profile_id = HiddenField()
+    friend_profile_id = HiddenField()
+    submit = SubmitField('Update')

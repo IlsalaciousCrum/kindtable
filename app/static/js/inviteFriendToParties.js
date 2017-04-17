@@ -1,19 +1,19 @@
-function showCurrentIntols(results) {
+function showUpcomingParties(results) {
     "use strict";
     console.dir(results); // for debugging
-    $(".intols").load(location.href + " #intols");
+    $(".upcoming_parties").load(location.href + " #upcoming_parties");
     $(".modal.in").modal("hide");
 }
 
 $(document).ready(function() {
     "use strict";
-    $('#intolsForm').on('submit', (function(event) {
+    $('#inviteForm').on('submit', (function(event) {
         event.preventDefault();
-        var url = $('#intolsForm').attr('action');
+        var url = $('#inviteForm').attr('action');
         $.ajax({
             type: "POST",
             url: url,
-            data: $('#intolsForm').serialize(),
+            data: $('#inviteForm').serialize(),
             success: showCurrentIntols
         });
     }));

@@ -4,17 +4,15 @@ from . import profiles
 
 from .. import db
 
-from ..models import User, Profile, Diet, Intolerance, RecipeBox, Party, PartyGuest, IngToAvoid, ProfileIntolerance
+from ..models import User, Profile, Diet, Intolerance, RecipeBox, Party, PartyGuest, IngToAvoid, ProfileIntolerance, Friend
 
 from flask_login import login_required, current_user
 
-from .forms import FirstNameForm, LastNameForm, DietForm, DietReasonForm, AddAvoidForm, FriendEmailForm, AddNewFriendForm, UpdateAvoidForm, DeleteAvoidForm, IntoleranceForm
+from .forms import FirstNameForm, LastNameForm, DietForm, DietReasonForm, AddAvoidForm, UpdateAvoidForm, IntoleranceForm, AddToPartiesForm, DeleteFriendForm
 
 from datetime import datetime
 
 from ..decorators import email_confirmation_required
-
-from datetime import datetime
 
 
 @profiles.route('/dashboard', methods=['GET'])
@@ -36,17 +34,12 @@ def show_dashboard():
     diet_reason_form.diet_reason.data = profile.diet_reason
     add_avoid_form = AddAvoidForm(request.form)
     update_avoid_form = UpdateAvoidForm(request.form)
-    intol_form = IntoleranceForm
-
-    intolerances = db.session.query(Intolerance.intol_id).filter(Intolerance.intol_id == ProfileIntolerance.intol_id, ProfileIntolerance.profil_id == profile.profile_id).all()
-    print intolerances
-    intol_form.intolerances.data = intolerances
-
+    intol_form = IntoleranceForm(request.form)
+    profile_intolerances = db.session.query(ProfileIntolerance).filter(Intolerance.intol_id == ProfileIntolerance.intol_id, ProfileIntolerance.profile_id == profile.profile_id).all()
+    intol_form.intolerances.data = [(intol.intol_id) for intol in profile_intolerances]
     friends = user.friends
     past_parties = db.session.query(Party).filter(Party.user_id == current_user.id, Party.datetime_of_party < datetime.utcnow()).all()
-    print past_parties
     upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id, Party.datetime_of_party >= datetime.utcnow()).all()
-    print upcoming_parties
     diets = Diet.query.order_by(Diet.diet_type).all()
     recipes = RecipeBox.query.filter_by(user_id=user.id).all()
     return render_template("/profiles/dashboard.html",
@@ -61,33 +54,8 @@ def show_dashboard():
                            diet_reason_form=diet_reason_form,
                            add_avoid_form=add_avoid_form,
                            update_avoid_form=update_avoid_form,
-                           intol_form=add_intol_form,
                            past_parties=past_parties,
                            upcoming_parties=upcoming_parties)
-
-
-@profiles.route('/friendprofile/<int:friend_id>', methods=['GET'])
-@login_required
-@email_confirmation_required
-def show_friend_profile(friend_id):
-    """Show logged in user's friends profile"""
-
-    session_token = session.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-    friends = user.friends
-    parties = user.parties
-
-    newfriend = Profile.query.get(friend_id)
-    diets = Diet.query.order_by(Diet.diet_type).all()
-    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
-    parties = db.session.query(Party).filter(Party.party_id == PartyGuest.party_id, PartyGuest.profile_id == newfriend.profile_id).all()
-    return render_template("/profiles/friends_profile_page.html",
-                           newfriend=newfriend,
-                           diets=diets,
-                           intol_list=intol_list,
-                           parties=parties,
-                           friends=friends
-                           )
 
 
 @profiles.route('/party_profile/<int:party_id>')
@@ -126,7 +94,7 @@ def changefirstname():
         profile.update({"first_name": form.first_name.data, "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'First name updated'})
     else:
-        for error in errors:
+        for field, error in form.errors.items():
             flash(u"Error in the %s field - %s" % (
                   getattr(form, field).label.text,
                   error), 'danger')
@@ -145,7 +113,7 @@ def changelastname():
         profile.update({"last_name": form.last_name.data, "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Last name updated'})
     else:
-        for error in errors:
+        for field, error in form.errors.items():
             flash(u"Error in the %s field - %s" % (
                   getattr(form, field).label.text,
                   error), 'danger')
@@ -164,7 +132,7 @@ def changediet():
         profile.update({"diet_id": form.diet.data, "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Diet updated'})
     else:
-        for error in errors:
+        for field, error in form.errors.items():
             flash(u"Error in the %s field - %s" % (
                   getattr(form, field).label.text,
                   error), 'danger')
@@ -183,7 +151,7 @@ def changedietreason():
         profile.update({"diet_reason": form.diet_reason.data, "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Diet reason updated'})
     else:
-        for error in errors:
+        for field, error in form.errors.items():
             flash(u"Error in the %s field - %s" % (
                   getattr(form, field).label.text,
                   error), 'danger')
@@ -199,23 +167,22 @@ def intol():
     form = IntoleranceForm(request.form)
     if form.validate():
         profile = Profile.query.get(form.profile_id.data)
-        profile_intolerances = ProfileIntolerances.query(profile_id).filter(ProfileIntolerances.profile_id == profile.profile_id).all()
-        print profile_intolerances
-        print form.intolerance.data
-        for intolerance in form.intolerance.data:
+        query = db.session.query(ProfileIntolerance).filter(ProfileIntolerance.profile_id == profile.profile_id).all()
+        profile_intolerances = [(intol.intol_id) for intol in query]
+        for intolerance in form.intolerances.data:
             if intolerance in profile_intolerances:
                 pass
             elif intolerance not in profile_intolerances:
                 ProfileIntolerance.create_record(profile_id=profile.profile_id, intol_id=intolerance)
                 profile.update({"last_updated": datetime.utcnow()})
         for profile_intolerance in profile_intolerances:
-            if profile_intolerance not in form.intolerance.data:
-                intol = ProfileIntolerance.query.get(profile_intolerance)
+            if profile_intolerance not in form.intolerances.data:
+                intol = db.session.query(ProfileIntolerance).filter(ProfileIntolerance.intol_id == profile_intolerance, ProfileIntolerance.profile_id == profile.profile_id).one()
                 intol.remove_intolerance()
                 profile.update({"last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Intolerances updated'})
     else:
-        for error in errors:
+        for field, error in form.errors.items():
             flash(u"Error in the %s field - %s" % (
                   getattr(form, field).label.text,
                   error), 'danger')
@@ -242,7 +209,7 @@ def addavoid():
             profile.update({"last_updated": datetime.utcnow()})
             return jsonify(data={'message': 'Ingredients to avoid added'})
     else:
-        for error in errors:
+        for field, error in form.errors.items():
             flash(u"Error in the %s field - %s" % (
                   getattr(form, field).label.text,
                   error), 'danger')
@@ -307,16 +274,80 @@ def deleteavoid():
         return jsonify(data={'errors': form.errors})
 
 
-# @profiles.route('/changeintols.json', methods=['POST'])
-# @login_required
-# @email_confirmation_required
-# def changeintols():
-#     """Takes an Ajax request and changes diet reason"""
+@profiles.route('/friendprofile/<int:friend_id>', methods=['GET'])
+@login_required
+@email_confirmation_required
+def show_friend_profile(friend_id):
+    """Show logged in user's friends profile"""
 
-#     form = DietReasonForm(request.form)
-#     if form.validate():
-#         profile = Profile.query.get(form.profile_id.data)
-#         profile.update({"diet_reason": form.diet_reason.data, "last_updated": datetime.utcnow()})
-#         return jsonify(data={'message': 'Diet reason updated', 'diet_reason': profile.diet_reason})
-#     else:
-#         return jsonify(data=form.errors)
+    session_token = session.get("session_token")
+    user = User.query.filter_by(session_token=session_token).first()
+    friend_profile = Profile.query.get(friend_id)
+    past_parties = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_profile.profile_id, Party.datetime_of_party < datetime.utcnow()).all()
+    upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_profile.profile_id, Party.datetime_of_party >= datetime.utcnow()).all()
+    party_form = AddToPartiesForm(request.form)
+    party_form.parties.choices = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id != friend_profile.profile_id, Party.datetime_of_party >= datetime.utcnow()).all()
+    delete_form = DeleteFriendForm(request.form)
+
+    is_friend = db.session.query(Friend).filter(Friend.user_id == current_user.id, Friend.friend_profile_id == friend_profile.profile_id).first()
+
+    if is_friend and friend_profile.owned_by_user_id == user.id:
+        return render_template("/profiles/friend_profile_editable.html",
+                               friend_profile=friend_profile,
+                               past_parties=past_parties,
+                               upcoming_parties=upcoming_parties,
+                               invite_form=party_form,
+                               profile=user.profile,
+                               delete_form=delete_form)
+    elif is_friend and is_friend.friendship_verified_by_email:
+        return render_template("/profiles/friend_profile_fixed.html",
+                               friend_profile=friend_profile,
+                               past_parties=past_parties,
+                               upcoming_parties=upcoming_parties,
+                               invite_form=party_form,
+                               profile=user.profile,
+                               delete_form=delete_form)
+    else:
+        flash("Looks like you are not friends with that person. Do you want to add them as a friend or create a profile for them?", "danger")
+
+
+@profiles.route('/addtoparty.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def add_to_party():
+    """Takes an Ajax request and adds a guest to parties"""
+
+    form = AddToPartiesForm(request.form)
+    if form.validate():
+        pass
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in the %s field - %s" % (
+                  getattr(form, field).label.text,
+                  error), 'danger')
+        return jsonify(data=form.errors)
+
+
+@profiles.route('/delete_friend.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def delete_friend():
+    """Takes an Ajax request and deletes a friend"""
+
+    form = DeleteFriendForm(request.form)
+    if form.validate():
+        friend_profile = Profile.query.get(form.friend_profile_id.data)
+        friendship = db.session.query(Friend).filter(Friend.user_id == current_user.id, Friend.friend_profile_id == form.friend_profile_id.data).all()
+        if friend_profile.owned_by_user_id == current_user.id:
+            friendship.remove_friendship()
+            friend_profile.remove_profile()
+        else:
+            friendship.remove_friendship()
+        flash("Friend removed from your account.")
+        return redirect(url_for('profiles.show_dashboard'))
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in the %s field - %s" % (
+                  getattr(form, field).label.text,
+                  error), 'danger')
+        return jsonify(data=form.errors)

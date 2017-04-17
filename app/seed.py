@@ -8,7 +8,7 @@ from datetime import datetime
 def LoadSeedData():
     """Load seed data about Spoonacular."""
 
-    Diet.create_record(diet_id=1, diet_type="vegan", description="does not eat an animal byproducts", ranking=1)
+    Diet.create_record(diet_id=1, diet_type="vegan", description="does not eat any animal byproducts", ranking=1)
     Diet.create_record(diet_id=2, diet_type="ketogenic", description="high-fat, adequate-protein, low-carbohydrate diet", ranking=2)
     Diet.create_record(diet_id=3, diet_type="vegetarian", description="does not eat meat", ranking=3)
     Diet.create_record(diet_id=4, diet_type="ovo vegetarian", description="vegetarianism which allows for the consumption of eggs but not dairy products", ranking=4)
@@ -16,22 +16,22 @@ def LoadSeedData():
     Diet.create_record(diet_id=6, diet_type="pescatarian", description="does not eat meat but does eat fish.", ranking=6)
     Diet.create_record(diet_id=7, diet_type="paleo", description="it's complex, but basically no dairy, no gluten, no corn, no sugar nor processed foods", ranking=7)
     Diet.create_record(diet_id=8, diet_type="primal", description="it's complex, but basically no gluten, no corn, no sugar nor processed foods", ranking=8)
-    Diet.create_record(diet_id=9, diet_type="whole 30", description="It's complex. No processed foods and few ingredients", ranking=9)
+    Diet.create_record(diet_id=9, diet_type="whole 30", description="it's complex. No processed foods and fewer ingredients", ranking=9)
     Diet.create_record(diet_id=10, diet_type="any", description="does not follow any limiting diet", ranking=10)
 
     print "loaded diets"
 
-    Intolerance.create_record(intol_id=1, intol_name="dairy", intol_description="Intolerance or allergy to the milk of a cow")
-    Intolerance.create_record(intol_id=2, intol_name="egg", intol_description="Intolerance or allergy to eggs")
-    Intolerance.create_record(intol_id=3, intol_name="gluten", intol_description="Intolerance or allergy to gluten")
+    Intolerance.create_record(intol_id=1, intol_name="dairy", intol_description="Intolerance or allergy to animal milk or animal milk products")
+    Intolerance.create_record(intol_id=2, intol_name="egg", intol_description="Intolerance or allergy to eggs or egg byproducts")
+    Intolerance.create_record(intol_id=3, intol_name="gluten", intol_description="Intolerance or allergy to ingredients that contain gluten")
     Intolerance.create_record(intol_id=4, intol_name="peanut", intol_description="Intolerance or allergy to peanuts and peanut products")
     Intolerance.create_record(intol_id=5, intol_name="sesame", intol_description="Intolerance or allergy to sesame seeds and sesame products")
-    Intolerance.create_record(intol_id=6, intol_name="seafood", intol_description="Intolerance or allergy to seafood")
-    Intolerance.create_record(intol_id=7, intol_name="shellfish", intol_description="Intolerance or allergy to shellfish")
+    Intolerance.create_record(intol_id=6, intol_name="seafood", intol_description="Intolerance or allergy to fish or fish products ")
+    Intolerance.create_record(intol_id=7, intol_name="shellfish", intol_description="Intolerance or allergy to shellfish or shellfish products")
     Intolerance.create_record(intol_id=8, intol_name="soy", intol_description="Intolerance or allergy to soy products")
-    Intolerance.create_record(intol_id=9, intol_name="sulfites", intol_description="Intolerance or allergy to sulfites")
-    Intolerance.create_record(intol_id=10, intol_name="tree nut", intol_description="Intolerance or allergy to tree nuts")
-    Intolerance.create_record(intol_id=11, intol_name="wheat", intol_description="Intolerance or allergy to wheat")
+    Intolerance.create_record(intol_id=9, intol_name="sulfites", intol_description="Intolerance or allergy to ingredients that contain sulfites")
+    Intolerance.create_record(intol_id=10, intol_name="tree nut", intol_description="Intolerance or allergy to tree nuts or tree nut products")
+    Intolerance.create_record(intol_id=11, intol_name="wheat", intol_description="Intolerance or allergy to wheat or wheat products")
 
     print "loaded intolerances"
 
