@@ -1,0 +1,18 @@
+Dear {{ profile.first_name }},
+
+{{ friend.first_name}} {{ friend.last_name  }}({{  friend.email  }}) would like to 
+connect with you on KindTable. 
+
+If you agree, they will be able to see your profile information and to invite you
+to dinner parties.
+
+To become friends with {{ friend.first_name}} {{ friend.last_name  }}({{  friend.email  }}), click 
+on the following link and sign in to your KindTable account:
+
+{{ url_for('profile.confirm_friendship_with_existing_user', token=token, _external=True) }}
+
+Sincerely,
+
+Ilsa Gordon
+
+Kind Table

@@ -5,8 +5,9 @@ from passlib.hash import bcrypt
 from . import db, login_manager
 from flask_login import UserMixin
 import pytz
-from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, BadSignature, BadData
+from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, BadData
 import os
+from sqlalchemy import and_, or_
 
 ##############################################################################
 # Model definitions
@@ -250,12 +251,18 @@ class User(BaseMixin, UserMixin, db.Model):
                 recipe._delete_()
 
         user_profile = self.profile
-
         self._delete_()
-
         user_profile.remove_profile()
-
         db.session.commit()
+
+    def valid_friends(self):
+        '''Returns all confirmed or private friendships'''
+
+        return db.session.query(Friend).filter(and_(or_(Friend.friendship_verified_by_email.is_(True),
+                                                        Friend.friendship_verified_by_facebook.is_(True),
+                                                        (and_(Profile.owned_by_user_id == self.id,
+                                                         Profile.owned_by_user_id == self.id))),
+                                               and_(Friend.user_id == self.id))).all()
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -275,6 +282,8 @@ class Friend(BaseMixin, db.Model):
     friend_profile_id = db.Column(db.Integer,
                                   db.ForeignKey('profiles.profile_id'),
                                   nullable=False)
+    friend_request_sent = db.Column(db.Boolean, unique=False,
+                                    default=False)
     friendship_verified_by_email = db.Column(db.Boolean, unique=False,
                                              default=False)
     friendship_verified_by_facebook = db.Column(db.Boolean, unique=False,
@@ -284,15 +293,50 @@ class Friend(BaseMixin, db.Model):
     friend_profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
 
+    def generate_email_token(self):
+        '''Creates an encrypted token to send via email to new user'''
+
+        email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
+        return email_serializer.dumps({'friend_record_id': self.record_id, 'friend_profile_id': self.friend_profile.profile_id, 'user_id': self.user_id})
+
+    @classmethod
+    def process_email_token(self, token):
+        email_serializer = URLSafeTimedSerializer(os.environ['APP_SECRET_KEY'])
+        try:
+            data = email_serializer.loads(token, max_age=3600)
+        except BadSignature, e:
+            print "Bad Signature"
+            encoded_payload = e.payload
+            if encoded_payload is not None:
+                print "data is not nothing"
+                try:
+                    d = email_serializer.load_payload(encoded_payload)
+                    print d
+                except BadData:
+                    print "bad data"
+
+        friendship = Friend.query.get(data['friend_record_id'])
+        if not friendship:
+            print "That friend record id does not exist."
+            return False
+
+        if data['friend_profile_id'] != friendship.friend_profile_id or data['user_id'] != friendship.user_id:
+            print "The profile id or the user_id don't match the friend record"
+            return False
+        else:
+            friendship.friendship_verified_by_email = True
+            db.session.commit()
+            return friendship
+
     def remove_friendship(self):
         '''Removes the friendship and all relevant records'''
 
-        guest_at_party = PartyGuest.query.filter_by(profile_id=self.profile_id).all()
+        guest_at_party = PartyGuest.query.filter_by(friend_profile_id=self.friend_profile_id).all()
         if guest_at_party:
             for invite in guest_at_party:
                 invite._delete_()
 
-        bookmarked = RecipeWorksFor.query.filter_by(profile_id=self.profile_id).all()
+        bookmarked = RecipeWorksFor.query.filter_by(guest_profile_id=self.friend_profile_id).all()
         if bookmarked:
             for recipe in bookmarked:
                 recipe._delete_()

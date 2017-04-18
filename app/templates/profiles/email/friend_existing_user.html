@@ -1,0 +1,21 @@
+<p>Dear {{ profile.first_name }},</p>
+<p><strong>{{ friend.first_name}} {{ friend.last_name  }}<strong>({{  friend.email  }}) would like to 
+connect with you on KindTable. </p>
+
+<p>To confirm your account please <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">click here</a>.</p>
+<p>Alternatively, you can paste the following link in your browser's address bar:</p>
+<p>{{ url_for('auth.confirm', token=token, _external=True) }}</p>
+
+
+If you agree, they will be able to see your profile information and to invite you
+to dinner parties.
+
+To confirm that you want to become friends with {{ friend.first_name}} {{ friend.last_name  }}({{  friend.email  }}) on KindTable, 
+<a href="{{ url_for('profile.confirm_friendship_with_existing_user', token=token, _external=True) }}">click here</a></p>
+
+<p>Alternatively, you can paste the following link in your browser's address bar:</p>
+<p>{{ url_for('profile.confirm_friendship', token=token, _external=True) }}</p>
+
+
+<p>Sincerely,</p>
+<p>Ilsa Gordon<br>Kind Table</p>

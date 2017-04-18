@@ -157,3 +157,12 @@ class FriendNotesForm(Form):
                         validators=[InputRequired('No notes added.'),
                                     Length(1, 300)])
     submit = SubmitField('Update')
+
+
+class FindaFriendForm(Form):
+    friend_email = StringField("Your friend's email address",
+                               widget=TextArea(),
+                               validators=[InputRequired(),
+                                           Length(1, 64),
+                                           Email()])
+    submit = SubmitField('Update')

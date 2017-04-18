@@ -46,14 +46,12 @@ from ..decorators import email_confirmation_required
 def index():
     """Homepage."""
 
-    try:
-        user = current_user
-        if user:
-            friends = user.friends
-            parties = user.parties
-            return render_template("kind_homepage.html", friends=friends, parties=parties)
-    except:
-        return render_template("kind_homepage.html", friends="", parties="")
+    user = current_user
+    if user:
+        profile = user.profile
+        return render_template("kind_homepage.html", profile=profile)
+    else:
+        return render_template("kind_homepage.html")
 
 
 

@@ -304,9 +304,9 @@
                             <span class="glyphicon glyphicon-plus text-info" title="Add friends" aria-hidden="true"></span>
                     </button></h3>
                     
-                    {% if current_user.friends %}
+                    {% if current_user.valid_friends() %}
                         <ul>
-                            {% for friend in current_user.friends %}
+                            {% for friend in current_user.valid_friends() %}
                                 <li>
                                     <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.friend_profile.profile_id) }}">
                                         {{ friend.friend_profile.first_name }} {{friend.friend_profile.last_name  }}

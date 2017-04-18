@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>Kind Table</title>
+
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="{{  url_for('static', filename='site.css') }}">
+
+
+  {{ moment.include_jquery() }}
+  {{ moment.include_moment() }}
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+          <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+          <![endif]-->
+</head>
+<body>
+
+<!-- Begin navbar -->
+
+            <nav class="navbar navbar-default">
+              <div class="container-fluid">
+               <!--     Brand and toggle get grouped for better mobile display--> 
+                 <div class="navbar-header">
+                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
+                  <a class="navbar-brand" href="/">Kind Table</a>
+                </div>
+              <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                  <ul class="nav navbar-nav">
+                    <li><a href={{ url_for('auth.register') }}>New User? Register here.</a></li>
+                    <li><a href={{ url_for('auth.login') }}>Log in</a></li>
+                  </ul>
+                </div><!-- /.navbar-collapse -->
+              </div><!-- /.container-fluid -->
+            </nav>
+
+          <!-- ------------ -->
+
+            <div class="container-fluid">
+                <div class="container">
+                  {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                      {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                      {% endfor %}
+                    {% endif %}
+                  {% endwith %}
+                </div></div>
+
+            {% block content %}
+
+
+
+                <div id="extending">
+                {% block page_content %}{% endblock %}
+                </div>
+              
+            {% endblock %}  <!-- /content -->
+
+            {% block scripts %}
+              {{ moment.include_moment() }}
+            {% endblock %}
+
+            <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+            <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+            <!-- Include all compiled plugins (below), or include individual files as needed -->
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+            <script>
+              $(document).ready(function(){
+                  jQuery('[data-toggle="tooltip"]').tooltip(); 
+              });
+            </script>
+
+
+          </body>
+          </html>

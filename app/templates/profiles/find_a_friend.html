@@ -1,39 +1,25 @@
-{% extends 'base.html' %}
-{% block content %}
+<div class="modal-header">
+    <h4 class="modal-title" id="findFriendModalLabel">Connect with a Friend on Kind Table</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class = "row round_hidden_div" style="padding-top: 2em">
+    <div id="ff-flashedalert"></div>
+      <p class="text-muted">If your friend is already registered with Kind Table, an email will be sent on your behalf asking them to share their profile with you.</p>
+      <p class="text-muted">If your friend is not registered, an email will be sent on your behalf asking them to register so you can use their dietary information and choose to invite them to parties.</p>
 
-<div class="row"  style="padding-top: 3em">
-    <div class="col-md-4 col-md-offset-4 round_div">
+      <p class="text-muted">If you don't want any emails sent to your friends, instead opt to Create a Friend Profile yourself. This Friend Profile will be your own private dossier on your friend's dietary preferences.</p>
 
+      <p class="text-muted">No emails will ever be sent to your friends without your consent.</p>
 
-
-
-
-        <h1>Find a friend</h1>
-        <form action="/addafriend" method="POST">
-            <div class="form-group">
-                <label>Email address:</label><br> 
-                <input type="email" name="email_address" class="form-control" placeholder="Email">
-            </div><br>
-
-            <div class="form-group">
-                <input type="submit" value="Add Friend" class="btn btn-success btn-block" class="form-control">
-            </div>
-            <form><br>
-
-                <b>You are already friends with:</b><br>
-                <ul>
-                    {% for person in this_user.friends %}    
-                    <li><a href="/friendprofile/{{ person.friends.user_id }}">{{ person.friends.first_name }} {{ person.friends.last_name}} ({{ person.friends.email }})</a></li>
-                    {% endfor %}   
-                </ul>
-           
-
-
-
-
-
-
-
-            </div>
-        </div>
-{% endblock %}
+    {% from "_formhelpers.html" import render_field %}
+        <form action="{{ url_for('profiles.connect_friends') }}" class="form form-horizontal" method="post" role="form" id="connectFriend">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            {{ render_field(find_friend_form.friend_email,  cols="40", rows="1") }}
+            <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+        </form>
+    </div>
+    
+</div>
