@@ -12,7 +12,7 @@ from . import main
 from app.models import User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
 from .. import db
 from flask_mail import Mail, Message
-from flask_login import login_required
+from flask_login import login_required, current_user
 from ..decorators import email_confirmation_required
 
 
@@ -47,8 +47,7 @@ def index():
     """Homepage."""
 
     try:
-        session_token = session.get("session_token")
-        user = User.query.filter(session_token=session_token).first()
+        user = current_user
         if user:
             friends = user.friends
             parties = user.parties

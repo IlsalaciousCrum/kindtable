@@ -1,21 +1,21 @@
-function showCurrentDietReason(results) {
+function showCurrentNotes(results) {
     "use strict";
     console.dir(results); // for debugging
     $(".modal.in").modal("hide");
-    $(".dietReason").load(location.href + " #dietReason");
+    $(".friend_notes").load(location.href + " #friend_notes");
 }
 
 
 $(document).ready(function() {
     "use strict";
-    $('#changeDietReason').on('submit', (function(event) {
+    $('#notesForm').on('submit', (function(event) {
         event.preventDefault();
-        var url = $('#changeDietReason').attr('action');
+        var url = $('#notesForm').attr('action');
         $.ajax({
             type: "POST",
             url: url,
-            data: $('#changeDietReason').serialize(),
-            success: showCurrentDietReason
+            data: $('#notesForm').serialize(),
+            success: showCurrentNotes
         });
     }));
 
@@ -29,23 +29,16 @@ $(document).ready(function() {
 });
 
 
-function refreshDietReason(results) {
-    "use strict";
-    console.dir(results); // for debugging
-    $(".modal.in").modal("hide");
-    $(".dietReason").load(location.href + " #dietReason");
-}
-
 $(document).ready(function() {
     "use strict";
-    $('#clearDietReason').on('click', (function(event) {
+    $('#deletenote').on('click', (function(event) {
     
-        var url = "/profiles/cleardietreason.json";
+        var url = "/profiles/clearfriendnote.json";
         $.ajax({
             type: "POST",
             url: url,
-            data: $('#changeDietReason').serialize(),
-            success: refreshDietReason
+            data: $('#notesForm').serialize(),
+            success: showCurrentNotes
         });
     }));
 

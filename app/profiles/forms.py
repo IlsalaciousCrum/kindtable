@@ -2,12 +2,13 @@
 
 from wtforms import Form, widgets
 from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField, SelectMultipleField
-from wtforms.validators import InputRequired, Length, Email, Optional, DataRequired
+from wtforms.validators import InputRequired, Length, Email, Optional, DataRequired, EqualTo
 from wtforms import ValidationError
 from wtforms.widgets import TextArea
-from ..models import Profile, Diet, User, Intolerance, Party
+from ..models import Profile, Diet, User, Intolerance, Party, Friend
 from .. import db
-from flask import flash, redirect, url_for
+from flask import flash, redirect, url_for, request
+from flask_login import current_user
 
 
 class FirstNameForm(Form):
@@ -38,7 +39,7 @@ class DietForm(Form):
 
 
 class DietReasonForm(Form):
-    profile_id = HiddenField()
+    profile_id = HiddenField(validators=[InputRequired()])
     diet_reason = TextField('Reason you follow this diet:',
                             widget=TextArea(),
                             validators=[Length(1, 128, message="Limit 64 characters"), DataRequired(message='Please enter a reason or exit the window')])
@@ -51,7 +52,7 @@ class MultiCheckboxField(SelectMultipleField):
 
 
 class IntoleranceForm(Form):
-    profile_id = HiddenField()
+    profile_id = HiddenField(validators=[InputRequired()])
     intol_query = Intolerance.query.order_by(Intolerance.intol_name).all()
     intolerances = MultiCheckboxField('Select all allergies and intolerance groups that apply to you',
                                       choices=[(intol.intol_id, '{} - <span class="text-muted small">{}</span>'.format(intol.intol_name, intol.intol_description)) for intol in intol_query],
@@ -60,8 +61,7 @@ class IntoleranceForm(Form):
 
 
 class AddAvoidForm(Form):
-    profile_id = HiddenField()
-    avoid_id = HiddenField()
+    profile_id = HiddenField(validators=[InputRequired()])
     add_avoid_ingredient = StringField('Ingredient to avoid:',
                                        widget=TextArea(),
                                        validators=[InputRequired(message="Please enter an ingredient to avoid."),
@@ -73,7 +73,7 @@ class AddAvoidForm(Form):
 
 
 class UpdateAvoidForm(Form):
-    profile_id = HiddenField()
+    profile_id = HiddenField(validators=[InputRequired()])
     avoid_id = HiddenField()
     update_avoid_ingredient = StringField('Change ingredient to avoid:',
                                           widget=TextArea(),
@@ -86,6 +86,7 @@ class UpdateAvoidForm(Form):
 
 
 class FriendEmailForm(Form):
+    friend_profile_id = HiddenField(validators=[InputRequired()])
     email = StringField('Email', validators=[InputRequired('Email address is a required field.'),
                                              Length(1, 64),
                                              Email('A valid email address is required.')])
@@ -118,8 +119,8 @@ class AddNewFriendForm(Form):
 
 
 class AddToPartiesForm(Form):
-    profile_id = HiddenField()
-    friend_profile_id = HiddenField()
+    profile_id = HiddenField(validators=[InputRequired()])
+    friend_profile_id = HiddenField(validators=[InputRequired()])
     party_query = Party.query.all()
     parties = MultiCheckboxField('Invite to upcoming parties:',
                                  choices=[(party.party_id, '{} - <span class="text-muted small">{}</span>'.format(party.title, party.datetime_of_party)) for party in party_query],
@@ -128,6 +129,31 @@ class AddToPartiesForm(Form):
 
 
 class DeleteFriendForm(Form):
-    profile_id = HiddenField()
-    friend_profile_id = HiddenField()
+    friend_profile_id = HiddenField(validators=[InputRequired()])
+    submit = SubmitField('Update')
+
+
+class ChangeFriendEmailForm(Form):
+    friend_profile_id = HiddenField(validators=[InputRequired()])
+    email = StringField('New Email:',
+                        widget=TextArea(),
+                        validators=[InputRequired(),
+                                    Length(1, 64),
+                                    Email(),
+                                    EqualTo('email2',
+                                            message='Email addresses must match')])
+    email2 = StringField('Confirm new email:',
+                         widget=TextArea(),
+                         validators=[InputRequired(),
+                                     Length(1, 64),
+                                     Email()])
+    submit = SubmitField('Update')
+
+
+class FriendNotesForm(Form):
+    friend_profile_id = HiddenField(validators=[InputRequired()])
+    notes = StringField('Private notes:',
+                        widget=TextArea(),
+                        validators=[InputRequired('No notes added.'),
+                                    Length(1, 300)])
     submit = SubmitField('Update')

@@ -2,7 +2,6 @@ function showCurrentDiet(results) {
     "use strict";
     console.dir(results); // for debugging
     $(".modal.in").modal("hide");
-    $("#dietModal").find('form')[0].reset();
     $(".dietType").load(location.href + " #dietType");
 }
 

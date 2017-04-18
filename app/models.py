@@ -5,8 +5,8 @@ from passlib.hash import bcrypt
 from . import db, login_manager
 from flask_login import UserMixin
 import pytz
-from itsdangerous import URLSafeSerializer, URLSafeTimedSerializer, BadSignature, BadData
-from flask import current_app
+from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, BadSignature, BadData
+import os
 
 ##############################################################################
 # Model definitions
@@ -72,7 +72,7 @@ class Profile(BaseMixin, db.Model):
 
     profile_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     owned_by_user_id = db.Column(db.Integer)
-    email = db.Column(db.String(200), nullable=False, unique=False)
+    email = db.Column(db.String(200), unique=False)
     email_verified = db.Column(db.Boolean, unique=False, default=False)
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)
@@ -92,12 +92,11 @@ class Profile(BaseMixin, db.Model):
     def generate_confirmation_token(self):
         '''Creates an encrypted token to send via email to new user'''
 
-        registration_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        registration_serializer = URLSafeTimedSerializer(os.environ['APP_SECRET_KEY'])
         return registration_serializer.dumps({'profile_id': self.profile_id, 'email': self.email})
 
     def confirm(self, token):
-
-        registration_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        registration_serializer = URLSafeTimedSerializer(os.environ['APP_SECRET_KEY'])
         try:
             data = registration_serializer.loads(token, max_age=3600)
         except BadSignature, e:
@@ -190,7 +189,7 @@ class User(BaseMixin, UserMixin, db.Model):
             return False
 
     def reset_password(self, token, new_password):
-        registration_serializer = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+        registration_serializer = URLSafeTimedSerializer(os.environ['APP_SECRET_KEY'])
         try:
             data = registration_serializer.loads(str(token))
         except:
@@ -209,9 +208,8 @@ class User(BaseMixin, UserMixin, db.Model):
     def make_session_token(self):
         '''Encode a secure token for a cookie'''
 
-        login_serializer = URLSafeSerializer(current_app.config['SECRET_KEY'])
-
-        self.session_token = login_serializer.dumps([self.id])
+        login_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
+        self.session_token = login_serializer.dumps({'id': self.id})
         db.session.commit()
 
         return self.session_token
@@ -222,13 +220,10 @@ class User(BaseMixin, UserMixin, db.Model):
         stored on the users computer, process it to check if its valid and then
         return a User Object if its valid or None if its not valid.'''
 
-        login_serializer = URLSafeSerializer(current_app.config['SECRET_KEY'])
-
+        login_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
         data = login_serializer.loads(session_token)
-        print "id is " + str(data[0])
         #Find the User
-        user = User.query.get(data[0])
-        print user
+        user = User.query.get(data['id'])
         #Check Password and return user or None
         if user:
             print "loading user "

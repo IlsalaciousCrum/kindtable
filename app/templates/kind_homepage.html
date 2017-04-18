@@ -1,4 +1,11 @@
+
+{% if current_user.is_authenticated %}
 {% extends 'base.html' %}
+{% else %}
+{% extends 'anonymous.html' %}
+{% endif %}
+
+
 {% block content %}
 
 <div class="row well-spaced" style="padding-top: 10em">

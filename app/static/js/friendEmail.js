@@ -1,21 +1,21 @@
-function showCurrentLastName(results) {
+function showCurrentEmail(results) {
     "use strict";
     console.dir(results); // for debugging
     $(".modal.in").modal("hide");
-    $(".last").load(location.href + " #last");
+    $(".friendEmail").load(location.href + " #friendEmail");
 }
 
 
 $(document).ready(function() {
     "use strict";
-    $('#changeLastName').on('submit', (function(event) {
+    $('#emailForm').on('submit', (function(event) {
         event.preventDefault();
-        var url = $('#changeLastName').attr('action');
+        var url = $('#emailForm').attr('action');
         $.ajax({
             type: "POST",
             url: url,
-            data: $('#changeLastName').serialize(),
-            success: showCurrentLastName
+            data: $('#emailForm').serialize(),
+            success: showCurrentEmail
         });
     }));
 

@@ -1,4 +1,4 @@
-function showCurrentAvoids(results) {
+function showCurrentAvoid(results) {
     "use strict";
     console.dir(results); // for debugging
     $(".avoids").load(location.href + " #avoids");
@@ -15,7 +15,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#addAvoidForm').serialize(),
-            success: showCurrentAvoids
+            success: showCurrentAvoid
         });
     }));
 

@@ -17,14 +17,14 @@
                 {% from "_formhelpers.html" import render_field %}
                     <form action="{{ url_for('profiles.changefirstname') }}" class="form form-horizontal" method="post" role="form" id="changeFirstName">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                    <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(first_name_form.first_name,  cols="40", rows="1") }}
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
         </div>
-         <script src="{{ url_for('static', filename = 'js/firstName.js') }}" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename = 'js/firstName.js') }}" type="text/javascript"></script>
     </div>
 </div>
 
@@ -42,7 +42,7 @@
                 {% from "_formhelpers.html" import render_field %}
                     <form action="{{ url_for('profiles.changelastname') }}" class="form form-horizontal" method="post" role="form" id="changeLastName">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                    <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(last_name_form.last_name, cols="40", rows="1") }}
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
@@ -50,7 +50,7 @@
             </div>
         </div>
     </div>
-     <script src="{{ url_for('static', filename = 'js/lastName.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename = 'js/lastName.js') }}" type="text/javascript"></script>
 </div>
 
 <div class="modal fade" id="dietModal" tabindex="-1" role="dialog" aria-labelledby="changeDietModalLabel" aria-hidden="true">
@@ -67,7 +67,7 @@
                 {% from "_formhelpers.html" import render_field %}
                     <form action="{{ url_for('profiles.changediet') }}" class="form form-horizontal" method="post" role="form" id="changeDiet">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                    <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(diet_form.diet) }}
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
@@ -75,7 +75,7 @@
             </div>
         </div>
     </div>
-     <script src="{{ url_for('static', filename = 'js/diet.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename = 'js/diet.js') }}" type="text/javascript"></script>
 </div>
 
 
@@ -93,15 +93,12 @@
                 {% from "_formhelpers.html" import render_field %}
                     <form action="{{ url_for('profiles.changedietreason') }}" class="form form-horizontal" method="post" role="form" id="changeDietReason">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(diet_reason_form.diet_reason, cols="65", rows="4", maxlength=128) }}
-                        <input type="submit" class="btn btn-sm btn-success" value="Submit">&emsp;
-                        <button type="button" class="btn btn-sm btn-warning" data-dismiss="modal" aria-label="Close">
-                            Cancel
-                        </button>&emsp;
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
                         <button type="button" class="btn btn-sm btn-danger" id="clearDietReason">Delete reason</button>
                     </form>
-                     <script src="{{ url_for('static', filename = 'js/dietReason.js') }}" type="text/javascript"></script>
+                    <script src="{{ url_for('static', filename = 'js/dietReason.js') }}" type="text/javascript"></script>
                 </div>             
             </div>
         </div>
@@ -124,7 +121,7 @@
                 {% from "_formhelpers.html" import render_field %}
                     <form action="{{ url_for('profiles.addavoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(add_avoid_form.add_avoid_ingredient, cols="40", rows="1") }}
                         {{ render_field(add_avoid_form.add_avoid_reason, cols="65", rows="4", maxlength=128) }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
@@ -136,7 +133,7 @@
                 </div>
             </div>
         </div>
-         <script src="{{ url_for('static', filename = 'js/addAvoid.js') }}" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename = 'js/addAvoid.js') }}" type="text/javascript"></script>
     </div>
 </div>
 
@@ -152,11 +149,10 @@
             <div class="modal-body">
                 <div class = "row round_hidden_div" style="padding-top: 2em">
 
-
                 {% from "_formhelpers.html" import render_field %}
                     <form action="{{ url_for('profiles.updateavoid') }}" class="form form-horizontal" method="POST" role="form" id="updateAvoidForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         <input type="hidden" id="updateAvoidFormAvoidId" name="avoid_id"/>
                         {{ render_field(update_avoid_form.update_avoid_ingredient, cols="40", rows="1") }}
                         {{ render_field(update_avoid_form.update_avoid_reason, cols="65", rows="4", maxlength=128) }}
@@ -172,7 +168,7 @@
             </div>
         </div>
     </div>
-     <script src="{{ url_for('static', filename = 'js/updateAvoid.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename = 'js/updateAvoid.js') }}" type="text/javascript"></script>
 </div>
 
 <div class="modal fade" id="intolModal" tabindex="-1" role="dialog" aria-labelledby="addIntolModalLabel" aria-hidden="true">
@@ -190,7 +186,7 @@
                 {% from "_formhelpers.html" import render_field %}
                     <form action="{{ url_for('profiles.intol') }}" class="form form-horizontal" method="POST" role="form" id="intolsForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(intol_form.intolerances) }}
                         <p class = "text-muted">Selecting the allergy/intolerance groups that apply to you can help make sure that KindTable recipes will be safe for you. For example, gluten can be found in many <a href="https://celiac.org/live-gluten-free/glutenfreediet/sources-of-gluten/" title="The Celiac Disease Foundation's list of sources of gluten" target="_blank">non-wheat ingredients</a> and if you select gluten, we will be sure that recipes will not include those ingredients. But if you are sensitive only to wheat itself and not ingredients such as soy sauce, selecting "wheat" instead of "gluten" gives you and your hosts more options.</p>
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">
@@ -201,9 +197,150 @@
                 </div>
             </div>
         </div>
-         <script src="{{ url_for('static', filename = 'js/Intol.js') }}" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename = 'js/intol.js') }}" type="text/javascript"></script>
     </div>
 </div>
+
+<div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="inviteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="inviteModalLabel">Invite {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend.friend_profile.email }}{%endif %} To A Party</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% if upcoming_parties %}
+                        <strong>Parties already invited to:</strong>
+                        <ul>
+                            {% for party in upcoming_parties %}
+                                <li>
+                                    <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
+                                        <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.add_to_party') }}" class="form form-horizontal" method="POST" role="form" id="inviteForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile_id  }}"/>
+                        <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
+                        {{ render_field(invite_form.parties) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
+                            Close
+                        </button>
+                    </form>
+                            <script src="{{ url_for('static', filename = 'js/inviteFriendToParties.js') }}" type="text/javascript"></script>
+                    {% else %}
+                    <span class="text-danger">Whoops! You will need to add at least one new party first before adding guests.</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="modal fade" id="removeFriend" tabindex="-1" role="dialog" aria-labelledby="removeFriendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="removeFriendModalLabel">Remove {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend.friend_profile.email }}{%endif %}</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                        
+                    <div class="alert alert-warning" role="alert">    
+                        <span class="text-danger">Caution: Are you sure this is what you want to do? All information you have saved about this friend will
+                            be permanently deleted. You can still add them again later as a new friend with a fresh start.
+                        </span>
+                    </div>
+
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.add_to_party') }}" class="form form-horizontal" method="POST" role="form" id="deleteForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile_id  }}"/>
+                        <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
+                        <input type="submit" class="btn btn-lg btn-danger" value="Delete Friend"><br><br>
+                        
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
+                            Close
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+<div class="modal fade" id="friendEmailModal" tabindex="-1" role="dialog" aria-labelledby="FriendEmailModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="FriendEmailModalLabel">Change Email Address</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.changefriendemail') }}" class="form form-horizontal" method="post" role="form" id="emailForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
+                        {{ render_field(email_form.email, cols="40", rows="1", maxlength=200) }}
+                        {{ render_field(email_form.email2, cols="40", rows="1", maxlength=200) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                     </form>
+                    <script src="{{ url_for('static', filename = 'js/friendEmail.js') }}" type="text/javascript"></script>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="notesModalLabel">Friend notes</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.changefriendnotes') }}" class="form form-horizontal" method="post" role="form" id="notesForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
+                        {{ render_field(notes_form.notes, cols="65", rows="5", maxlength=300) }}
+                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        <button type="button" class="btn btn-sm btn-danger" id="deletenote">Delete note</button>
+                     </form>
+                    <script src="{{ url_for('static', filename = 'js/friendNotes.js') }}" type="text/javascript"></script>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
 
 <!-- Begin content -->
 
@@ -211,57 +348,62 @@
     <div class="row well-spaced" style="padding-top: 3em">
         <div class="col-md-4 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
-                <h3>Profile</h3>
+                <h3>Your Profile for {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }} {{  friend_profile.last_name  }}
+                    {% else %}
+                        {{ friend.friend_profile.email }}
+                    {%endif %}</h3>
                 <div class='lastUpdated'>
                     <div id='lastUpdated' class="text-muted small" style='padding-bottom: 1em'>
-                        Last updated {{ moment(profile.last_updated).format('LLLL') }}
+                        Last updated {{ moment(friend_profile.last_updated).format('LLLL') }}
                     </div>
                 </div>
                 <div class="first">
                     <div id="first">
                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#firstNameModal">
-                            <span class="glyphicon glyphicon-pencil text-info" title="Change your first name" aria-hidden="true"></span>
-                        </button>&emsp; <strong>First Name:</strong>&emsp;{{  profile.first_name  }}
+                            <span class="glyphicon glyphicon-pencil text-info" title="Change the first name" aria-hidden="true"></span>
+                        </button>&emsp; <strong>First Name:</strong>&emsp;{{  friend_profile.first_name  }}
                     </div>
                 </div>
                 <div class="last">
                     <div id="last">
-                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change your last name" data-target="#lastNameModal">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change the last name" data-target="#lastNameModal">
                             <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
-                        </button>&emsp; <strong>Last Name:</strong>&emsp;{{  profile.last_name  }}
+                        </button>&emsp; <strong>Last Name:</strong>&emsp;{{  friend_profile.last_name  }}
                     </div>
                 </div>
 
-                <div id="email">
-                    <a href="{{  url_for('auth.change_email')  }}" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-pencil text-info" title="Change your email address. Caution: This is also how your friends find you on KindTable" aria-hidden="true"></span>
-                    </a>&emsp; <strong>Email address:</strong>&emsp;{{  profile.email  }}
+                <div class="friendEmail">
+                    <div id="friendEmail">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#friendEmailModal">
+                                <span class="glyphicon glyphicon-pencil text-info" title="Change the first name" aria-hidden="true"></span>
+                            </button>&emsp; <strong>Email address:</strong>&emsp;{{  friend_profile.email  }}
+                    </div>
                 </div>
 
                 <div class="dietType">
                     <div id="dietType">
                         <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#dietModal">
-                            <span class="glyphicon glyphicon-pencil text-info" title="Change the diet you follow" aria-hidden="true"></span>
-                        </button>&emsp; <strong>Diet you generally follow:</strong>&emsp;{{  profile.diet.diet_type  }}
+                            <span class="glyphicon glyphicon-pencil text-info" title="Change the diet they follow" aria-hidden="true"></span>
+                        </button>&emsp; <strong>Diet they generally follow:</strong>&emsp;{{  friend_profile.diet.diet_type  }}
                     </div>
                 </div>
 
                 <div class="dietReason">
                     <div id="dietReason">
                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#dietReasonModal">
-                            <span class="glyphicon glyphicon-pencil text-info" title="Change the reason you follow this diet. This information is shown to hosts to help them decide what to make for other guests." aria-hidden="true"></span>
-                        </button>&emsp; <strong>Diet reason:</strong>&emsp;{{  profile.diet_reason  }}
+                            <span class="glyphicon glyphicon-pencil text-info" title="Change the reason they follow this diet." aria-hidden="true"></span>
+                        </button>&emsp; <strong>Diet reason:</strong>&emsp;{{  friend_profile.diet_reason  }}
                     </div>
                 </div>
 
                 <div class='intols'>
                     <div id='intols' style="padding-top: 1em">
-                        {% if profile.intolerances %}
+                        {% if friend_profile.intolerances %}
                             <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add another allergy/intolerance group" data-target="#intolModal">
                                 <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>&ensp; <span class="glyphicon glyphicon-plus text-info" aria-hidden="true"></span>
                             </button>&emsp; <strong>Allergies/intolerances:</strong>
                             <ul>
-                                {% for intolerance in profile.intolerances|sort(attribute='intol_name') %}
+                                {% for intolerance in friend_profile.intolerances|sort(attribute='intol_name') %}
                                     <li>
                                         <strong>{{ intolerance.intol_name }}</strong> - (<i>{{  intolerance.intol_description  }}</i>)
                                     </li>
@@ -275,12 +417,12 @@
 
                 <div class='avoids'>
                     <div id="avoids" style="padding-top: 1em">
-                        {% if profile.avoidances %}
+                        {% if friend_profile.avoidances %}
                             <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#addAvoidModal" title="Add another ingredient to avoid">
                                 <span class="glyphicon glyphicon-plus text-info" aria-hidden="true"></span>
-                            </button>&emsp;<strong>Ingredients you would like to avoid:</strong> 
+                            </button>&emsp;<strong>Ingredients they would like to avoid:</strong> 
                             <ul>
-                                {% for avoid in profile.avoidances|sort(attribute='ingredient') %}
+                                {% for avoid in friend_profile.avoidances|sort(attribute='ingredient') %}
                                     <li style="list-style: none;">
                                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#updateAvoidModal" data-whatever="{{ avoid.avoid_id  }}">
                                             <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
@@ -289,9 +431,16 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <button type="button" class="btn btn-sm btn-default" title="Add some ingredients you would like to avoid" data-toggle="modal" data-target="#addAvoidModal">add</button>&emsp;<span class="text-muted strong">No ingredients to avoid added yet</span> 
+                            <button type="button" class="btn btn-sm btn-default" title="Add some ingredients they would like to avoid" data-toggle="modal" data-target="#addAvoidModal">add</button>&emsp;<span class="text-muted strong">No ingredients to avoid added yet</span> 
                         {% endif %}
                     </div>
+                </div>
+
+                <div id="remove" style="padding-top: 3em">
+                    <small>Don't want to be friends with this person on Kind Table anymore?</small>
+                    <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#removeFriend">
+                        <span class="text-danger">Remove Friend</span>
+                    </button>
                 </div>
 
             </div>
@@ -299,60 +448,47 @@
 
         <div class="col-md-5 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
-                <div id="friends">
-                    <h3>Friends&emsp; <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#firstNameModal">
-                            <span class="glyphicon glyphicon-plus text-info" title="Add friends" aria-hidden="true"></span>
-                    </button></h3>
-                    
-                    {% if current_user.friends %}
-                        <ul>
-                            {% for friend in current_user.friends %}
-                                <li>
-                                    <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.friend_profile.profile_id) }}">
-                                        {{ friend.friend_profile.first_name }} {{friend.friend_profile.last_name  }}
-                                    </a> <span class="text-muted">({{  friend.friend_profile.email  }})</span>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span class="text-muted strong">No friends added yet.</span>
-                    {% endif %}
+                
+                <div class='friend_notes'>
+                    <div id="friend_notes" style="padding-top: 1em">
+                        
+                        {% if friend_profile_notes %}
+                        <h3>Notes
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#notesModal" title="Add or update the notes for this friend"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></button></h3>
+                            {{  friend_profile_notes}}</dd>
+                        {% else %}
+                            <h3>Notes
+                            <button type="button" class="btn btn-sm btn-default" title="Add some private notes about this friend" data-toggle="modal" data-target="#notesModal">add</button></h3>
+                            <span class="text-muted strong">Is there anything that would make your friend more comfortable at your table? Keep track of that information here.</span> 
+                        {% endif %}
+                    </div>
                 </div>
 
-                <div id="recipes">
-                <h3>Bookmarked recipes</h3>
-                    {% if current_user.recipebox %}
-                        <ul>
-                            {% for recipe in current_user.recipebox.recipes %}
-                                <li>
-                                    <a href="{{ url_for('profiles.show_recipe_profile', recipe_id=recipe.recipes.recipe_record_id) }}">{{ recipe.recipes.title }}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span class="text-muted strong">No recipes bookmarked yet</span>
-                    {% endif %}
+
+                <h3>Upcoming Parties Invited To</h3>
+                <div class="upcomingParties">
+                    <div id="upcomingParties">
+                        <button type="button" class="btn btn-sm btn-success" href="#" data-toggle="modal" data-target="#inviteModal">
+                                Invite To Parties
+                        </button><br><br>
+                        {% if upcoming_parties %}
+                            <ul>
+                                {% for party in upcoming_parties %}
+                                    <li>
+                                        <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
+                                            <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-muted strong">No upcoming parties.</span>
+                        {% endif %}
+                    </div>
                 </div>
-                <h3>Upcoming Parties&emsp; <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#firstNameModal">
-                            <span class="glyphicon glyphicon-plus text-info" title="Add a new party" aria-hidden="true"></span>
-                    </button></h3>
-                <div id="upcomingparties">
-                    {% if upcoming_parties %}
-                        <ul>
-                            {% for party in upcoming_parties %}
-                                <li>
-                                    <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
-                                        <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
-                                    </a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span class="text-muted strong">No upcoming parties. Time to plan some!</span>
-                    {% endif %}
-                </div>
-                <h3>Past Parties</h3>
-                <div id="pastparties">
+
+                <h3>Past Parties Invited To</h3>
+                <div id="pastParties">
                     {% if past_parties %}
                         <ul>
                             {% for party in past_parties %}

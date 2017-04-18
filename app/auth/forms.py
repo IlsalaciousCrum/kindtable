@@ -11,12 +11,10 @@ from flask import flash, redirect, url_for
 
 class LoginForm(Form):
     email = StringField('Email',
-                        widget=TextArea(),
                         validators=[InputRequired('Email address is a required field.'),
                                     Length(1, 64),
                                     Email('A valid email address is required.')])
     password = PasswordField('Password',
-                             widget=TextArea(),
                              validators=[InputRequired('Please enter a valid password or reset password')])
     remember_me = BooleanField('Keep me logged in')
     submit1 = SubmitField('Log in')

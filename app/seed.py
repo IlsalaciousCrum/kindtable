@@ -85,8 +85,11 @@ def LoadTestPeople():
     darrin_profile = Profile.create_record(email='darrin@erin.com', email_verified=False, first_name='Darrin', last_name='Ward')
     erin_profile = Profile.create_record(email='erin@darrin.com', email_verified=False, first_name='Erin', last_name='Rosenthal')
 
-    User.create_record(password="Password!", profile_id=1)
-    User.create_record(password='No', profile_id=2)
+    ilsa = User.create_record(password="Password!", profile_id=1)
+    todd = User.create_record(password='No', profile_id=2)
+
+    ilsa.make_session_token()
+    todd.make_session_token()
 
     ilsa_profile = Profile.query.get(1)
     todd_profile = Profile.query.get(2)

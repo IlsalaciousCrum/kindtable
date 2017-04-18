@@ -21,7 +21,6 @@ function showCurrentAvoids(results) {
     "use strict";
     console.dir(results); // for debugging
     $(".avoids").load(location.href + " #avoids");
-    $(".modal.in").find('form')[0].reset();
     $(".modal.in").modal("hide");
 }
 
@@ -51,7 +50,6 @@ function showCurrentAvoids(results) {
     "use strict";
     console.dir(results); // for debugging
     $(".avoids").load(location.href + " #avoids");
-    $(".modal.in").find('form')[0].reset();
     $(".modal.in").modal("hide");
 }
 
@@ -60,6 +58,36 @@ $(document).ready(function() {
     $('#deleteavoid').on('click', (function(event) {
     
         var url = "/profiles/deleteavoid.json";
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: $('#updateAvoidForm').serialize(),
+            success: showCurrentAvoids
+        });
+    }));
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", "{{ form.csrf_token._value() }}");
+            }
+        }
+    });
+});
+
+
+function showCurrentAvoids(results) {
+    "use strict";
+    console.dir(results); // for debugging
+    $(".avoids").load(location.href + " #avoids");
+    $(".modal.in").modal("hide");
+}
+
+$(document).ready(function() {
+    "use strict";
+    $('#deleteavoidreason').on('click', (function(event) {
+    
+        var url = "/profiles/deleteavoidreason.json";
         $.ajax({
             type: "POST",
             url: url,

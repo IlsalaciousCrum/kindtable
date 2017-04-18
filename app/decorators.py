@@ -11,3 +11,12 @@ def email_confirmation_required(f):
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated_function
+
+
+def load_base(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        profile = current_user.profile
+        return redirect(url_for('auth/login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
