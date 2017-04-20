@@ -14,8 +14,6 @@ from datetime import datetime
 
 from ..decorators import email_confirmation_required
 
-from sqlalchemy import and_, or_
-
 from ..email import send_email
 
 
@@ -63,64 +61,63 @@ def show_dashboard():
 def show_friend_profile(friend_id):
     """Show logged in user's friends profile"""
 
-    session_token = session.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-    friend_profile = Profile.query.get(friend_id)
-    past_parties = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_profile.profile_id, Party.datetime_of_party < datetime.utcnow()).all()
-    upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_profile.profile_id, Party.datetime_of_party >= datetime.utcnow()).all()
-    party_form = AddToPartiesForm(request.form)
-    party_form.parties.choices = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id != friend_profile.profile_id, Party.datetime_of_party >= datetime.utcnow()).all()
-    delete_form = DeleteFriendForm(request.form)
-    email_form = ChangeFriendEmailForm(request.form)
-    friendship = Friend.query.filter(Friend.friend_profile_id == friend_profile.profile_id, Friend.user_id == current_user.id).one()
-    is_friend = db.session.query(Friend).filter(Friend.user_id == current_user.id, Friend.friend_profile_id == friend_profile.profile_id).first()
-    notes_form = FriendNotesForm(request.form)
-    notes_form.notes.data = friendship.profile_notes
+    is_friend = Friend.query.filter(Friend.user_id == current_user.id, Friend.friend_profile_id == friend_id).first()
+    if is_friend:
+        friend_profile = Profile.query.get(friend_id)
+        past_parties = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_profile.profile_id, Party.datetime_of_party < datetime.utcnow()).all()
+        upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_profile.profile_id, Party.datetime_of_party >= datetime.utcnow()).all()
+        party_form = AddToPartiesForm(request.form)
+        party_form.parties.choices = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id != friend_profile.profile_id, Party.datetime_of_party >= datetime.utcnow()).all()
+        delete_form = DeleteFriendForm(request.form)
+        email_form = ChangeFriendEmailForm(request.form)
+        notes_form = FriendNotesForm(request.form)
+        notes_form.notes.data = is_friend.profile_notes
 
-    if is_friend and friend_profile.owned_by_user_id == user.id:
-        first_name_form = FirstNameForm(request.form)
-        first_name_form.first_name.data = friend_profile.first_name
-        last_name_form = LastNameForm(request.form)
-        last_name_form.last_name.data = friend_profile.last_name
-        diet_form = DietForm(request.form)
-        diet_reason_form = DietReasonForm(request.form)
-        diet_reason_form.diet_reason.data = friend_profile.diet_reason
-        add_avoid_form = AddAvoidForm(request.form)
-        update_avoid_form = UpdateAvoidForm(request.form)
-        intol_form = IntoleranceForm(request.form)
-        profile_intolerances = db.session.query(ProfileIntolerance).filter(Intolerance.intol_id == ProfileIntolerance.intol_id, ProfileIntolerance.profile_id == friend_profile.profile_id).all()
-        intol_form.intolerances.data = [(intol.intol_id) for intol in profile_intolerances]
-        return render_template("/profiles/friend_profile_editable.html",
-                               profile_id=user.profile.profile_id,
-                               friend_profile=friend_profile,
-                               past_parties=past_parties,
-                               upcoming_parties=upcoming_parties,
-                               invite_form=party_form,
-                               profile=user.profile,
-                               delete_form=delete_form,
-                               intol_form=intol_form,
-                               first_name_form=first_name_form,
-                               last_name_form=last_name_form,
-                               diet_form=diet_form,
-                               diet_reason_form=diet_reason_form,
-                               add_avoid_form=add_avoid_form,
-                               update_avoid_form=update_avoid_form,
-                               email_form=email_form,
-                               friend_profile_notes=friendship.profile_notes,
-                               notes_form=notes_form)
-    elif is_friend and is_friend.friendship_verified_by_email:
-        return render_template("/profiles/friend_profile_fixed.html",
-                               profile_id=user.profile.profile_id,
-                               friend_profile=friend_profile,
-                               past_parties=past_parties,
-                               upcoming_parties=upcoming_parties,
-                               invite_form=party_form,
-                               profile=user.profile,
-                               delete_form=delete_form,
-                               notes_form=notes_form,
-                               friend_profile_notes=friendship.profile_notes,)
+        if friend_profile.owned_by_user_id == current_user.id:
+            first_name_form = FirstNameForm(request.form)
+            first_name_form.first_name.data = friend_profile.first_name
+            last_name_form = LastNameForm(request.form)
+            last_name_form.last_name.data = friend_profile.last_name
+            diet_form = DietForm(request.form)
+            diet_reason_form = DietReasonForm(request.form)
+            diet_reason_form.diet_reason.data = friend_profile.diet_reason
+            add_avoid_form = AddAvoidForm(request.form)
+            update_avoid_form = UpdateAvoidForm(request.form)
+            intol_form = IntoleranceForm(request.form)
+            profile_intolerances = db.session.query(ProfileIntolerance).filter(Intolerance.intol_id == ProfileIntolerance.intol_id, ProfileIntolerance.profile_id == friend_profile.profile_id).all()
+            intol_form.intolerances.data = [(intol.intol_id) for intol in profile_intolerances]
+            return render_template("/profiles/friend_profile_editable.html",
+                                   profile_id=current_user.profile.profile_id,
+                                   friend_profile=friend_profile,
+                                   past_parties=past_parties,
+                                   upcoming_parties=upcoming_parties,
+                                   invite_form=party_form,
+                                   profile=current_user.profile,
+                                   delete_form=delete_form,
+                                   intol_form=intol_form,
+                                   first_name_form=first_name_form,
+                                   last_name_form=last_name_form,
+                                   diet_form=diet_form,
+                                   diet_reason_form=diet_reason_form,
+                                   add_avoid_form=add_avoid_form,
+                                   update_avoid_form=update_avoid_form,
+                                   email_form=email_form,
+                                   friend_profile_notes=is_friend.profile_notes,
+                                   notes_form=notes_form)
+        elif is_friend and is_friend.friendship_verified_by_email:
+            return render_template("/profiles/friend_profile_fixed.html",
+                                   profile_id=current_user.profile.profile_id,
+                                   friend_profile=friend_profile,
+                                   past_parties=past_parties,
+                                   upcoming_parties=upcoming_parties,
+                                   invite_form=party_form,
+                                   profile=current_user.profile,
+                                   delete_form=delete_form,
+                                   notes_form=notes_form,
+                                   friend_profile_notes=is_friend.profile_notes,)
     else:
-        flash("Looks like you are not friends with that person. Do you want to add them as a friend or create a profile for them?", "danger")
+        flash("Looks like you are trying to view the profile of someone you are not friends with. Do you want to create your own profile for a friend?", "danger")
+        return redirect(request.referrer)
 
 
 @profiles.route('/connect_friends', methods=['GET', 'POST'])
@@ -131,14 +128,10 @@ def connect_friends():
 
     find_friend_form = FindaFriendForm(request.form)
     if request.method == 'POST' and find_friend_form.validate():
-        existing_user = db.session.query(Profile).join(User).filter(Profile.email == find_friend_form.email.data, Profile.profile_id == User.profile_id).all()
-        already_connected_friends = db.session.query(Friend).filter(and_(or_(Friend.user_id == existing_user.user_id,
-                                                                             Friend.user_id == current_user.user_id)),
-                                                                    and_(or_(Friend.friend_profile_id == existing_user.profile_id,
-                                                                             Friend.friend_profile_id == current_user.profile.profile_id)),
-                                                                    and_(Friend.friendship_verified_by_email.is_(True))).first()
+        existing_user = db.session.query(Profile).join(User).filter(Profile.email == find_friend_form.friend_email.data, Profile.profile_id == User.profile_id).first()
+        already_connected_friends = Friend.query.filter(Friend.user_id == current_user.id, Friend.friend_profile_id == existing_user.profile_id).first()
         if already_connected_friends:
-            flash("Looks like you are already connected to %s, you can find their profile information from the navigation bar above or on your dashboard." % find_friend_form.email.data, "warning")
+            flash("Looks like you are already connected to %s, you can find their profile information from the navigation bar above or on your dashboard." % find_friend_form.friend_email.data, "warning")
             return redirect(request.referrer)
         if existing_user:
             friendship = Friend.create_record(user_id=current_user.id,
@@ -149,24 +142,18 @@ def connect_friends():
                                                                                     current_user.profile.last_name,
                                                                                     current_user.profile.email),
                        template='profiles/email/friend_existing_user',
-                       profile=existing_user.profile,
+                       profile=existing_user,
                        friend=current_user.profile,
                        token=token)
-            friendship.update(friend_request_sent=True)
+            friendship.update({"friend_request_sent": True})
             flash('An connection request email has been sent to %s.' % existing_user.email, "success")
             return redirect(request.referrer)
-        already_sent_email = db.session.query(Friend).filter(and_(or_(Friend.user_id == existing_user.user_id,
-                                                                      Friend.user_id == current_user.user_id)),
-                                                             and_(or_(Friend.friend_profile_id == existing_user.profile_id,
-                                                                      Friend.friend_profile_id == current_user.profile.profile_id)),
-                                                             and_(and_(Friend.friendship_verified_by_email.is_(False),
-                                                                       Friend.friend_request_sent.is_(True)))).first()
-        if already_sent_email:
+        if already_connected_friends.friend_request_sent is True:
             flash("Looks like you have already sent this person a friend request. Maybe check with them personally or create a friend profile for them yourself?", "danger")
             return redirect(request.referrer)
         else:
-            new_friend_profile = Profile.create_record(email=find_friend_form.email.data)
-            friendship = Friend.create_record(user_id=current_user.id, friend_profile_id=new_friend_profile.id)
+            new_friend_profile = Profile.create_record(email=find_friend_form.friend_email.data)
+            friendship = Friend.create_record(user_id=current_user.id, friend_profile_id=new_friend_profile.profile_id)
             token = friendship.generate_email_token()
             send_email(to=new_friend_profile.email, subject=' %s %s wants to connect on KindTable',
                        template='profiles/email/friend_new_user', friend=current_user.profile, token=token)
@@ -180,6 +167,25 @@ def connect_friends():
 @login_required
 @email_confirmation_required
 def confirm_friendship_with_existing_user(token):
+    """Validates an email token and confirms friendship between two existing users"""
+
+    friend_dict = Friend.process_email_token(token)
+    print friend_dict
+    if not friend_dict:
+        abort(404)
+    else:
+        new_friend = User.query.get(friend_dict['user_id'])
+        Friend.create_record(user_id=current_user.id,
+                             friend_profile_id=new_friend.profile_id,
+                             friendship_verified_by_email=True)
+        flash("Congratulations! You are now friends!", "success")
+        return redirect('profiles/friendprofile/%s' % new_friend.profile_id)
+
+
+@profiles.route('/reg_confirm_friendship/<token>', methods=['GET'])
+@login_required
+@email_confirmation_required
+def confirm_friendship_with_new_user(token):
     """Validates an email token and confirms friendship between two existing users"""
 
     friendship = Friend.process_email_token(token)
@@ -573,8 +579,7 @@ def clearfriendnotes():
 def findafriend():
     """Takes an Ajax request and sends friend requests"""
 
-    form = FindAFriendForm(request.form)
-    profile = current_user.profile
+    form = FindaFriendForm(request.form)
     friendship = db.session.query(Friend).join(Profile).filter(Profile.email == form.email.data, Friend.user_id == current_user.id).first()
     if form.validate():
         friendship.update({"profile_notes": None, "last_updated": datetime.utcnow()})
@@ -585,6 +590,3 @@ def findafriend():
                   getattr(form, field).label.text,
                   error[0]), 'danger')
         return redirect(request.referrer)
-
-
-

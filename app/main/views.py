@@ -46,9 +46,8 @@ from ..decorators import email_confirmation_required
 def index():
     """Homepage."""
 
-    user = current_user
-    if user:
-        profile = user.profile
+    if current_user.is_authenticated:
+        profile = current_user.profile
         return render_template("kind_homepage.html", profile=profile)
     else:
         return render_template("kind_homepage.html")

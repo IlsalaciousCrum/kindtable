@@ -235,6 +235,15 @@ class User(BaseMixin, UserMixin, db.Model):
     def get_id(self):
         return unicode(self.session_token)
 
+    def valid_friends(self):
+        '''Returns a list with the profile objects of friends that have been confirmed'''
+
+        return db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
+                                                                       (or_(Friend.friendship_verified_by_email == True,
+                                                                        Friend.friendship_verified_by_facebook == True,
+                                                                        Profile.owned_by_user_id == self.id,
+                                                                        User.profile_id != Profile.owned_by_user_id))).all()
+
     def delete_user(self):
         '''deletes a user and all records in affected tables'''
 
@@ -254,15 +263,6 @@ class User(BaseMixin, UserMixin, db.Model):
         self._delete_()
         user_profile.remove_profile()
         db.session.commit()
-
-    def valid_friends(self):
-        '''Returns all confirmed or private friendships'''
-
-        return db.session.query(Friend).filter(and_(or_(Friend.friendship_verified_by_email.is_(True),
-                                                        Friend.friendship_verified_by_facebook.is_(True),
-                                                        (and_(Profile.owned_by_user_id == self.id,
-                                                         Profile.owned_by_user_id == self.id))),
-                                               and_(Friend.user_id == self.id))).all()
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -290,20 +290,20 @@ class Friend(BaseMixin, db.Model):
                                                 default=False)
     profile_notes = db.Column(db.String(300), nullable=True)
 
-    friend_profile = db.relationship('Profile', backref='friend')
+    profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
 
     def generate_email_token(self):
         '''Creates an encrypted token to send via email to new user'''
 
         email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
-        return email_serializer.dumps({'friend_record_id': self.record_id, 'friend_profile_id': self.friend_profile.profile_id, 'user_id': self.user_id})
+        return email_serializer.dumps({'friend_record_id': self.record_id, 'friend_profile_id': self.profile.profile_id, 'user_id': self.user_id})
 
     @classmethod
     def process_email_token(self, token):
-        email_serializer = URLSafeTimedSerializer(os.environ['APP_SECRET_KEY'])
+        email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
         try:
-            data = email_serializer.loads(token, max_age=3600)
+            data = email_serializer.loads(token)
         except BadSignature, e:
             print "Bad Signature"
             encoded_payload = e.payload
@@ -316,6 +316,11 @@ class Friend(BaseMixin, db.Model):
                     print "bad data"
 
         friendship = Friend.query.get(data['friend_record_id'])
+
+        print "Friend record id is " + str(data['friend_record_id'])
+        print "Friend_profile_id is " + str(data['friend_profile_id'])
+        print "user_id is " + str(data['user_id'])
+
         if not friendship:
             print "That friend record id does not exist."
             return False
@@ -326,7 +331,7 @@ class Friend(BaseMixin, db.Model):
         else:
             friendship.friendship_verified_by_email = True
             db.session.commit()
-            return friendship
+            return {'friend_record_id': data['friend_record_id'], 'friend_profile_id': data['friend_profile_id'], 'user_id': data['user_id']}
 
     def remove_friendship(self):
         '''Removes the friendship and all relevant records'''
