@@ -44,17 +44,11 @@ class RegistrationForm(Form):
                         validators=[InputRequired(message='We need an email address to register you with Kind Table.'),
                                     Length(1, 64, message="Limit 64 characters"),
                                     Email(message='Please provide a valid email address so that you can confirm your account.')])
-    intol_query = Intolerance.query.order_by(Intolerance.intol_name).all()
-    intolerances = MultiCheckboxField('Select all allergies and intolerance groups that apply to you',
-                                      choices=[(intol.intol_id, '{} - <span class="text-muted small">{}</span>'.format(intol.intol_name, intol.intol_description)) for intol in intol_query],
-                                      coerce=int)
-    add_avoid_ingredient = StringField('Ingredient to avoid:',
-                                       widget=TextArea(),
-                                       validators=[InputRequired(message="Please enter an ingredient to avoid."),
-                                                   Length(1, 64, message="Limit 64 characters")])
-    add_avoid_reason = TextField('Reason you would like to avoid this ingredient:',
-                                 widget=TextArea(),
-                                 validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
+    profile_notes = StringField('Private notes:',
+                                widget=TextArea(),
+                                validators=[InputRequired('No notes added.'),
+                                            Length(1, 300)])
+    submit = SubmitField('Update')
     password = PasswordField('Password:',
                              validators=[InputRequired(message='Please provide a strong password'),
                                          Length(1, 64, message="Limit 64 characters"),
@@ -73,6 +67,14 @@ class RegistrationForm(Form):
             return redirect(url_for('main.login'))
 
 
+class IntoleranceForm(Form):
+    intol_query = Intolerance.query.order_by(Intolerance.intol_name).all()
+    intolerances = MultiCheckboxField('Select all allergies and intolerance groups that apply to you',
+                                      choices=[(intol.intol_id, '{} - <span class="text-muted small">{}</span>'.format(intol.intol_name, intol.intol_description)) for intol in intol_query],
+                                      coerce=int)
+    submit = SubmitField('Update')
+
+
 class UpdateAvoidForm(Form):
     update_avoid_ingredient = StringField('Change ingredient to avoid:',
                                           widget=TextArea(),
@@ -81,6 +83,17 @@ class UpdateAvoidForm(Form):
     update_avoid_reason = TextField('Change the reason you avoid this ingredient:',
                                     widget=TextArea(),
                                     validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
+    submit = SubmitField('Update')
+
+
+class AddAvoidForm(Form):
+    add_avoid_ingredient = StringField('Ingredient to avoid:',
+                                       widget=TextArea(),
+                                       validators=[InputRequired(message="Please enter an ingredient to avoid."),
+                                                   Length(1, 64, message="Limit 64 characters")])
+    add_avoid_reason = TextField('Reason you would like to avoid this ingredient:',
+                                 widget=TextArea(),
+                                 validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
 
 

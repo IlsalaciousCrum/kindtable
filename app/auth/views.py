@@ -1,6 +1,6 @@
 '''Views related to user management tasks'''
 
-from flask import render_template, redirect, url_for, flash, session, request, abort
+from flask import render_template, redirect, url_for, flash, session, request, abort, jsonify
 
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -12,7 +12,7 @@ from ..email import send_email
 
 from ..models import Profile, User, Diet
 
-from .forms import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm
+from .forms import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm, UpdateAvoidForm, AddAvoidForm, IntoleranceForm
 
 from datetime import datetime
 
@@ -95,8 +95,35 @@ def logout():
     return redirect(url_for('main.index'))
 
 
+@auth.route('/add_intols.json', methods=['POST'])
+def store_intols():
+    '''Store allergies/intolerances for registration'''
+
+    intol_form = IntoleranceForm(request.form)
+    if intol_form.validate():
+        print intol_form.intolerances.data
+        session['intolerances'] = {'intols': intol_form.intolerances.data}
+        print session['intolerances']
+    return jsonify(data={'message': 'Intols saved'})
+
+
+@auth.route('/add_avoid')
+def store_avoid():
+    '''Store ingredients to avoid and the reason, for registration'''
+
+    return redirect(request.refererr)
+
+
+@auth.route('/update_avoid')
+def update_stored_avoid():
+    '''Store ingredients to avoid and the reason, for registration'''
+
+    return redirect(request.refererr)
+
+
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
+    '''Register a new user'''
     form = RegistrationForm(request.form)
 
     if request.method == 'POST' and form.validate():
@@ -104,7 +131,7 @@ def register():
         profile = Profile.create_record(email=email.lower(),
                                         first_name=form.first_name.data,
                                         last_name=form.last_name.data,
-                                        diet_id=int(form.diet.data),
+                                        diet_id=form.diet.data,
                                         diet_reason=form.diet_reason.data)
 
         user = User.create_record(profile_id=profile.profile_id,
@@ -117,8 +144,25 @@ def register():
                    template='auth/email/confirm', profile=profile, token=token)
         flash('Please check your email for instructions on completing registration.', "success")
         return redirect(url_for('auth.login'))
+    if 'avoid_dict' in session:
+        session['avoid_dict']
+    else:
+        session['avoid_dict'] = {}
+
+    if 'intolerances' in session:
+        session['intolerances']
+    else:
+        session['intolerances'] = {}
     diets = Diet.query.order_by(Diet.diet_type).all()
-    return render_template('auth/register.html', form=form, diets=diets)
+    add_avoid_form = AddAvoidForm(request.form)
+    update_avoid_form = UpdateAvoidForm(request.form)
+    intol_form = IntoleranceForm(request.form)
+    return render_template('auth/register.html',
+                           form=form,
+                           diets=diets,
+                           add_avoid_form=add_avoid_form,
+                           update_avoid_form=update_avoid_form,
+                           intol_form=intol_form)
 
 
 @auth.route('/confirm/<token>')
