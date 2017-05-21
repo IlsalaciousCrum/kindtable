@@ -1,14 +1,19 @@
-from flask import render_template, redirect, url_for, flash, session, request, jsonify, abort
+from flask import (render_template, redirect, url_for, flash, session,
+                   request, jsonify, abort)
 
 from . import profiles
 
 from .. import db
 
-from ..models import User, Profile, Diet, Intolerance, Party, PartyGuest, IngToAvoid, ProfileIntolerance, Friend
+from ..models import (User, Profile, Diet, Intolerance, Party, PartyGuest,
+                      IngToAvoid, ProfileIntolerance, Friend)
 
 from flask_login import login_required, current_user
 
-from .forms import FirstNameForm, LastNameForm, DietForm, DietReasonForm, AddAvoidForm, UpdateAvoidForm, IntoleranceForm, AddToPartiesForm, DeleteFriendForm, ChangeFriendEmailForm, FriendNotesForm, FindaFriendForm
+from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
+                    AddAvoidForm, UpdateAvoidForm, IntoleranceForm,
+                    AddToPartiesForm, DeleteFriendForm, ChangeFriendEmailForm,
+                    FriendNotesForm, FindaFriendForm)
 
 from datetime import datetime
 
@@ -38,10 +43,21 @@ def show_dashboard():
     add_avoid_form = AddAvoidForm(request.form)
     update_avoid_form = UpdateAvoidForm(request.form)
     intol_form = IntoleranceForm(request.form)
-    profile_intolerances = db.session.query(ProfileIntolerance).filter(Intolerance.intol_id == ProfileIntolerance.intol_id, ProfileIntolerance.profile_id == profile.profile_id).all()
-    intol_form.intolerances.data = [(intol.intol_id) for intol in profile_intolerances]
-    past_parties = db.session.query(Party).filter(Party.user_id == current_user.id, Party.datetime_of_party < datetime.utcnow()).all()
-    upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id, Party.datetime_of_party >= datetime.utcnow()).all()
+    profile_intolerances = db.session.query(ProfileIntolerance
+                                            ).filter(Intolerance.intol_id ==
+                                                     ProfileIntolerance.intol_id,
+                                                     ProfileIntolerance.profile_id ==
+                                                     profile.profile_id).all()
+    intol_form.intolerances.data = [(intol.intol_id)
+                                    for intol in profile_intolerances]
+    past_parties = db.session.query(Party).filter(Party.user_id ==
+                                                  current_user.id,
+                                                  Party.datetime_of_party
+                                                  < datetime.utcnow()).all()
+    upcoming_parties = db.session.query(Party).filter(Party.user_id ==
+                                                      current_user.id,
+                                                      Party.datetime_of_party >=
+                                                      datetime.utcnow()).all()
     return render_template("/profiles/dashboard.html",
                            profile=profile,
                            intol_form=intol_form,
@@ -61,13 +77,34 @@ def show_dashboard():
 def show_friend_profile(friend_id):
     """Show logged in user's friends profile"""
 
-    is_friend = Friend.query.filter(Friend.user_id == current_user.id, Friend.friend_profile_id == friend_id).first()
+    is_friend = Friend.query.filter(Friend.user_id ==
+                                    current_user.id,
+                                    Friend.friend_profile_id ==
+                                    friend_id).first()
     if is_friend:
         friend_profile = Profile.query.get(friend_id)
-        past_parties = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_profile.profile_id, Party.datetime_of_party < datetime.utcnow()).all()
-        upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_profile.profile_id, Party.datetime_of_party >= datetime.utcnow()).all()
+        past_parties = db.session.query(Party
+                                        ).filter(Party.user_id ==
+                                                 current_user.id,
+                                                 PartyGuest.friend_profile_id ==
+                                                 friend_profile.profile_id,
+                                                 Party.datetime_of_party <
+                                                 datetime.utcnow()).all()
+        upcoming_parties = db.session.query(Party
+                                            ).filter(Party.user_id ==
+                                                     current_user.id,
+                                                     PartyGuest.friend_profile_id ==
+                                                     friend_profile.profile_id,
+                                                     Party.datetime_of_party >=
+                                                     datetime.utcnow()).all()
         party_form = AddToPartiesForm(request.form)
-        party_form.parties.choices = db.session.query(Party).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id != friend_profile.profile_id, Party.datetime_of_party >= datetime.utcnow()).all()
+        party_form.parties.choices = db.session.query(Party
+                                                      ).filter(Party.user_id ==
+                                                               current_user.id,
+                                                               PartyGuest.friend_profile_id !=
+                                                               friend_profile.profile_id,
+                                                               Party.datetime_of_party >=
+                                                               datetime.utcnow()).all()
         delete_form = DeleteFriendForm(request.form)
         email_form = ChangeFriendEmailForm(request.form)
         notes_form = FriendNotesForm(request.form)
@@ -84,7 +121,11 @@ def show_friend_profile(friend_id):
             add_avoid_form = AddAvoidForm(request.form)
             update_avoid_form = UpdateAvoidForm(request.form)
             intol_form = IntoleranceForm(request.form)
-            profile_intolerances = db.session.query(ProfileIntolerance).filter(Intolerance.intol_id == ProfileIntolerance.intol_id, ProfileIntolerance.profile_id == friend_profile.profile_id).all()
+            profile_intolerances = db.session.query(ProfileIntolerance
+                                                    ).filter(Intolerance.intol_id ==
+                                                             ProfileIntolerance.intol_id,
+                                                             ProfileIntolerance.profile_id ==
+                                                             friend_profile.profile_id).all()
             intol_form.intolerances.data = [(intol.intol_id) for intol in profile_intolerances]
             return render_template("/profiles/friend_profile_editable.html",
                                    profile_id=current_user.profile.profile_id,
@@ -116,7 +157,8 @@ def show_friend_profile(friend_id):
                                    notes_form=notes_form,
                                    friend_profile_notes=is_friend.profile_notes,)
     else:
-        flash("Looks like you are trying to view the profile of someone you are not friends with. Do you want to create your own profile for a friend?", "danger")
+        flash("Looks like you are trying to view the profile of someone you are not\
+              friends with. Do you want to create your own profile for a friend?", "danger")
         return redirect(request.referrer)
 
 
@@ -128,36 +170,56 @@ def connect_friends():
 
     find_friend_form = FindaFriendForm(request.form)
     if request.method == 'POST' and find_friend_form.validate():
-        existing_user = db.session.query(Profile).join(User).filter(Profile.email == find_friend_form.friend_email.data, Profile.profile_id == User.profile_id).first()
-        already_connected_friends = Friend.query.filter(Friend.user_id == current_user.id, Friend.friend_profile_id == existing_user.profile_id).first()
-        if already_connected_friends:
-            flash("Looks like you are already connected to %s, you can find their profile information from the navigation bar above or on your dashboard." % find_friend_form.friend_email.data, "warning")
-            return redirect(request.referrer)
+        existing_user = db.session.query(Profile
+                                         ).join(User
+                                                ).filter(Profile.email ==
+                                                         find_friend_form.friend_email.data,
+                                                         Profile.profile_id ==
+                                                         User.profile_id).first()
         if existing_user:
-            friendship = Friend.create_record(user_id=current_user.id,
-                                              friend_profile_id=existing_user.profile_id)
-            token = friendship.generate_email_token()
-            send_email(to=existing_user.email,
-                       subject=' {0} {1}({2}) wants to connect on KindTable'.format(current_user.profile.first_name,
-                                                                                    current_user.profile.last_name,
-                                                                                    current_user.profile.email),
-                       template='profiles/email/friend_existing_user',
-                       profile=existing_user,
-                       friend=current_user.profile,
-                       token=token)
-            friendship.update({"friend_request_sent": True})
-            flash('An connection request email has been sent to %s.' % existing_user.email, "success")
-            return redirect(request.referrer)
-        if already_connected_friends.friend_request_sent is True:
-            flash("Looks like you have already sent this person a friend request. Maybe check with them personally or create a friend profile for them yourself?", "danger")
-            return redirect(request.referrer)
+            already_connected_friends = Friend.query.filter(Friend.user_id ==
+                                                            current_user.id,
+                                                            Friend.friend_profile_id ==
+                                                            existing_user.profile_id).first()
+            if already_connected_friends:
+                flash("Looks like you are already connected to %s, you can find\
+                      their profile information from the navigation bar above or\
+                      on your dashboard." % find_friend_form.friend_email.data,
+                      "warning")
+                return redirect(request.referrer)
+            if existing_user:
+                friendship = Friend.create_record(user_id=current_user.id,
+                                                  friend_profile_id=existing_user.profile_id)
+                token = friendship.generate_email_token()
+                send_email(to=existing_user.email,
+                           subject=' {0} {1}({2}) wants to connect\
+                           on KindTable'.format(current_user.profile.first_name,
+                                                current_user.profile.last_name,
+                                                current_user.profile.email),
+                           template='profiles/email/friend_existing_user',
+                           profile=existing_user,
+                           friend=current_user.profile,
+                           token=token)
+                friendship.update({"friend_request_sent": True})
+                flash('An connection request email has been sent to %s.'
+                      % existing_user.email, "success")
+                return redirect(request.referrer)
+            if already_connected_friends.friend_request_sent is True:
+                flash("Looks like you have already sent this person a friend\
+                      request. Maybe check with them personally or create a friend\
+                      profile for them yourself?", "danger")
+                return redirect(request.referrer)
         else:
             new_friend_profile = Profile.create_record(email=find_friend_form.friend_email.data)
-            friendship = Friend.create_record(user_id=current_user.id, friend_profile_id=new_friend_profile.profile_id)
+            friendship = Friend.create_record(user_id=current_user.id,
+                                              friend_profile_id=new_friend_profile.profile_id)
             token = friendship.generate_email_token()
-            send_email(to=new_friend_profile.email, subject=' %s %s wants to connect on KindTable',
-                       template='profiles/email/friend_new_user', friend=current_user.profile, token=token)
-            flash('An connection request email has been sent to %s.' % new_friend_profile.email, "success")
+            send_email(to=new_friend_profile.email,
+                       subject=' %s %s wants to connect on KindTable',
+                       template='profiles/email/friend_new_user',
+                       friend=current_user.profile, token=token)
+            flash('An connection request email has been sent to %s.'
+                  % new_friend_profile.email, "success")
             return redirect(request.referrer)
     return render_template("profiles/find_a_friend.html",
                            find_friend_form=find_friend_form)
@@ -167,7 +229,8 @@ def connect_friends():
 @login_required
 @email_confirmation_required
 def confirm_friendship_with_existing_user(token):
-    """Validates an email token and confirms friendship between two existing users"""
+    """Validates an email token and confirms friendship between
+    two existing users"""
 
     friend_dict = Friend.process_email_token(token)
     print friend_dict
@@ -186,7 +249,8 @@ def confirm_friendship_with_existing_user(token):
 @login_required
 @email_confirmation_required
 def confirm_friendship_with_new_user(token):
-    """Validates an email token and confirms friendship between two existing users"""
+    """Validates an email token and confirms friendship between
+    two existing users"""
 
     friendship = Friend.process_email_token(token)
     if not friendship:
@@ -221,11 +285,6 @@ def show_party_profile(party_id):
                            parties=parties)
 
 
-
-
-
-
-
 # Only JSON routes below for AJAX calls
 
 
@@ -239,7 +298,8 @@ def changefirstname():
     profile = Profile.query.get(form.profile_id.data)
     if form.validate() and profile.owned_by_user_id == current_user.id:
         profile = Profile.query.get(form.profile_id.data)
-        profile.update({"first_name": form.first_name.data, "last_updated": datetime.utcnow()})
+        profile.update({"first_name": form.first_name.data,
+                        "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'First name updated'})
     else:
         for field, error in form.errors.items():
@@ -259,7 +319,8 @@ def changelastname():
     profile = Profile.query.get(form.profile_id.data)
     if form.validate() and profile.owned_by_user_id == current_user.id:
         profile = Profile.query.get(form.profile_id.data)
-        profile.update({"last_name": form.last_name.data, "last_updated": datetime.utcnow()})
+        profile.update({"last_name": form.last_name.data,
+                        "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Last name updated'})
     else:
         for field, error in form.errors.items():
@@ -278,7 +339,8 @@ def changediet():
     form = DietForm(request.form)
     profile = Profile.query.get(form.profile_id.data)
     if form.validate() and profile.owned_by_user_id == current_user.id:
-        profile.update({"diet_id": form.diet.data, "last_updated": datetime.utcnow()})
+        profile.update({"diet_id": form.diet.data,
+                        "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Diet updated'})
     else:
         for field, error in form.errors.items():
@@ -297,7 +359,8 @@ def changedietreason():
     form = DietReasonForm(request.form)
     profile = Profile.query.get(form.profile_id.data)
     if form.validate() and profile.owned_by_user_id == current_user.id:
-        profile.update({"diet_reason": form.diet_reason.data, "last_updated": datetime.utcnow()})
+        profile.update({"diet_reason": form.diet_reason.data,
+                        "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Diet reason updated'})
     else:
         for field, error in form.errors.items():
@@ -335,17 +398,24 @@ def intol():
     form = IntoleranceForm(request.form)
     profile = Profile.query.get(form.profile_id.data)
     if form.validate() and profile.owned_by_user_id == current_user.id:
-        query = db.session.query(ProfileIntolerance).filter(ProfileIntolerance.profile_id == profile.profile_id).all()
+        query = db.session.query(ProfileIntolerance
+                                 ).filter(ProfileIntolerance.profile_id ==
+                                          profile.profile_id).all()
         profile_intolerances = [(intol.intol_id) for intol in query]
         for intolerance in form.intolerances.data:
             if intolerance in profile_intolerances:
                 pass
             elif intolerance not in profile_intolerances:
-                ProfileIntolerance.create_record(profile_id=profile.profile_id, intol_id=intolerance)
+                ProfileIntolerance.create_record(profile_id=profile.profile_id,
+                                                 intol_id=intolerance)
                 profile.update({"last_updated": datetime.utcnow()})
         for profile_intolerance in profile_intolerances:
             if profile_intolerance not in form.intolerances.data:
-                intol = db.session.query(ProfileIntolerance).filter(ProfileIntolerance.intol_id == profile_intolerance, ProfileIntolerance.profile_id == profile.profile_id).one()
+                intol = db.session.query(ProfileIntolerance
+                                         ).filter(ProfileIntolerance.intol_id ==
+                                                  profile_intolerance,
+                                                  ProfileIntolerance.profile_id ==
+                                                  profile.profile_id).one()
                 intol.remove_intolerance()
                 profile.update({"last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Intolerances updated'})
@@ -369,11 +439,14 @@ def addavoid():
     print 3
     if form.validate() and profile.owned_by_user_id == current_user.id:
         print 4
-        already_added = db.session.query(IngToAvoid).filter(IngToAvoid.ingredient == form.add_avoid_ingredient.data).all()
+        already_added = db.session.query(IngToAvoid
+                                         ).filter(IngToAvoid.ingredient ==
+                                                  form.add_avoid_ingredient.data).all()
         print 5
         if already_added:
             print 6
-            flash("We already know about that ingredient to avoid. Would you like to add a different one?", "warning")
+            flash("We already know about that ingredient to avoid.\
+                  Would you like to add a different one?", "warning")
             print 7
             return redirect(request.referrer)
         else:
@@ -402,7 +475,8 @@ def getavoid():
 
     avoid_id = request.args.get("id")
     avoidance = IngToAvoid.query.get(avoid_id)
-    return jsonify(data={'ingredient': avoidance.ingredient, 'reason': avoidance.reason})
+    return jsonify(data={'ingredient': avoidance.ingredient,
+                         'reason': avoidance.reason})
 
 
 @profiles.route('/updateavoid.json', methods=['POST'])
@@ -497,7 +571,10 @@ def delete_friend():
     form = DeleteFriendForm(request.form)
     if form.validate():
         friend_profile = Profile.query.get(form.friend_profile_id.data)
-        friendship = db.session.query(Friend).filter(Friend.user_id == current_user.id, Friend.friend_profile_id == form.friend_profile_id.data).all()
+        friendship = db.session.query(Friend).filter(Friend.user_id ==
+                                                     current_user.id,
+                                                     Friend.friend_profile_id ==
+                                                     form.friend_profile_id.data).all()
         if friend_profile.owned_by_user_id == current_user.id:
             friendship.remove_friendship()
             friend_profile.remove_profile()
@@ -523,7 +600,8 @@ def changefriendemail():
     profile = Profile.query.get(form.friend_profile_id.data)
     if form.validate() and profile.owned_by_user_id == current_user.id:
         profile = Profile.query.get(form.friend_profile_id.data)
-        profile.update({"email": form.email.data, "last_updated": datetime.utcnow()})
+        profile.update({"email": form.email.data,
+                        "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'First name updated'})
     else:
         for field, error in form.errors.items():
@@ -541,9 +619,12 @@ def changefriendnotes():
 
     form = FriendNotesForm(request.form)
     profile = Profile.query.get(form.friend_profile_id.data)
-    friendship = Friend.query.filter(Friend.friend_profile_id == profile.profile_id, Friend.user_id == current_user.id).one()
+    friendship = Friend.query.filter(Friend.friend_profile_id ==
+                                     profile.profile_id, Friend.user_id ==
+                                     current_user.id).one()
     if form.validate():
-        friendship.update({"profile_notes": form.notes.data, "last_updated": datetime.utcnow()})
+        friendship.update({"profile_notes": form.notes.data,
+                           "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Notes updated'})
     else:
         for field, error in form.errors.items():
@@ -561,9 +642,12 @@ def clearfriendnotes():
 
     form = FriendNotesForm(request.form)
     profile = Profile.query.get(form.friend_profile_id.data)
-    friendship = Friend.query.filter(Friend.friend_profile_id == profile.profile_id, Friend.user_id == current_user.id).one()
+    friendship = Friend.query.filter(Friend.friend_profile_id ==
+                                     profile.profile_id, Friend.user_id ==
+                                     current_user.id).one()
     if form.validate():
-        friendship.update({"profile_notes": None, "last_updated": datetime.utcnow()})
+        friendship.update({"profile_notes": None,
+                           "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Notes updated'})
     else:
         for field, error in form.errors.items():
@@ -580,9 +664,14 @@ def findafriend():
     """Takes an Ajax request and sends friend requests"""
 
     form = FindaFriendForm(request.form)
-    friendship = db.session.query(Friend).join(Profile).filter(Profile.email == form.email.data, Friend.user_id == current_user.id).first()
+    friendship = db.session.query(Friend).join(Profile
+                                               ).filter(Profile.email ==
+                                                        form.email.data,
+                                                        Friend.user_id ==
+                                                        current_user.id).first()
     if form.validate():
-        friendship.update({"profile_notes": None, "last_updated": datetime.utcnow()})
+        friendship.update({"profile_notes": None,
+                           "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Notes updated'})
     else:
         for field, error in form.errors.items():

@@ -2,17 +2,14 @@ $(document).ready(function() {
     "use strict";
     $('#updateAvoidModal').on('show.bs.modal', (function(event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
-        var avoid_id = button.data('whatever'); // Extract info from data-* attributes
-        var modal = $(this);
-        $('#updateAvoidFormAvoidId').val(avoid_id);
+        var avoid_key = button.data('key'); // Extract info from data-* attributes
+        var avoid_value = button.data('value'); // Extract info from data-* attributes
 
-        function replaceAvoidFormValues(results) {
-            console.dir(results);
-            $("#update_avoid_ingredient").val(results.data.ingredient);
-            $("#update_avoid_reason").val(results.data.reason);
-        }
-
-        $.get("/profiles/getavoid.json", {id: avoid_id}, replaceAvoidFormValues);
+        $('textarea[name="update_avoid_key"]').val(avoid_key);
+        $('textarea[name="update_avoid_value"]').val(avoid_value);
+        $('input[name="original_key"]').val(avoid_key);
+    
+        $(".updateAvoidModal").modal("show");
     }));
 });
 
@@ -57,7 +54,7 @@ $(document).ready(function() {
     "use strict";
     $('#deleteavoid').on('click', (function(event) {
     
-        var url = "/profiles/deleteavoid.json";
+        var url = "/auth/delete_ingredient.json";
         $.ajax({
             type: "POST",
             url: url,
@@ -87,7 +84,7 @@ $(document).ready(function() {
     "use strict";
     $('#deleteavoidreason').on('click', (function(event) {
     
-        var url = "/profiles/deleteavoidreason.json";
+        var url = "/auth/delete_reason.json";
         $.ajax({
             type: "POST",
             url: url,

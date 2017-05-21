@@ -3,8 +3,13 @@ function showCurrentAvoid(results) {
     "use strict";
     console.dir(results); // for debugging
     $(".avoids").load(location.href + " #avoids");
+    $(".avoids").show();
     $(".modal.in").find('form')[0].reset();
-    $("#intols").html('<div class="alert alert-success"><strong>Success!</strong> Would you like to add another ingredient?</div>');
+    $("#flashed_alert").css('display', 'inline');
+     $("#avoid-success").css('display', 'inline');
+    $("#avoid-success").fadeOut(4000, (function(){
+        $('#avoid-success').css('display', 'none');
+    }));
 }
 
 $(document).ready(function() {

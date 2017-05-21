@@ -1,8 +1,12 @@
 function showCurrentIntols(results) {
     "use strict";
     console.dir(results); // for debugging
-    $(".intol-success").html('<span class="alert alert-success glyphicon glyphicon-ok"></span>');
+    $("#intol-success").css('display', 'inline');
+    $("#intol-success").fadeOut(2500, (function(){
+        $('#intol-success').css('display', 'none');
+    }));
     $(".modal.in").modal("hide");
+
 }
 
 $(document).ready(function() {

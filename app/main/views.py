@@ -6,10 +6,13 @@ from flask import render_template, request, flash, redirect, session, json, url_
 from flask_moment import Moment
 from . import main
 
-# commented out because I have not made my forms yet, NameForm is a placeholder name, not a real form
+# commented out because I have not made my forms yet, NameForm is a placeholder
+# name, not a real form
 # from .forms import NameForm
 
-from app.models import User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes
+from app.models import (User, Profile, Friend, ProfileIntolerance, Intolerance,
+                        Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party,
+                        RecipeCard, RecipeBox, PartyRecipes)
 from .. import db
 from flask_mail import Mail, Message
 from flask_login import login_required, current_user
@@ -25,7 +28,9 @@ from ..decorators import email_confirmation_required
 #     try:
 #         msg = Message("Ilsa has sent you a Kind Table Request!",
 #                       recipients=["ilsalacious@gmail.com"])
-#         msg.body = "Ilsa (ilsalacious@gmail.com) would like you to fill out a brief dietary preference profile to make cooking for you easier."
+#         msg.body = "Ilsa (ilsalacious@gmail.com) would like you to fill\
+#                           out a brief dietary preference profile to make\
+#                           cooking for you easier."
 #         Mail.send(msg)
 #         return 'Mail sent!'
 #     except Exception, e:

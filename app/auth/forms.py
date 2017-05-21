@@ -1,8 +1,10 @@
 '''WTForms forms for user management'''
 
 from wtforms import Form, widgets
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, RadioField, TextField, SelectMultipleField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, Optional, DataRequired, ValidationError
+from wtforms import (StringField, PasswordField, BooleanField, SubmitField,
+                     RadioField, TextField, SelectMultipleField, HiddenField)
+from wtforms.validators import (InputRequired, Length, Email, EqualTo, Optional,
+                                DataRequired, ValidationError)
 from wtforms.widgets import TextArea
 from ..models import Profile, Diet, User, Intolerance
 from .. import db
@@ -36,9 +38,14 @@ class RegistrationForm(Form):
                                         Length(1, 64, message="Limit 64 characters")])
     diets = Diet.query.order_by(Diet.diet_type).all()
     diet = RadioField('Diet you follow:', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
-                      validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
-    diet_reason = TextField('Reason you follow this diet:', widget=TextArea(), validators=[Length(1, 128, message="Limit 64 characters"),
-                            Optional(strip_whitespace=True)])
+                      validators=[DataRequired(message='Please choose a diet')],
+                      default="10",
+                      coerce=int)
+    diet_reason = TextField('Reason you follow this diet:',
+                            widget=TextArea(),
+                            validators=[Length(1, 128,
+                                        message="Limit 64 characters"),
+                                        Optional(strip_whitespace=True)])
     email = StringField('Email:',
                         widget=TextArea(),
                         validators=[InputRequired(message='We need an email address to register you with Kind Table.'),
@@ -76,13 +83,14 @@ class IntoleranceForm(Form):
 
 
 class UpdateAvoidForm(Form):
-    update_avoid_ingredient = StringField('Change ingredient to avoid:',
-                                          widget=TextArea(),
-                                          validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
-                                                      Length(1, 64, message="Limit 64 characters")])
-    update_avoid_reason = TextField('Change the reason you avoid this ingredient:',
-                                    widget=TextArea(),
-                                    validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
+    original_key = HiddenField()
+    update_avoid_key = StringField('Change ingredient to avoid:',
+                                   widget=TextArea(),
+                                   validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
+                                               Length(1, 64, message="Limit 64 characters")])
+    update_avoid_value = TextField('Change the reason you avoid this ingredient:',
+                                   widget=TextArea(),
+                                   validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
 
 

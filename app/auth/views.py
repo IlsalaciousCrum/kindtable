@@ -1,6 +1,6 @@
 '''Views related to user management tasks'''
 
-from flask import render_template, redirect, url_for, flash, session, request, abort, jsonify
+from flask import render_template, redirect, url_for, flash, session, request, jsonify
 
 from flask_login import login_user, logout_user, login_required, current_user
 
@@ -10,9 +10,16 @@ from .. import db
 
 from ..email import send_email
 
-from ..models import Profile, User, Diet
+from ..models import Profile, User, Diet, ProfileIntolerance, IngToAvoid
 
-from .forms import LoginForm, RegistrationForm, PasswordResetRequestForm, PasswordResetForm, ChangeEmailForm, UpdateAvoidForm, AddAvoidForm, IntoleranceForm
+from .forms import (LoginForm,
+                    RegistrationForm,
+                    PasswordResetRequestForm,
+                    PasswordResetForm,
+                    ChangeEmailForm,
+                    UpdateAvoidForm,
+                    AddAvoidForm,
+                    IntoleranceForm)
 
 from datetime import datetime
 
@@ -22,11 +29,15 @@ def login():
     '''Loads the login and password reset forms'''
 
     login_form = LoginForm(request.form, prefix="b")
-    reset_password_request_form = PasswordResetRequestForm(request.form, prefix="a")
+    reset_password_request_form = PasswordResetRequestForm(request.form,
+                                                           prefix="a")
 
     if request.method == 'POST' and login_form.validate():
         email = login_form.email.data
-        user = db.session.query(User).join(Profile).filter(Profile.email == email.lower(), User.profile_id == Profile.profile_id).first()
+        user = db.session.query(User).join(Profile).filter(Profile.email ==
+                                                           email.lower(),
+                                                           User.profile_id ==
+                                                           Profile.profile_id).first()
         if user is not None and user.verify_password(login_form.password.data):
             login_user(user, remember=login_form.remember_me.data)
             session['session_token'] = user.session_token
@@ -44,25 +55,33 @@ def login():
 def process_reset():
     '''Starts the password reset process'''
 
-    reset_password_request_form = PasswordResetRequestForm(request.form, prefix="a")
+    reset_password_request_form = PasswordResetRequestForm(request.form,
+                                                           prefix="a")
     if request.method == 'POST' and reset_password_request_form.validate():
         if not current_user.is_anonymous:
             print "a user is already logged in"
             return redirect(url_for('main.index'))
         email = reset_password_request_form.email.data
-        user = db.session.query(User).join(Profile).filter(Profile.email == email.lower(), User.profile_id == Profile.profile_id).first()
+        user = db.session.query(User).join(Profile).filter(Profile.email ==
+                                                           email.lower(),
+                                                           User.profile_id ==
+                                                           Profile.profile_id).first()
         profile = user.profile
         if user:
             token = profile.generate_confirmation_token()
             send_email(to=profile.email, subject=' Reset your password',
-                       template='auth/email/reset_password', profile=profile, token=token)
-            flash('An email with instructions to reset your password has been sent to you.', "success")
+                       template='auth/email/reset_password',
+                       profile=profile, token=token)
+            flash('An email with instructions to reset your password\
+             has been sent to you.', "success")
             return redirect(url_for('auth.login'))
         else:
-            flash('That email is not registered, please try another email address or register.', "danger")
+            flash('That email is not registered, please try another email\
+                   address or register.', "danger")
             return redirect(url_for('auth.login'))
     else:
-        flash('That email is not registered, please try another email address or register.', "danger")
+        flash('That email is not registered, please try another email\
+               address or register.', "danger")
         return redirect(url_for('auth.login'))
 
 
@@ -73,9 +92,14 @@ def password_reset(token):
     form = PasswordResetForm(request.form)
     if request.method == 'POST' and form.validate():
         email = form.email.data
-        user = db.session.query(User).join(Profile).filter(Profile.email == email.lower(), User.profile_id == Profile.profile_id).first()
+        user = db.session.query(User).join(Profile
+                                           ).filter(Profile.email ==
+                                                    email.lower(),
+                                                    User.profile_id ==
+                                                    Profile.profile_id).first()
         if user is None:
-            flash('You have entered an incorrect email address. Please follow the link from your email again')
+            flash('You have entered an incorrect email address.\
+                  Please follow the link from your email again')
             return redirect(url_for('main.index'))
         if user.reset_password(token=token, new_password=form.password.data):
             flash('Your password has been updated.', 'success')
@@ -95,30 +119,90 @@ def logout():
     return redirect(url_for('main.index'))
 
 
+@auth.route('/clear')
+def clear_session():
+    session.clear()
+    return redirect(url_for('auth.register'))
+
+
 @auth.route('/add_intols.json', methods=['POST'])
 def store_intols():
     '''Store allergies/intolerances for registration'''
 
     intol_form = IntoleranceForm(request.form)
     if intol_form.validate():
-        print intol_form.intolerances.data
         session['intolerances'] = {'intols': intol_form.intolerances.data}
-        print session['intolerances']
     return jsonify(data={'message': 'Intols saved'})
 
 
-@auth.route('/add_avoid')
+@auth.route('/add_avoid.json', methods=['POST'])
 def store_avoid():
     '''Store ingredients to avoid and the reason, for registration'''
 
-    return redirect(request.refererr)
+    add_avoid_form = AddAvoidForm(request.form)
+    if add_avoid_form.validate():
+        print add_avoid_form.add_avoid_ingredient.data
+        print add_avoid_form.add_avoid_reason.data
+
+        avoid_dict = session['avoid_dict']
+        print avoid_dict
+
+        avoid_dict[add_avoid_form.add_avoid_ingredient.data
+                   ] = add_avoid_form.add_avoid_reason.data
+        session.modified = True
+        print avoid_dict
+        print session['avoid_dict']
+        return jsonify(data={'message': 'avoid saved'})
 
 
-@auth.route('/update_avoid')
+@auth.route('/update_avoid.json', methods=['POST'])
 def update_stored_avoid():
     '''Store ingredients to avoid and the reason, for registration'''
 
-    return redirect(request.refererr)
+    update_avoid_form = UpdateAvoidForm(request.form)
+    if update_avoid_form.validate():
+        print update_avoid_form.original_key.data
+        print update_avoid_form.update_avoid_key.data
+        print update_avoid_form.update_avoid_value.data
+
+        avoid_dict = session['avoid_dict']
+        del avoid_dict[update_avoid_form.update_avoid_key.data]
+        avoid_dict[update_avoid_form.update_avoid_key.data
+                   ] = update_avoid_form.update_avoid_value.data
+        session.modified = True
+    return jsonify(data={'message': 'avoid updated'})
+
+
+@auth.route('/delete_ingredient.json', methods=['POST'])
+def delete_stored_ingredient():
+    '''Delete ingredient to avoid, for registration'''
+
+    update_avoid_form = UpdateAvoidForm(request.form)
+    if update_avoid_form.validate():
+        print update_avoid_form.original_key.data
+        print update_avoid_form.update_avoid_key.data
+        print update_avoid_form.update_avoid_value.data
+
+        avoid_dict = session['avoid_dict']
+        del avoid_dict[update_avoid_form.original_key.data]
+        session.modified = True
+    return jsonify(data={'message': 'avoid updated'})
+
+
+@auth.route('/delete_reason.json', methods=['POST'])
+def delete_stored_reason():
+    '''Delete reason for avoiding ingredient, for registration'''
+
+    update_avoid_form = UpdateAvoidForm(request.form)
+    if update_avoid_form.validate():
+        print update_avoid_form.original_key.data
+        print update_avoid_form.update_avoid_key.data
+        print update_avoid_form.update_avoid_value.data
+
+        avoid_dict = session['avoid_dict']
+        avoid_dict[update_avoid_form.original_key.data] = ""
+        session.modified = True
+    return jsonify(data={'message': 'avoid updated'})
 
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -136,22 +220,32 @@ def register():
 
         user = User.create_record(profile_id=profile.profile_id,
                                   password=form.password.data)
+
+        for intolerance in session['intolerances']:
+            ProfileIntolerance.create_record(profile_id=profile.profile_id,
+                                             intol_id=intolerance)
+
+        for key, value in session['avoid_dict']:
+            IngToAvoid.create_record(ingredient=key,
+                                     reason=value,
+                                     profile_id=profile.profile_id)
+
         user.make_session_token()
         profile.owned_by_user_id = user.id
         db.session.commit()
         token = profile.generate_confirmation_token()
         send_email(to=profile.email, subject=' Confirm Your Account',
                    template='auth/email/confirm', profile=profile, token=token)
-        flash('Please check your email for instructions on completing registration.', "success")
+        flash('Please check your email for instructions on completing\
+              registration.', "success")
         return redirect(url_for('auth.login'))
-    if 'avoid_dict' in session:
+    try:
         session['avoid_dict']
-    else:
+    except:
         session['avoid_dict'] = {}
-
-    if 'intolerances' in session:
+    try:
         session['intolerances']
-    else:
+    except:
         session['intolerances'] = {}
     diets = Diet.query.order_by(Diet.diet_type).all()
     add_avoid_form = AddAvoidForm(request.form)
@@ -184,7 +278,8 @@ def confirm(token):
 @auth.route('/change_email', methods=['GET', 'POST'])
 @login_required
 def change_email():
-    """Takes an Ajax request and changes a user's email address, requires the user to reconfim their account"""
+    """Takes an Ajax request and changes a user's email address, requires
+    the user to reconfim their account"""
 
     form = ChangeEmailForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -201,7 +296,8 @@ def change_email():
                        template='auth/email/confirm', profile=profile, token=token)
             session.clear()
             logout_user()
-            flash('An email with instructions to reset your password has been sent to you.', "success")
+            flash('An email with instructions to reset your password\
+                  has been sent to you.', "success")
             return redirect(url_for('auth.login'))
         else:
             flash('Incorrect password. Please reenter your password.', "danger")
