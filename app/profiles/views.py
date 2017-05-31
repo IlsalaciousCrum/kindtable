@@ -12,8 +12,8 @@ from flask_login import login_required, current_user
 
 from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
                     AddAvoidForm, UpdateAvoidForm, IntoleranceForm,
-                    AddToPartiesForm, DeleteFriendForm, ChangeFriendEmailForm,
-                    FriendNotesForm, FindaFriendForm)
+                    AddNewPartyForm, DeleteFriendForm, ChangeFriendEmailForm,
+                    FriendNotesForm, FindaFriendForm, AddGuestToPartyForm)
 
 from datetime import datetime
 
@@ -97,7 +97,7 @@ def show_friend_profile(friend_id):
                                                      friend_profile.profile_id,
                                                      Party.datetime_of_party >=
                                                      datetime.utcnow()).all()
-        party_form = AddToPartiesForm(request.form)
+        party_form = AddGuestToPartyForm(request.form)
         party_form.parties.choices = db.session.query(Party
                                                       ).filter(Party.user_id ==
                                                                current_user.id,
@@ -160,6 +160,13 @@ def show_friend_profile(friend_id):
         flash("Looks like you are trying to view the profile of someone you are not\
               friends with. Do you want to create your own profile for a friend?", "danger")
         return redirect(request.referrer)
+
+
+# @profiles.route('/add_a_new_party_form', methods=['GET', 'POST'])
+# @login_required
+# @email_confirmation_required
+# def add_a_new_party():
+#     """Loads modal content for creating a new party"""
 
 
 @profiles.route('/connect_friends', methods=['GET', 'POST'])
@@ -286,7 +293,6 @@ def show_party_profile(party_id):
 
 
 # Only JSON routes below for AJAX calls
-
 
 @profiles.route('/changefirstname.json', methods=['POST'])
 @login_required
@@ -669,6 +675,29 @@ def findafriend():
                                                         form.email.data,
                                                         Friend.user_id ==
                                                         current_user.id).first()
+    if form.validate():
+        friendship.update({"profile_notes": None,
+                           "last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Notes updated'})
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@profiles.route('/add_new_party.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def add_new_party():
+    """Takes an Ajax request and adds a new party"""
+
+    form = FriendNotesForm(request.form)
+    profile = Profile.query.get(form.friend_profile_id.data)
+    friendship = Friend.query.filter(Friend.friend_profile_id ==
+                                     profile.profile_id, Friend.user_id ==
+                                     current_user.id).one()
     if form.validate():
         friendship.update({"profile_notes": None,
                            "last_updated": datetime.utcnow()})

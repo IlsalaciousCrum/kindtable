@@ -103,7 +103,7 @@
                         <ul class="dropdown-menu">
                             {% if current_user.parties %}
                             {% for party in current_user.parties %}
-                            <li><a href="{{ url_for('profiles.show_party_profile', party_id = party.party_id) }}">{{  party.title  }}</a></li>
+                            <li class="myParties"><a href="{{ url_for('profiles.show_party_profile', party_id = party.party_id) }}">{{  party.title  }}</a></li>
                             {% endfor %}
                             {% else %}
                             {% endif %}

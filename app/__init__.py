@@ -47,6 +47,9 @@ def create_app(config_name):
     from .profiles import profiles as profiles_blueprint
     app.register_blueprint(profiles_blueprint, url_prefix='/profiles')
 
+    from .spoonacular import spoonacular as spoonacular_blueprint
+    app.register_blueprint(spoonacular_blueprint, url_prefix='/spoonacular')
+
     db.app = app
 
     #  attach routes and custom error pages here

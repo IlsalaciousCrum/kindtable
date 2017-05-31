@@ -1,14 +1,16 @@
 '''WTForms forms for app data collection'''
 
 from wtforms import Form, widgets
-from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField, SelectMultipleField
+from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField, SelectMultipleField, DateField
 from wtforms.validators import InputRequired, Length, Email, Optional, DataRequired, EqualTo
 from wtforms import ValidationError
 from wtforms.widgets import TextArea
-from ..models import Profile, Diet, User, Intolerance, Party, Friend
+from ..models import Profile, Diet, User, Intolerance, Party, Friend, Party
 from .. import db
 from flask import flash, redirect, url_for, request
 from flask_login import current_user
+from datetime import datetime, date
+from wtforms_components import DateRange
 
 
 class FirstNameForm(Form):
@@ -118,7 +120,7 @@ class AddNewFriendForm(Form):
             return redirect(url_for('main.login'))
 
 
-class AddToPartiesForm(Form):
+class AddGuestToPartyForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     friend_profile_id = HiddenField(validators=[InputRequired()])
     party_query = Party.query.all()
@@ -126,6 +128,28 @@ class AddToPartiesForm(Form):
                                  choices=[(party.party_id, '{} - <span class="text-muted small">{}</span>'.format(party.title, party.datetime_of_party)) for party in party_query],
                                  coerce=int)
     submit = SubmitField('Update')
+
+
+class AddNewPartyForm(Form):
+    user_id = HiddenField(validators=[InputRequired()])
+    party_name = StringField('Name your event:',
+                             widget=TextArea(),
+                             validators=[InputRequired(message="What would you like to call your event?"),
+                                         Length(1, 64, message="Limit 64 characters")])
+    start_date = DateField('Date of your event:',
+                           validators=[DateRange(min=date.today(),
+                                                 message="That date is in the past.")])
+    start_time = DateField('Time of your event:',
+                           validators=[DateRange(min=datetime.now(),
+                                                 message="That time is in the past.")])
+
+    def validate_party_name(self, field):
+        print "checking existing party name"
+        if Party.query.filter(Party.title == field.data,
+                              Party.user_id == Form.user_id.data).first():
+            print "triggering the party title validation but somehow not flashing"
+            flash('You already have a party with that title. To avoid confusion, please choose another name.')
+            raise ValidationError('Existing party name')
 
 
 class DeleteFriendForm(Form):

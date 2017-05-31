@@ -361,8 +361,8 @@
                             {% for party in past_parties %}
                                 <li>
                                     <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
-                                        <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
-                                    </a>
+                                        <h4>{{ party.title}}</a><small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
+                                    
                                 </li>
                             {% endfor %}
                         </ul>

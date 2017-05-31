@@ -32,6 +32,9 @@ def login():
     reset_password_request_form = PasswordResetRequestForm(request.form,
                                                            prefix="a")
 
+    print "The next line is it"
+    print login_form.remember_me.data
+
     if request.method == 'POST' and login_form.validate():
         email = login_form.email.data
         user = db.session.query(User).join(Profile).filter(Profile.email ==
@@ -39,6 +42,7 @@ def login():
                                                            User.profile_id ==
                                                            Profile.profile_id).first()
         if user is not None and user.verify_password(login_form.password.data):
+            session['remember_me'] = login_form.remember_me.data
             login_user(user, remember=login_form.remember_me.data)
             session['session_token'] = user.session_token
             flash('You are now logged in', 'success')
@@ -113,9 +117,8 @@ def password_reset(token):
 @auth.route('/logout')
 @login_required
 def logout():
-    session.clear()
     logout_user()
-
+    session.clear()
     return redirect(url_for('main.index'))
 
 

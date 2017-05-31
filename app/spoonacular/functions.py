@@ -1,16 +1,12 @@
 # # from sqlalchemy import func
 
-from app.models import (db, User, Profile, Friend, ProfileIntolerance, Intolerance, Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party, RecipeCard, RecipeBox, PartyRecipes)
+from app.models import (db, Diet, Cuisine, Course, Party)
 
 # from server import app
 
-from flask import render_template, request, flash, jsonify
 
 import requests
 import os
-import json
-import datetime
-import bleach
 
 
 def all_guest_diets(partyid):
@@ -33,8 +29,8 @@ def guest_diet(partyid):
     """Query that gets the diet of each guest coming to the party and figures out the most limiting"""
 
     diet_ranking = []
-    hostparty = Party.query.get(partyid)
-    party_guests = hostparty.users
+    party = Party.query.get(partyid)
+    party_guests = party.guest_profiles
 
     for guest in party_guests:
         diet_rank = guest.diet.ranking
