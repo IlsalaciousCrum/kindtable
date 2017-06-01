@@ -6,7 +6,7 @@
     <div class="col-md-4 side_column">
         <div class="row display_guest">
             <div class="guest_name">
-                <h3>{{ responses.get('number', None) }} Recipes<br>found<br>for<br> <a href="/party_profile/<int:{{ party.party_id  }}>">{{ party.title }}</a></h3>  
+                <h3>{{ responses.get('totalResults', None) }} Recipes <br>found<br>for<br> <a href="/party_profile/<int:{{ party.party_id  }}>">{{ party.title }}</a></h3>  
             </div>
         </div>   
 
@@ -19,8 +19,8 @@
         <div class="row">                            
 
 
-            <form class="horizontal" action="/reloadsearchrecipes" method="POST">
-
+            <form class="horizontal" action="/spoonacular/reloadsearchrecipes" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
                     <label for="sel1">Pick a different cuisine:</label>
                     <select class="form-control" name="cuisine" id="sel1">
@@ -45,7 +45,7 @@
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" class="alertme" name="diets" value="{{  diet }}" checked><strong>{{  diet|capitalize  }}</strong><br>
-                        {% for guest in party.users %}{% if guest.diet.diet_type == diet %}
+                        {% for guest in party.guest_profiles %}{% if guest.diet.diet_type == diet %}
 
 
                         <a href="#" data-toggle="tooltip" title="Reason: {{  guest.diet_reason}}">
@@ -62,7 +62,7 @@
                         {% for intol in party_intols %}                 
                         <label>
                             <input type="checkbox" class="alertme" name="intols" value="{{  intol }}" checked><strong>{{  intol|capitalize  }}</strong><br>
-                            {% for guest in party.users %}
+                            {% for guest in party.guest_profiles %}
                             {% for intolerance in guest.intolerances %}
                             {% if intolerance.intol_name == intol %}
                             <a href="#" data-toggle="tooltip" title="No reasons are collected for Intolerances/Allergies because the reason is always the same, these things will make your guest very sick. Tread carefully. It may be enough to have seperate dishes and it may not.">
@@ -82,7 +82,7 @@
                             {% for avoid in party_avoids %}                 
                             <label>
                                 <input type="checkbox" name="avoids" class="alertme" value="{{  avoid }}" checked><strong>{{  avoid|capitalize  }}</strong><br>
-                                {% for guest in party.users %}
+                                {% for guest in party.guest_profiles %}
                                 {% for guestavoid in guest.avoidances %}
                                 
                                 {% if guestavoid.ingredient == avoid %}
@@ -107,10 +107,11 @@
 
             <div class="col-md-8 recipe_results side_column">
 
-                {% for i in range(responses.get('number', None)) %}
+                {% for i in range(result_number) %}
                 <div class="col-md-6 recipe">
                     <h4><a href="#" data-toggle="tooltip" title="{{  responses['response'][i].get('title')  }}" >{{  responses['response'][i].get('title')|truncate(39, end=" (...)") }}</a></h4>
-                    <form action="/see_recipe" method="POST">
+                    <form action="/spoonacular/see_recipe" method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="intols" value="{{  intols  }}">
                         <input type="hidden" name="cuisine" value="{{  cuisine  }}">
                         <input type="hidden" name="course" value="{{  course  }}">

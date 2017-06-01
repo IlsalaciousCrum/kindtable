@@ -37,7 +37,14 @@ def show_search_spoonacular():
     session["intols"] = get_intolerance
     session["avoids"] = get_avoid
 
-    return render_template("recipe_search.html", party=party,
+    print "This is number"
+    print responses.get('number', None)
+    print "this is totalResults"
+    print responses.get('totalResults', None)
+
+    result_number = int(min(responses.get('number', None), responses.get('totalResults', None)))
+
+    return render_template("spoonacular/recipe_search.html", party=party,
                            responses=responses,
                            avoids=get_avoid,
                            intols=get_intolerance,
@@ -49,7 +56,8 @@ def show_search_spoonacular():
                            party_intols=get_intolerance,
                            cuisine=25,
                            course=1,
-                           newdiets=party_diets)
+                           newdiets=party_diets,
+                           result_number=result_number)
 
 
 @spoonacular.route('/reloadsearchrecipes', methods=["POST"])
@@ -94,8 +102,9 @@ def show_re_search_spoonacular():
     # ---------------
     cuisine_list = Cuisine.query.order_by(Cuisine.cuisine_name).all()
     course_list = Course.query.order_by(Course.course_name).all()
+    result_number = int(min(responses.get('number', None), responses.get('totalResults', None)))
 
-    return render_template("recipe_search.html", party=party,
+    return render_template("spoonacular/recipe_search.html", party=party,
                            responses=responses,
                            this_user=this_user,
                            party_diets=party_diets,
@@ -107,7 +116,8 @@ def show_re_search_spoonacular():
                            intols=intols,
                            cuisine=cuisine,
                            course=course,
-                           newdiets=diets)
+                           newdiets=diets,
+                           result_number=result_number)
 
 
 @spoonacular.route('/show_recipe/<int:record_id>')
@@ -128,7 +138,7 @@ def preview_saved_recipe(record_id):
     avoid = guest_avoidances(party.party_id)
     intolerances = guest_intolerances(party.party_id)
 
-    return render_template("recipe_preview.html",
+    return render_template("spoonacular/recipe_preview.html",
                            this_user=this_user,
                            this_recipe=this_recipe,
                            party=party,
@@ -156,7 +166,7 @@ def show_saved_recipe(record_id):
 
     avoid = guest_avoidances(party.party_id)
     intolerances = guest_intolerances(party.party_id)
-    return render_template("recipe_profile.html",
+    return render_template("spoonacular/recipe_profile.html",
                            this_user=this_user,
                            this_recipe=this_recipe,
                            party=party,
@@ -188,7 +198,7 @@ def show_recipe():
     ingredients = spoonacular_recipe_ingredients(recipe_id)
     instructions = spoonacular_recipe_instructions(recipe_id)
 
-    return render_template("view_recipe.html",
+    return render_template("spoonacular/view_recipe.html",
                            recipe_id=recipe_id,
                            party_id=party_id,
                            title=title,

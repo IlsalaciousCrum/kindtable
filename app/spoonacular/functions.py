@@ -14,7 +14,7 @@ def all_guest_diets(partyid):
 
     diet_set = set()
     hostparty = Party.query.get(partyid)
-    party_guests = hostparty.users
+    party_guests = hostparty.guest_profiles
 
     for guest in party_guests:
         diet = str(guest.diet.diet_type)
@@ -47,8 +47,8 @@ def guest_avoidances(partyid):
     """Query that gets the avoidances of each guest coming to the party"""
 
     avoidance_set = set()
-    hostparty = Party.query.get(partyid)
-    party_guests = hostparty.users
+    party = Party.query.get(partyid)
+    party_guests = party.guest_profiles
 
     for guest in party_guests:
         avoids = guest.avoidances
@@ -63,8 +63,8 @@ def guest_intolerances(partyid):
     """Query that gets the avoidances of each guest coming to the party"""
 
     intolerance_set = set()
-    hostparty = Party.query.get(partyid)
-    party_guests = hostparty.users
+    party = Party.query.get(partyid)
+    party_guests = party.guest_profiles
 
     for guest in party_guests:
         intols = guest.intolerances
@@ -93,12 +93,25 @@ def spoonacular_request(party_id):
     responses = {}
 
     spoon = response.json()
-    num_results = spoon['totalResults']
+
+    print spoon
+
+    possible_results = spoon['totalResults']
+    print possible_results
+    num_results = spoon['number']
+    print num_results
+
     base_url = spoon.get('baseUri')
     responses["number"] = num_results
+    responses["totalResults"] = possible_results
     response = []
 
-    for i in range(num_results):
+    if num_results < possible_results:
+        number = num_results
+    else:
+        number = possible_results
+
+    for i in range(number):
         recipe_id = spoon['results'][i].get('id')
         image = spoon['results'][i].get('image')
         image_urls = spoon['results'][i].get('imageUrls')
@@ -135,26 +148,37 @@ def spoonacular_request(party_id):
 def new_guest_diet(diets):
     """Query that takes the diets from the form and determines the most limiting"""
 
-    diet_ranking = []
+    if diets:
+        diet_ranking = []
 
-    for each_diet in diets:
-        this_diet = db.session.query(Diet).filter(Diet.diet_type == each_diet).first()
-        this_diet_rank = this_diet.ranking
-        diet_ranking.append(this_diet_rank)
+        for each_diet in diets:
+            this_diet = db.session.query(Diet).filter(Diet.diet_type == each_diet).first()
+            this_diet_rank = this_diet.ranking
+            diet_ranking.append(this_diet_rank)
 
-    diet_ranking = sorted(diet_ranking)
-    most_limiting = diet_ranking[0]
+        diet_ranking = sorted(diet_ranking)
+        most_limiting = diet_ranking[0]
+    else:
+        most_limiting = 10
+
     diet_string = Diet.query.filter_by(ranking=most_limiting).first()
     diet_string = str(diet_string.diet_type)
-
     return diet_string
 
 
 def new_spoonacular_request(diet, intols, avoids, cuisine, course):
     """Assembles a new API request with new variables, to Spoonacular"""
 
-    avoid_string = ', '.join(avoids)
-    intolerance_string = ', '.join(intols)
+    if avoids:
+        avoid_string = ', '.join(avoids)
+    else:
+        avoid_string = ""
+
+    if intols:
+        intolerance_string = ', '.join(intols)
+    else:
+        intolerance_string = ""
+
     cuisine = (Cuisine.query.get(cuisine))
     cuisine = (cuisine.cuisine_name)
     cuisine = str(cuisine)
@@ -174,12 +198,22 @@ def new_spoonacular_request(diet, intols, avoids, cuisine, course):
 
     spoon = response.json()
     print spoon
-    num_results = spoon['totalResults']
+
+    possible_results = spoon['totalResults']
+    print possible_results
+
+    num_results = spoon['number']
     base_url = spoon.get('baseUri')
     responses["number"] = num_results
+    responses["totalResults"] = possible_results
     response = []
 
-    for i in range(num_results):
+    if num_results < possible_results:
+        number = num_results
+    else:
+        number = possible_results
+
+    for i in range(number):
         recipe_id = spoon['results'][i].get('id')
         image = spoon['results'][i].get('image')
         image_urls = spoon['results'][i].get('imageUrls')

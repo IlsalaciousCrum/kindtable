@@ -15,13 +15,13 @@
                     <b>Guests:</b>
                
                     {% for guest in party.guest_profiles %}    
-                        <button type="button" class="btn btn-warning btn-block" data-toggle="tooltip" title="Click for more info {% if guest.first_name is not none %}about {{ guest.first_name }}{% else %}{{  guest.email  }}{%endif %}" id="friend_info{{  guest.user_id  }}" style="margin-top:5px">{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }})</button>
+                        <button type="button" class="btn btn-warning btn-block" data-toggle="tooltip" title="Click for more info about {% if guest.first_name is not none %}about {{ guest.first_name }}{% else %}{{  guest.email  }}{%endif %}" id="friend_info{{  guest.profile_id  }}" style="margin-top:5px">{{ guest.first_name }} {{guest.last_name }} ({{ guest.email }})</button>
 
-                        <div class="friend_info{{  guest.user_id  }}"  hidden>
+                        <div class="friend_info{{  guest.profile_id  }}"  hidden>
                             
                             <div class="row round_hidden_div">
                                 <div class="col-md-3">
-                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.user_id  }} btn-block" data-toggle="modal" data-target="#guest_basic_info_change{{  guest.user_id  }}" hidden>update<br>basic<br>info</button>
+                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.profile_id  }} btn-block" data-toggle="modal" data-target="#guest_basic_info_change{{  guest.profile_id  }}" hidden>update<br>basic<br>info</button>
                                 
 
                                 </div>
@@ -37,7 +37,7 @@
 
                             <div class="row round_hidden_div" style="padding-top: 2em">  
                                 <div class="col-md-3">
-                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.user_id  }} btn-block" data-toggle="modal" data-target="#Intols{{  guest.user_id  }}" hidden>update<br>intolerance<br>allergies</button>
+                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.profile_id  }} btn-block" data-toggle="modal" data-target="#Intols{{  guest.profile_id  }}" hidden>update<br>intolerance<br>allergies</button>
                                 </div>
                                 <div class="col-md-6">
                                 <b>Intolerances/Allergies:</b><br>
@@ -49,7 +49,7 @@
 
                             <div class="row round_hidden_div" style="padding-top: 2em">
                                 <div class="col-md-3">
-                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.user_id  }} btn-block" data-toggle="modal" data-target="#avoids{{ guest.user_id  }}" hidden>update<br>ingredients<br>to avoid</button>
+                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.profile_id  }} btn-block" data-toggle="modal" data-target="#avoids{{ guest.profile_id  }}" hidden>update<br>ingredients<br>to avoid</button>
                                 </div>
                                 <div class="col-md-6">
                                      <b>Ingredients to avoid:</b><br>
@@ -63,7 +63,7 @@
                         </div>
 
                                     <!-- Modal has to be here -->
-                        <div id="guest_basic_info_change{{  guest.user_id  }}" class="modal fade" role="dialog">
+                        <div id="guest_basic_info_change{{  guest.profile_id  }}" class="modal fade" role="dialog">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -73,7 +73,7 @@
                                     <div class="modal-body">
                                          <form action="/update_user_from_party_profile" method="POST">
                                             <div class="form-group">
-                                                <input type="hidden" name="friend_id" value="{{ guest.user_id  }}">
+                                                <input type="hidden" name="friend_id" value="{{ guest.profile_id  }}">
                                                 <label>Email address</label> (required):
                                                 <input type="email" name="email" value="{{ guest.email }}" class="form-control" required>
                                             </div><br>
@@ -109,7 +109,7 @@
                         </div>
 
                                                 <!-- Modal Needs To Stay Here To Be in The For Loop -->
-                        <div id="Intols{{  guest.user_id  }}" class="modal fade" role="dialog">
+                        <div id="Intols{{  guest.profile_id  }}" class="modal fade" role="dialog">
                             <div class="modal-dialog">
                                 <!-- Modal content-->
                                 <div class="modal-content">
@@ -119,9 +119,9 @@
                                     </div>
                                     <div class="modal-body">
                                         <form action="/partyfriendintol" method="POST">
-                                            <input type="hidden" name="friend_id" value="{{ guest.user_id  }}">
+                                            <input type="hidden" name="friend_id" value="{{ guest.profile_id  }}">
                                             <div class="form-group">
-                                                    <input type="hidden" name="user_id" value="{{ guest.user_id  }}">
+                                                    <input type="hidden" name="profile_id" value="{{ guest.profile_id  }}">
                                                     <label>Select all that apply:</label><br>
                                                     {% for intolerance in intol_list %}  
                                                     <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}<br>  
@@ -136,7 +136,7 @@
                             </div>
                         </div>
                                                 <!-- Modal Needs To Stay Here To Be in The For Loop -->
-                        <div id="avoids{{  guest.user_id  }}" class="modal fade" role="dialog">
+                        <div id="avoids{{  guest.profile_id  }}" class="modal fade" role="dialog">
                             <div class="modal-dialog">
                                 <!-- Modal content-->
                                 <div class="modal-content">
@@ -147,7 +147,7 @@
                                     <div class="modal-body">
                                         <form action="/partyfriendingredientadded" method="POST">
                                             <div class="form-group">
-                                                    <input type="hidden" name="friend_id" value="{{ guest.user_id  }}">
+                                                    <input type="hidden" name="friend_id" value="{{ guest.profile_id  }}">
                                                     <label>Ingredient to avoid:</label><br>
                                                     <input type="text" name="ingredient" class="form-control">
                                                     <label>Reason you would like to avoid this ingredient (optional):</label><br>
@@ -263,24 +263,24 @@
     });
     
     {% for guest in party.guest_profiles %}
-    $("#update_friend_at_party{{  guest.user_id  }}").click(function(){
-        $(".update_friend_at_party{{  guest.user_id  }}").toggle();
-        $(".intols{{  guest.user_id  }}").toggle();
-        $(".avoids{{  guest.user_id  }}").toggle();
+    $("#update_friend_at_party{{  guest.profile_id  }}").click(function(){
+        $(".update_friend_at_party{{  guest.profile_id  }}").toggle();
+        $(".intols{{  guest.profile_id  }}").toggle();
+        $(".avoids{{  guest.profile_id  }}").toggle();
         console.log("show form");
     });
 
-    $("#friend_info{{  guest.user_id  }}").click(function(){
-        // $("#friend_info{{  guest.user_id  }}").toggle();
+    $("#friend_info{{  guest.profile_id  }}").click(function(){
+        // $("#friend_info{{  guest.profile_id  }}").toggle();
         
-        $(".friend_info{{  guest.user_id  }}").toggle();
+        $(".friend_info{{  guest.profile_id  }}").toggle();
         console.log("show form");
     });
 
     
-    $("#close{{  guest.user_id  }}").click(function(){
-        $("#update_friend_at_party{{  guest.user_id  }}").show();
-        $(".update_friend_at_party{{  guest.user_id  }}").toggle();
+    $("#close{{  guest.profile_id  }}").click(function(){
+        $("#update_friend_at_party{{  guest.profile_id  }}").show();
+        $(".update_friend_at_party{{  guest.profile_id  }}").toggle();
         console.log("show form");
     });
 
