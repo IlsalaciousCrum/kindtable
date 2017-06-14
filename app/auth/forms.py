@@ -28,39 +28,36 @@ class LoginForm(Form):
 
 
 class RegistrationForm(Form):
-    first_name = StringField('First name:',
+    first_name = StringField('First name',
                              widget=TextArea(),
                              validators=[InputRequired(message="Please tell us what to you call you."),
                                          Length(1, 64, message="Limit 64 characters")])
-    last_name = StringField('Last name:',
+    last_name = StringField('Last name',
                             widget=TextArea(),
                             validators=[InputRequired(message="Please tell us a last name to use for you."),
                                         Length(1, 64, message="Limit 64 characters")])
     diets = Diet.query.order_by(Diet.diet_type).all()
-    diet = RadioField('Diet you follow:', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
+    diet = RadioField('Diet you follow', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
                       validators=[DataRequired(message='Please choose a diet')],
                       default="10",
                       coerce=int)
-    diet_reason = TextField('Reason you follow this diet:',
+    diet_reason = TextField('Reason you follow this diet',
                             widget=TextArea(),
                             validators=[Length(1, 128,
                                         message="Limit 64 characters"),
                                         Optional(strip_whitespace=True)])
-    email = StringField('Email:',
+    email = StringField('Email',
                         widget=TextArea(),
                         validators=[InputRequired(message='We need an email address to register you with Kind Table.'),
                                     Length(1, 64, message="Limit 64 characters"),
                                     Email(message='Please provide a valid email address so that you can confirm your account.')])
-    profile_notes = StringField('Private notes:',
-                                widget=TextArea(),
-                                validators=[InputRequired('No notes added.'),
-                                            Length(1, 300)])
-    submit = SubmitField('Update')
-    password = PasswordField('Password:',
+    profile_notes = StringField('Private notes',
+                                widget=TextArea())
+    password = PasswordField('Password',
                              validators=[InputRequired(message='Please provide a strong password'),
                                          Length(1, 64, message="Limit 64 characters"),
                                          EqualTo('password2', message='Passwords must match.')])
-    password2 = PasswordField('Confirm password:',
+    password2 = PasswordField('Confirm password',
                               validators=[InputRequired()])
     submit = SubmitField('Register')
 
@@ -69,9 +66,7 @@ class RegistrationForm(Form):
 
         if db.session.query(User).join(Profile).filter(Profile.email == field.data, User.profile_id == Profile.profile_id).first():
             print "triggering the email validation but somehow not flashing"
-            flash('Email address already registered. Please log in.')
-            raise ValidationError('Email address already registered. Please log in.')
-            return redirect(url_for('main.login'))
+            raise ValidationError('Email address already registered.')
 
 
 class IntoleranceForm(Form):

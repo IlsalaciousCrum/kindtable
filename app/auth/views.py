@@ -12,6 +12,8 @@ from ..email import send_email
 
 from ..models import Profile, User, Diet, ProfileIntolerance, IngToAvoid
 
+from ..decorators import flash_errors
+
 from .forms import (LoginForm,
                     RegistrationForm,
                     PasswordResetRequestForm,
@@ -211,49 +213,77 @@ def delete_stored_reason():
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     '''Register a new user'''
+
+    print 1
     form = RegistrationForm(request.form)
 
+    print 2
+
     if request.method == 'POST' and form.validate():
+        print 3
         email = form.email.data
+        print 4
         profile = Profile.create_record(email=email.lower(),
                                         first_name=form.first_name.data,
                                         last_name=form.last_name.data,
                                         diet_id=form.diet.data,
                                         diet_reason=form.diet_reason.data)
-
+        print 5
         user = User.create_record(profile_id=profile.profile_id,
                                   password=form.password.data)
-
-        for intolerance in session['intolerances']:
-            ProfileIntolerance.create_record(profile_id=profile.profile_id,
-                                             intol_id=intolerance)
-
-        for key, value in session['avoid_dict']:
-            IngToAvoid.create_record(ingredient=key,
-                                     reason=value,
-                                     profile_id=profile.profile_id)
-
+        print 6
+        if session['intolerances']['intols']:
+            for intolerance in session['intolerances']['intols']:
+                ProfileIntolerance.create_record(profile_id=profile.profile_id,
+                                                 intol_id=intolerance)
+        print 7
+        avoidances = session['avoid_dict']
+        if avoidances:
+            for key, value in session['avoid_dict'].iteritems():
+                IngToAvoid.create_record(ingredient=key,
+                                         reason=value,
+                                         profile_id=profile.profile_id)
+        print 8
         user.make_session_token()
+        print 9
         profile.owned_by_user_id = user.id
+        print 10
         db.session.commit()
+        print 11
         token = profile.generate_confirmation_token()
+        print 12
         send_email(to=profile.email, subject=' Confirm Your Account',
                    template='auth/email/confirm', profile=profile, token=token)
+        print 13
         flash('Please check your email for instructions on completing\
               registration.', "success")
+        print 14
         return redirect(url_for('auth.login'))
+    if request.method == 'POST' and not form.validate():
+        flash_errors(form)
+        return redirect(url_for('auth.register'))
     try:
         session['avoid_dict']
+        print 15
     except:
         session['avoid_dict'] = {}
+        print 16
     try:
         session['intolerances']
+        print 17
     except:
         session['intolerances'] = {}
+        print 18
+
+    print 19
     diets = Diet.query.order_by(Diet.diet_type).all()
+    print 20
     add_avoid_form = AddAvoidForm(request.form)
+    print 21
     update_avoid_form = UpdateAvoidForm(request.form)
+    print 22
     intol_form = IntoleranceForm(request.form)
+    print 23
     return render_template('auth/register.html',
                            form=form,
                            diets=diets,

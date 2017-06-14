@@ -154,8 +154,11 @@ def LoadTestPeople():
                           last_name='Rosenthal',
                           profile_notes="Erin likes szechaun peppers")
 
-    User.create_record(password="Password!", profile_id=1)
-    User.create_record(password='No', profile_id=2)
+    Ilsa = User.create_record(password="Password!", profile_id=1)
+    Todd = User.create_record(password='No', profile_id=2)
+
+    Ilsa.make_session_token()
+    Todd.make_session_token()
 
     ilsa_profile = Profile.query.get(1)
     todd_profile = Profile.query.get(2)

@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import redirect, url_for, flash
+from flask import redirect, url_for, flash, request
 from flask_login import current_user
 
 
@@ -16,7 +16,16 @@ def email_confirmation_required(f):
 def load_base(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        profile = current_user.profile
-        return redirect(url_for('auth/login', next=request.url))
-        return f(*args, **kwargs)
-    return decorated_function
+        if not current_user.profile:
+            return redirect(url_for('auth/login', next=request.url))
+            return f(*args, **kwargs)
+        return decorated_function
+
+# Though this is not a decoratator, it is similar in nature
+
+
+def flash_errors(form):
+    for field, errors in form.errors.items():
+        for error in errors:
+            flash(u"Error in the %s field - %s" %
+                  (getattr(form, field).label.text, error), 'danger')

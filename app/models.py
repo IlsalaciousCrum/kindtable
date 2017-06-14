@@ -123,10 +123,6 @@ class Profile(BaseMixin, db.Model):
     def remove_profile(self):
         '''Deletes an unofficial profile and all affected records'''
 
-        if self.friends:
-            for friend in self.friend:
-                friend.remove_friendship()
-
         if self.intolerances:
             for intolerance in self.intolerances:
                 intolerance._delete_()
