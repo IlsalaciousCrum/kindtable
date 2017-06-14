@@ -284,10 +284,6 @@ def spoonacular_recipe_instructions(recipe_id):
     print "spoon:"
     print spoon
 
-    instructions_list = []
-    for i in spoon:
-        for each in i["steps"]:
-            step = each["step"]
-            instructions_list.append(step)
+    instructions_list = [steps['step'] for steps in spoon[0]['steps']]
 
     return instructions_list

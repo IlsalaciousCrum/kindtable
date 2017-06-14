@@ -166,7 +166,6 @@ class User(BaseMixin, UserMixin, db.Model):
                            nullable=False, unique=False)
 
     parties = db.relationship('Party', backref='user')
-    recipebox = db.relationship('RecipeBox', backref='user')
 
     profile = db.relationship("Profile",
                               uselist=False,
@@ -239,6 +238,9 @@ class User(BaseMixin, UserMixin, db.Model):
     def valid_friends(self):
         '''Returns a list with the profile objects of friends that have been confirmed'''
 
+        # Sublime flags ' == True,' as a syntax error but in this case, for SQLAlchemy,
+        # this is the correct syntax.
+
         return db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
                                                                        (or_(Friend.friendship_verified_by_email == True,
                                                                         Friend.friendship_verified_by_facebook == True,
@@ -255,10 +257,6 @@ class User(BaseMixin, UserMixin, db.Model):
         if self.parties:
             for party in self.parties:
                 party.discard_party()
-
-        if self.recipebox:
-            for recipe in self.recipebox:
-                recipe._delete_()
 
         user_profile = self.profile
         self._delete_()
@@ -285,12 +283,11 @@ class Friend(BaseMixin, db.Model):
                                   nullable=False)
     friend_request_sent = db.Column(db.Boolean, unique=False,
                                     default=False)
+    friend_notes = db.Column(db.String(300), nullable=True)
     friendship_verified_by_email = db.Column(db.Boolean, unique=False,
                                              default=False)
     friendship_verified_by_facebook = db.Column(db.Boolean, unique=False,
                                                 default=False)
-    profile_notes = db.Column(db.String(300), nullable=True)
-
     profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
 
@@ -472,14 +469,12 @@ class Party(BaseMixin, db.Model):
     title = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
                         nullable=False)
-    cuisine_id = db.Column(db.Integer, db.ForeignKey('cuisines.cuisine_id'), nullable=True)
     datetime_of_party = db.Column(db.DateTime(timezone=True), nullable=True)
-    profile_notes = db.Column(db.String(300), nullable=True)
+    party_notes = db.Column(db.String(300), nullable=True)
     guest_profiles = db.relationship('Profile',
                                      secondary='party_guests',
                                      lazy='joined',
                                      backref='party')
-    cuisine = db.relationship('Cuisine', backref='parties')
     recipes = db.relationship('RecipeCard',
                               secondary='partyrecipes',
                               backref='parties',
@@ -540,7 +535,6 @@ class PartyGuest(BaseMixin, db.Model):
                          nullable=False)
     friend_profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                                   nullable=False)
-    profile_notes = db.Column(db.String(300), nullable=True)
 
     def disinvite_guest(self):
         '''removes a guest from the party'''
@@ -551,6 +545,13 @@ class PartyGuest(BaseMixin, db.Model):
                 recipe.discard_recipe
         self._delete_()
         db.session.commit()
+
+        def __repr__(self):
+            '''Provide helpful representation when printed.'''
+
+            return '<PartyGuest record_id=%s party_id=%s friend_profile_id=%s>' % (self.record_id,
+                                                                                   self.party_id,
+                                                                                   self.friend_profile_id)
 
 
 class RecipeCard(BaseMixin, db.Model):
@@ -566,6 +567,11 @@ class RecipeCard(BaseMixin, db.Model):
     ingredients = db.Column(db.String(2000), nullable=True)
     instructions = db.Column(db.String(2000), nullable=True)
 
+    recipe_works_for = db.relationship('Profile',
+                                       secondary='worksfor',
+                                       backref='recipe_card',
+                                       lazy='joined')
+
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
@@ -580,47 +586,14 @@ class RecipeCard(BaseMixin, db.Model):
                              self.instructions)
 
 
-class RecipeBox(BaseMixin, db.Model):
-    '''Recipes bookmarked by a user'''
-
-    __tablename__ = 'recipebox'
-
-    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    recipe_record_id = db.Column(db.Integer,
-                                 db.ForeignKey('recipecard.recipe_record_id'),
-                                 nullable=False)
-    profile_notes = db.Column(db.String(300), nullable=True)
-
-    recipes = db.relationship('RecipeCard', lazy='joined')
-    works_for = db.relationship('Profile',
-                                secondary='worksfor',
-                                backref='recipe_box',
-                                lazy='joined')
-
-    def discard_recipe(self):
-        '''Removes a recipe from a user's recipe box'''
-
-        self._delete_()
-        db.session.commit()
-
-    def __repr__(self):
-        '''Provide helpful representation when printed.'''
-
-        return '<RecipeBox record_id=%s user_id=%s \
-        recipe_record_id=%s>' % (self.record_id,
-                                 self.user_id,
-                                 self.recipe_record_id)
-
-
 class RecipeWorksFor(BaseMixin, db.Model):
     '''Party Guests that this recipe has worked for'''
     __tablename__ = 'worksfor'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    recipe_box_id = db.Column(db.Integer,
-                              db.ForeignKey('recipebox.record_id'),
-                              nullable=False)
+    recipe_card_id = db.Column(db.Integer,
+                               db.ForeignKey('recipecard.recipe_record_id'),
+                               nullable=False)
     guest_profile_id = db.Column(db.Integer,
                                  db.ForeignKey('profiles.profile_id'),
                                  nullable=False)
@@ -629,6 +602,12 @@ class RecipeWorksFor(BaseMixin, db.Model):
         '''Removes a reference to a person this recipe works for'''
 
         self._delete_()
+
+    def __repr__(self):
+        '''Provide helpful representation when printed.'''
+
+        return '<RecipeWorksFor recipe_card_id=%s guest_profile_id=%s>' % (self.recipe_card_id,
+                                                                           self.guest_profile_id)
 
 
 class PartyRecipes(BaseMixin, db.Model):
@@ -649,7 +628,7 @@ class PartyRecipes(BaseMixin, db.Model):
     cuisine_id = db.Column(db.Integer,
                            db.ForeignKey('cuisines.cuisine_id'),
                            nullable=False)
-    profile_notes = db.Column(db.String(300), nullable=True)
+    party_recipe_notes = db.Column(db.String(300), nullable=True)
 
     course = db.relationship('Course',
                              backref='party_recipes',
@@ -668,7 +647,6 @@ class PartyRecipes(BaseMixin, db.Model):
         '''Provide helpful representation when printed.'''
 
         return '<PartyRecipes record_id=%s party_id=%s \
-        recipe_record_id=%s works_for=%s>' % (self.record_id,
-                                              self.party_id,
-                                              self.recipe_record_id,
-                                              self.works_for)
+        recipe_record_id=%s>' % (self.record_id,
+                                 self.party_id,
+                                 self.recipe_record_id)

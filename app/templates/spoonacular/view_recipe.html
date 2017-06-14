@@ -7,6 +7,7 @@
             <h1>{{  title  }}</h1>
             <form action="/spoonacular/addtorecipebox" method="POST">
                 <div class="form-group">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="party_diets" value="{{  newdiets  }}">
                     <input type="hidden" name="party_avoids" value="{{  avoids  }}">
                     <input type="hidden" name="party_intols" value="{{  intols  }}">
@@ -14,12 +15,19 @@
                     <input type="hidden" name="title" value="{{  title  }}">
                     <input type="hidden" name="recipe_image_url" value="{{  recipe_image_url  }}">
                     <input type="hidden" name="recipe_url" value="{{  recipe_url }}">
+                    <input type="hidden" name="instructions" value="{{  instructions }}">
+                    <input type="hidden" name="ingredients" value="{{  ingredients }}">
+                    <input type="hidden" name="diets" value="{{  newdiets }}">
+                    <input type="hidden" name="intols" value="{{  intols }}">
+                    <input type="hidden" name="avoids" value="{{  avoids }}">
+                    <input type="hidden" name="cuisine" value="{{  cuisine }}">
+                    <input type="hidden" name="course" value="{{  course }}">
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Save this recipe" class="btn btn-success" style="width: 100%">
                 </div>
             </form>
-            <a href="/searchrecipes" class="btn btn-success">Back to recipe search page</a></li>
+            <a href="/spoonacular/searchrecipes" class="btn btn-success">Back to recipe search page</a></li>
 
             <br>
             <b>Safe for:</b>
@@ -47,19 +55,5 @@
 </div>
 {% endblock %}
 
-
-    recipes = db.relationship('RecipeBox',
-                              secondary='partyrecipes',
-                              backref='parties')
-
-class PartyRecipes(db.Model):
-    '''Associate a recipe with a party'''
-
-    __tablename__ = 'partyrecipes'
-
-    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    party_id = db.Column(db.Integer, db.ForeignKey('parties.party_id'), nullable=False)
-    recipe_record_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_record_id'), nullable=False)
-    works_for = db.Column(db.String(1000), nullable=True)
 
 

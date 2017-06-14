@@ -5,7 +5,7 @@ from flask import (render_template, request, flash, redirect, session, json)
 from . import spoonacular
 
 from app.models import (User, Cuisine, Course, Party,
-                        RecipeBox, PartyRecipes)
+                        PartyRecipes, RecipeCard, RecipeWorksFor)
 from .. import db
 
 from flask_login import login_required, current_user
@@ -36,6 +36,8 @@ def show_search_spoonacular():
     session["diets"] = party_diets
     session["intols"] = get_intolerance
     session["avoids"] = get_avoid
+    session["course"] = "any"
+    session["cuisine"] = "any"
 
     print "This is number"
     print responses.get('number', None)
@@ -124,11 +126,11 @@ def show_re_search_spoonacular():
 @login_required
 @email_confirmation_required
 def preview_saved_recipe(record_id):
-    """Show a recipe preview of recipes saved in the RecipeBox from the party page"""
+    """Show a recipe preview of recipes saved in the RecipeCard table, from the party page"""
 
     session_token = session.get("session_token")
     this_user = User.query.filter_by(session_token=session_token).first()
-    this_recipe = RecipeBox.query.get(record_id)
+    this_recipe = RecipeCard.query.get(record_id)
     recipe_id = this_recipe.recipe_id
     works_for = json.loads(this_recipe.works_for)
     ingredients = spoonacular_recipe_ingredients(recipe_id)
@@ -153,11 +155,11 @@ def preview_saved_recipe(record_id):
 @login_required
 @email_confirmation_required
 def show_saved_recipe(record_id):
-    """Show a recipe saved in the RecipeBox in it's own page, from the recipe preview, on the party page"""
+    """Show a recipe saved in the RecipeCard in it's own page, from the recipe preview, on the party page"""
 
     session_token = session.get("session_token")
     this_user = User.query.filter_by(session_token=session_token).first()
-    this_recipe = RecipeBox.query.get(record_id)
+    this_recipe = RecipeCard.query.get(record_id)
     recipe_id = this_recipe.recipe_id
     works_for = json.loads(this_recipe.works_for)
     ingredients = spoonacular_recipe_ingredients(recipe_id)
@@ -183,35 +185,40 @@ def show_saved_recipe(record_id):
 def show_recipe():
     """Preview a recipe not yet saved, from the recipe search page"""
 
-    session_token = session.get("session_token")
-    this_user = User.query.filter_by(session_token=session_token).first()
-    party_id = session.get("party_id")
-    recipe_id = request.form.get("recipe_id")
-    avoids = session.get("avoids")
-    intols = session.get("intols")
-    cuisine = request.form.get("cuisine")
-    course = request.form.get("course")
-    newdiets = session.get("diets")
-    title = request.form.get("title")
-    recipe_image_url = request.form.get("recipe_image_url")
-    recipe_url = request.form.get("recipe_url")
-    ingredients = spoonacular_recipe_ingredients(recipe_id)
-    instructions = spoonacular_recipe_instructions(recipe_id)
+    if request.method == 'POST':
+        session_token = session.get("session_token")
+        this_user = User.query.filter_by(session_token=session_token).first()
+        party_id = session.get("party_id")
+        recipe_id = request.form.get("recipe_id")
+        avoids = session.get("avoids")
+        intols = session.get("intols")
+        cuisine = request.form.get("cuisine")
+        course = request.form.get("course")
+        newdiets = session.get("diets")
+        title = request.form.get("title")
+        recipe_image_url = request.form.get("recipe_image_url")
+        recipe_url = request.form.get("recipe_url")
+        ingredients = spoonacular_recipe_ingredients(recipe_id)
+        instructions = spoonacular_recipe_instructions(recipe_id)
 
-    return render_template("spoonacular/view_recipe.html",
-                           recipe_id=recipe_id,
-                           party_id=party_id,
-                           title=title,
-                           recipe_image_url=recipe_image_url,
-                           recipe_url=recipe_url,
-                           this_user=this_user,
-                           ingredients=ingredients,
-                           instructions=instructions,
-                           avoids=avoids,
-                           intols=intols,
-                           cuisine=cuisine,
-                           course=course,
-                           newdiets=newdiets)
+        return render_template("spoonacular/view_recipe.html",
+                               recipe_id=recipe_id,
+                               party_id=party_id,
+                               title=title,
+                               recipe_image_url=recipe_image_url,
+                               recipe_url=recipe_url,
+                               this_user=this_user,
+                               ingredients=ingredients,
+                               instructions=instructions,
+                               avoids=avoids,
+                               intols=intols,
+                               cuisine=cuisine,
+                               course=course,
+                               newdiets=newdiets)
+    else:
+        return redirect(request.referrer)
+
+#  I think 'Get Recipe Information' API call would take it from two requests down to one
 
 
 @spoonacular.route('/addtorecipebox', methods=['POST'])
@@ -222,69 +229,62 @@ def add_recipe_box():
 
     party_id = session.get("party_id")
     title = request.form.get("title")
+    cuisine = session.get("cuisine")
+    cuisine_object = Cuisine.query.filter_by(cuisine_name=cuisine).first()
+    course = session.get("course")
+    course_object = Course.query.filter_by(course_name=course).first()
 
     # Creates the -workfor- json
-    party_diets = session.get("diets")
-    party_intols = session.get("intols")
-    party_avoids = session.get("avoids")
-    food_dict = {}
-    food_dict["Diets"] = party_diets
-    food_dict["Intolerances/Allergies"] = party_intols
-    food_dict["Ingredients to omit"] = party_avoids
-    food_dump = (json.dumps(food_dict))
+
+    avoids = session.get("avoids")
+    intols = session.get("intols")
+    diets = session.get("diets")
+
+    party = Party.query.filter_by(party_id=party_id).first()
 
     recipe_id = request.form.get("recipe_id")
-    this_recipe = RecipeBox.query.filter(recipe_id == recipe_id).first()
+    this_recipe = RecipeCard.query.filter(recipe_id == recipe_id).first()
     if this_recipe:
         party_recipe = PartyRecipes.query.filter(recipe_id == recipe_id, party_id == party_id).first()
         if party_recipe:
-            flash("This recipe is already saved to your Recipe Box.", "danger")
+            flash("This recipe is already saved.", "warning")
             return redirect("/searchrecipes")
         else:
-            recipe_added = PartyRecipes(party_id=party_id,
-                                        recipe_id=recipe_id,
-                                        works_for=food_dump)
-            db.session.add(recipe_added)
-            db.session.commit()
-            flash("The recipe for %s has been saved to your recipe box." % title, "success")
-            return redirect("/searchrecipes")
+            PartyRecipes.create_record(party_id=party_id,
+                                       recipe_record_id=recipe_id,
+                                       course_id=course_object.course_id,
+                                       cuisine_id=cuisine_object.cuisine_id)
+            flash("The recipe for %s has been saved." % title, "success")
+            return redirect("/spoonacular/searchrecipes")
     else:
         recipe_image_url = request.form.get("recipe_image_url")
         recipe_url = request.form.get("recipe_url")
 
-        instruction_listA = request.form.get("instructions")
-        ingredient_listA = request.form.get("ingredients")
-        raise Exception
+        instruction_list = request.form.get("instructions")
+        ingredient_list = request.form.get("ingredients")
 
-        instruction_list = []
-        for each in instruction_listA:
-            instruction_list.append(each)
-
-        ingredient_list = []
-        for each in ingredient_listA:
-            instruction_list.append(each)
-
-        instructions = {}
-        instructions["Instructions"] = instruction_list
-        ingredients = {}
-        ingredients["Ingredients"] = ingredient_list
+        print instruction_list
+        print ingredient_list
 
         ingredient_dump = (json.dumps(ingredient_list))
         instruction_dump = (json.dumps(instruction_list))
 
-        new_recipe = RecipeBox(party_id=party_id,
-                               recipe_id=recipe_id,
-                               title=title,
-                               recipe_image_url=recipe_image_url,
-                               recipe_url=recipe_url,
-                               ingredients=ingredient_dump,
-                               instruction_dump=instruction_dump)
-        db.session.add(new_recipe)
-        db.session.commit()
-        recipe_added = PartyRecipes(party_id=party_id,
-                                    recipe_id=new_recipe.recipe_id,
-                                    works_for=food_dump)
-        db.session.add(recipe_added)
-        db.session.commit()
+        new_recipe = RecipeCard.create_record(recipe_id=recipe_id,
+                                              title=title,
+                                              recipe_image_url=recipe_image_url,
+                                              recipe_url=recipe_url,
+                                              ingredients=ingredient_dump,
+                                              instructions=instruction_dump)
+
+        PartyRecipes.create_record(party_id=party_id,
+                                   recipe_record_id=new_recipe.recipe_record_id,
+                                   course_id=course_object.course_id,
+                                   cuisine_id=cuisine_object.cuisine_id)
+
+        for guest in party.guest_profiles:
+            if guest.diet.diet_type in diets and guest.avoidances in avoids and guest.intolerances in intols:
+                RecipeWorksFor.create_record(recipe_card_id=party_id,
+                                             guest_profile_id=guest.profile_id)
+
         flash("The recipe for %s has been saved to your recipe box." % title, "success")
-        return redirect("/searchrecipes")
+        return redirect("/spoonacular/searchrecipes")
