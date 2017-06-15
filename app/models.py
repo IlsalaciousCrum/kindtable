@@ -3,9 +3,10 @@
 from datetime import datetime
 from passlib.hash import bcrypt
 from . import db, login_manager
+from flask import flash
 from flask_login import UserMixin
 import pytz
-from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, BadData
+from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, BadData, SignatureExpired
 import os
 from sqlalchemy import and_, or_
 
@@ -100,17 +101,15 @@ class Profile(BaseMixin, db.Model):
     def confirm(self, token):
         registration_serializer = URLSafeTimedSerializer(os.environ['APP_SECRET_KEY'])
         try:
-            data = registration_serializer.loads(token, max_age=3600)
-        except BadSignature, e:
-            print "Bad Signature"
-            encoded_payload = e.payload
-            if encoded_payload is not None:
-                print "data is not nothing"
-                try:
-                    d = registration_serializer.load_payload(encoded_payload)
-                    print d
-                except BadData:
-                    print "bad data"
+            data = registration_serializer.loads(token, max_age=86400)
+        except SignatureExpired:
+            # TODO: add functionality to send another confirmation link automatically here.
+            flash("It's been more than 24 hours since we sent the confirmation link. Please email kindtableapp@gmail.com for assistance. Please email kindtableapp@gmail.com for assistance.", 'danger')
+            return False
+        except BadSignature:
+            # TODO: add functionality to email me an error log when this happens with all possible information
+            flash("There seems to be something wrong with your confirmation email. Please email kindtableapp@gmail.com for assistance.", 'danger')
+            return False
 
         if data['profile_id'] != self.profile_id and data['email'] != self.email:
             print "The profile ids or the email adress don't match"
