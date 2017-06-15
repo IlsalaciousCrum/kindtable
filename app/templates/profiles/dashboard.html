@@ -303,9 +303,7 @@
         <div class="col-md-5 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
                 <div id="friends">
-                    <h3>Friends&emsp; <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#firstNameModal">
-                            <span class="glyphicon glyphicon-plus text-info" title="Add friends" aria-hidden="true"></span>
-                    </button></h3>
+                    <h3>Friends</h3>
                     
                     {% if current_user.valid_friends() %}
                         <ul>
@@ -329,7 +327,7 @@
                             {% for party in recipes %}
                                 {% for recipe in party %}
                                 <li>
-                                    <a href="{{ url_for('spoonacular.show_saved_recipe', record_id=recipe.recipe_record_id) }}">{{ recipe.title }}
+                                    <a href="{{ url_for('spoonacular.show_saved_recipe', record_id=recipe.recipe_record_id) }}">{{ recipe.title }}</a>
                                 </li>
                                 {% endfor %}
                             {% endfor %}
@@ -338,9 +336,7 @@
                         <span class="text-muted strong">No recipes bookmarked yet</span>
                     {% endif %}
                 </div>
-                <h3>Upcoming Parties&emsp; <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#firstNameModal">
-                            <span class="glyphicon glyphicon-plus text-info" title="Add a new party" aria-hidden="true"></span>
-                    </button></h3>
+                <h3>Upcoming Parties</h3>
                 <div id="upcomingparties">
                     {% if upcoming_parties %}
                         <ul>
