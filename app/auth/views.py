@@ -301,7 +301,7 @@ def confirm(token):
         return redirect(url_for('main.index'))
     elif current_user.profile.confirm(token):
         print "we passed the confirmation "
-        flash('You have confirmed your account.Thanks!', 'success')
+        flash('You have confirmed your account. Thanks!', 'success')
     else:
         flash('The confirmation link is invalid.', 'danger')
 
@@ -329,7 +329,7 @@ def change_email():
                        template='auth/email/confirm', profile=profile, token=token)
             session.clear()
             logout_user()
-            flash('An email with instructions to reset your password\
+            flash('An email with instructions for confirming your new email address\
                   has been sent to you.', "success")
             return redirect(url_for('auth.login'))
         else:

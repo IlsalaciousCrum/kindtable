@@ -58,6 +58,10 @@ def show_dashboard():
                                                       current_user.id,
                                                       Party.datetime_of_party >=
                                                       datetime.utcnow()).all()
+    this_users_parties = db.session.query(Party).filter(Party.user_id == current_user.id).all()
+
+    recipes = [[recipe for recipe in party.recipes] for party in this_users_parties]
+
     return render_template("/profiles/dashboard.html",
                            profile=profile,
                            intol_form=intol_form,
@@ -68,7 +72,8 @@ def show_dashboard():
                            add_avoid_form=add_avoid_form,
                            update_avoid_form=update_avoid_form,
                            past_parties=past_parties,
-                           upcoming_parties=upcoming_parties)
+                           upcoming_parties=upcoming_parties,
+                           recipes=recipes)
 
 
 @profiles.route('/friendprofile/<int:friend_id>', methods=['GET'])

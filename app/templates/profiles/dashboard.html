@@ -324,12 +324,14 @@
 
                 <div id="recipes">
                 <h3>Bookmarked recipes</h3>
-                    {% if current_user.recipebox %}
+                    {% if recipes %}
                         <ul>
-                            {% for recipe in current_user.recipebox.recipes %}
+                            {% for party in recipes %}
+                                {% for recipe in party %}
                                 <li>
-                                    <a href="{{ url_for('profiles.show_recipe_profile', recipe_id=recipe.recipes.recipe_record_id) }}">{{ recipe.recipes.title }}
+                                    <a href="{{ url_for('spoonacular.show_saved_recipe', record_id=recipe.recipe_record_id) }}">{{ recipe.title }}
                                 </li>
+                                {% endfor %}
                             {% endfor %}
                         </ul>
                     {% else %}

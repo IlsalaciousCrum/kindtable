@@ -15,7 +15,7 @@ from wtforms_components import DateRange
 
 class FirstNameForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
-    first_name = StringField('Change first name to:',
+    first_name = StringField('First name',
                              widget=TextArea(),
                              validators=[InputRequired(message="Please tell us what to you call you."),
                                          Length(1, 64, message="Limit 64 characters")])
@@ -24,7 +24,7 @@ class FirstNameForm(Form):
 
 class LastNameForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
-    last_name = StringField('Last name:',
+    last_name = StringField('Last name',
                             widget=TextArea(),
                             validators=[InputRequired(message="Please tell us a last name to use for you."),
                                         Length(1, 64, message="Limit 64 characters")])
@@ -34,7 +34,7 @@ class LastNameForm(Form):
 class DietForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     diets = Diet.query.order_by(Diet.diet_type).all()
-    diet = RadioField('Diet you follow:',
+    diet = RadioField('Diet you follow',
                       choices=[(diet.diet_id, '{} - <span class="text-muted small">{}</span>'.format(diet.diet_type, diet.description)) for diet in diets],
                       validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
     submit = SubmitField('Update')
@@ -42,7 +42,7 @@ class DietForm(Form):
 
 class DietReasonForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
-    diet_reason = TextField('Reason you follow this diet:',
+    diet_reason = TextField('Reason you follow this diet',
                             widget=TextArea(),
                             validators=[Length(1, 128, message="Limit 64 characters"), DataRequired(message='Please enter a reason or exit the window')])
     submit = SubmitField('Update')
@@ -56,7 +56,7 @@ class MultiCheckboxField(SelectMultipleField):
 class IntoleranceForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     intol_query = Intolerance.query.order_by(Intolerance.intol_name).all()
-    intolerances = MultiCheckboxField('Select all allergies and intolerance groups that apply to you',
+    intolerances = MultiCheckboxField('Allergies/Intolerances',
                                       choices=[(intol.intol_id, '{} - <span class="text-muted small">{}</span>'.format(intol.intol_name, intol.intol_description)) for intol in intol_query],
                                       coerce=int)
     submit = SubmitField('Update')
@@ -64,11 +64,11 @@ class IntoleranceForm(Form):
 
 class AddAvoidForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
-    add_avoid_ingredient = StringField('Ingredient to avoid:',
+    add_avoid_ingredient = StringField('Ingredient to avoid',
                                        widget=TextArea(),
                                        validators=[InputRequired(message="Please enter an ingredient to avoid."),
                                                    Length(1, 64, message="Limit 64 characters")])
-    add_avoid_reason = TextField('Reason you would like to avoid this ingredient:',
+    add_avoid_reason = TextField('Reason you would like to avoid this ingredient',
                                  widget=TextArea(),
                                  validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
@@ -77,11 +77,11 @@ class AddAvoidForm(Form):
 class UpdateAvoidForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     avoid_id = HiddenField()
-    update_avoid_ingredient = StringField('Change ingredient to avoid:',
+    update_avoid_ingredient = StringField('Ingredient to avoid',
                                           widget=TextArea(),
                                           validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
                                                       Length(1, 64, message="Limit 64 characters")])
-    update_avoid_reason = TextField('Change the reason you avoid this ingredient:',
+    update_avoid_reason = TextField('Reason you would like to avoid this ingredient',
                                     widget=TextArea(),
                                     validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
@@ -96,16 +96,16 @@ class FriendEmailForm(Form):
 
 
 class AddNewFriendForm(Form):
-    first_name = StringField('First name:', validators=[InputRequired(message="Please tell us what to you call you."),
+    first_name = StringField('First name', validators=[InputRequired(message="Please tell us what to you call you."),
                                                         Length(1, 64, message="Limit 64 characters")])
-    last_name = StringField('Last name:', validators=[InputRequired(message="Please tell us a last name to use for you."),
+    last_name = StringField('Last name', validators=[InputRequired(message="Please tell us a last name to use for you."),
                                                       Length(1, 64, message="Limit 64 characters")])
     diets = Diet.query.order_by(Diet.diet_type).all()
-    diet = RadioField('Diet you follow:', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
+    diet = RadioField('Diet you follow', choices=[(diet.diet_id, diet.diet_type) for diet in diets],
                       validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
-    diet_reason = StringField('Reason you follow this diet:', validators=[Length(1, 128, message="Limit 64 characters"),
+    diet_reason = StringField('Reason you follow this diet', validators=[Length(1, 128, message="Limit 64 characters"),
                                                                           Optional(strip_whitespace=True)])
-    email = StringField('Email:',
+    email = StringField('Email',
                         validators=[InputRequired(message='We need an email address to register you with Kind Table.'),
                                     Length(1, 64, message="Limit 64 characters"),
                                     Email(message='Please provide a valid email address so that you can confirm your account.')])
@@ -124,7 +124,7 @@ class AddGuestToPartyForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     friend_profile_id = HiddenField(validators=[InputRequired()])
     party_query = Party.query.all()
-    parties = MultiCheckboxField('Invite to upcoming parties:',
+    parties = MultiCheckboxField('Invite to upcoming parties',
                                  choices=[(party.party_id, '{} - <span class="text-muted small">{}</span>'.format(party.title, party.datetime_of_party)) for party in party_query],
                                  coerce=int)
     submit = SubmitField('Update')
@@ -132,14 +132,14 @@ class AddGuestToPartyForm(Form):
 
 class AddNewPartyForm(Form):
     user_id = HiddenField(validators=[InputRequired()])
-    party_name = StringField('Name your event:',
+    party_name = StringField('Name your event',
                              widget=TextArea(),
                              validators=[InputRequired(message="What would you like to call your event?"),
                                          Length(1, 64, message="Limit 64 characters")])
-    start_date = DateField('Date of your event:',
+    start_date = DateField('Date of your event',
                            validators=[DateRange(min=date.today(),
                                                  message="That date is in the past.")])
-    start_time = DateField('Time of your event:',
+    start_time = DateField('Time of your event',
                            validators=[DateRange(min=datetime.now(),
                                                  message="That time is in the past.")])
 
@@ -159,14 +159,14 @@ class DeleteFriendForm(Form):
 
 class ChangeFriendEmailForm(Form):
     friend_profile_id = HiddenField(validators=[InputRequired()])
-    email = StringField('New Email:',
+    email = StringField('New Email',
                         widget=TextArea(),
                         validators=[InputRequired(),
                                     Length(1, 64),
                                     Email(),
                                     EqualTo('email2',
                                             message='Email addresses must match')])
-    email2 = StringField('Confirm new email:',
+    email2 = StringField('Confirm new email',
                          widget=TextArea(),
                          validators=[InputRequired(),
                                      Length(1, 64),
@@ -176,7 +176,7 @@ class ChangeFriendEmailForm(Form):
 
 class FriendNotesForm(Form):
     friend_profile_id = HiddenField(validators=[InputRequired()])
-    notes = StringField('Private notes:',
+    notes = StringField('Private notes',
                         widget=TextArea(),
                         validators=[InputRequired('No notes added.'),
                                     Length(1, 300)])

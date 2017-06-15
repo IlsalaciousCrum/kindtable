@@ -147,20 +147,19 @@ class PasswordResetForm(Form):
 
 
 class ChangeEmailForm(Form):
-    email = StringField('New Email:',
+    email = StringField('New Email',
                         widget=TextArea(),
                         validators=[InputRequired(),
                                     Length(1, 64),
                                     Email(),
                                     EqualTo('email2',
                                             message='Email addresses must match')])
-    email2 = StringField('Confirm new email:',
+    email2 = StringField('Confirm new email',
                          widget=TextArea(),
                          validators=[InputRequired(),
                                      Length(1, 64),
                                      Email()])
     password = PasswordField('Password',
-                             widget=TextArea(),
                              validators=[InputRequired()])
     submit = SubmitField('Update Email Address')
 
