@@ -21,6 +21,8 @@ from ..decorators import email_confirmation_required
 
 from ..email import send_email
 
+import pytz
+
 
 @profiles.route('/dashboard', methods=['GET'])
 @login_required
@@ -53,11 +55,11 @@ def show_dashboard():
     past_parties = db.session.query(Party).filter(Party.user_id ==
                                                   current_user.id,
                                                   Party.datetime_of_party
-                                                  < datetime.utcnow()).all()
+                                                  < datetime.utcnow()).order_by(Party.datetime_of_party).all()
     upcoming_parties = db.session.query(Party).filter(Party.user_id ==
                                                       current_user.id,
                                                       Party.datetime_of_party >=
-                                                      datetime.utcnow()).all()
+                                                      datetime.utcnow()).order_by(Party.datetime_of_party).all()
     this_users_parties = db.session.query(Party).filter(Party.user_id == current_user.id).all()
 
     recipes = [[recipe for recipe in party.recipes] for party in this_users_parties]
@@ -88,32 +90,24 @@ def show_friend_profile(friend_id):
                                     friend_id).first()
     if is_friend:
         friend_profile = Profile.query.get(friend_id)
-        past_parties = db.session.query(Party
-                                        ).filter(Party.user_id ==
-                                                 current_user.id,
-                                                 PartyGuest.friend_profile_id ==
-                                                 friend_profile.profile_id,
-                                                 Party.datetime_of_party <
-                                                 datetime.utcnow()).all()
-        upcoming_parties = db.session.query(Party
-                                            ).filter(Party.user_id ==
-                                                     current_user.id,
-                                                     PartyGuest.friend_profile_id ==
-                                                     friend_profile.profile_id,
-                                                     Party.datetime_of_party >=
-                                                     datetime.utcnow()).all()
+
+        _parties_invited = db.session.query(PartyGuest).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_id).all()
+
+        parties_invited = [partyguest.party for partyguest in _parties_invited]
+
         party_form = AddGuestToPartyForm(request.form)
-        party_form.parties.choices = db.session.query(Party
-                                                      ).filter(Party.user_id ==
-                                                               current_user.id,
-                                                               PartyGuest.friend_profile_id !=
-                                                               friend_profile.profile_id,
-                                                               Party.datetime_of_party >=
-                                                               datetime.utcnow()).all()
+
+        all_users_parties = Party.query.filter(Party.user_id == current_user.id, Party.datetime_of_party >=
+                                               datetime.utcnow()).all()
+
+        not_invited = set(all_users_parties).difference(set(parties_invited))
+
+        party_form.parties.choices = [(party.party_id, party.title) for party in not_invited]
+
         delete_form = DeleteFriendForm(request.form)
         email_form = ChangeFriendEmailForm(request.form)
         notes_form = FriendNotesForm(request.form)
-        notes_form.notes.data = is_friend.profile_notes
+        notes_form.notes.data = is_friend.friend_notes
 
         if friend_profile.owned_by_user_id == current_user.id:
             first_name_form = FirstNameForm(request.form)
@@ -132,11 +126,13 @@ def show_friend_profile(friend_id):
                                                              ProfileIntolerance.profile_id ==
                                                              friend_profile.profile_id).all()
             intol_form.intolerances.data = [(intol.intol_id) for intol in profile_intolerances]
+
+            now = datetime.now(pytz.utc)
+
             return render_template("/profiles/friend_profile_editable.html",
                                    profile_id=current_user.profile.profile_id,
                                    friend_profile=friend_profile,
-                                   past_parties=past_parties,
-                                   upcoming_parties=upcoming_parties,
+                                   parties_invited=parties_invited,
                                    invite_form=party_form,
                                    profile=current_user.profile,
                                    delete_form=delete_form,
@@ -148,19 +144,21 @@ def show_friend_profile(friend_id):
                                    add_avoid_form=add_avoid_form,
                                    update_avoid_form=update_avoid_form,
                                    email_form=email_form,
-                                   friend_profile_notes=is_friend.profile_notes,
-                                   notes_form=notes_form)
+                                   friend_profile_notes=is_friend.friend_notes,
+                                   notes_form=notes_form,
+                                   now=now)
         elif is_friend and is_friend.friendship_verified_by_email:
+            now = datetime.now(pytz.utc)
             return render_template("/profiles/friend_profile_fixed.html",
                                    profile_id=current_user.profile.profile_id,
                                    friend_profile=friend_profile,
-                                   past_parties=past_parties,
-                                   upcoming_parties=upcoming_parties,
+                                   parties_invited=parties_invited,
                                    invite_form=party_form,
                                    profile=current_user.profile,
                                    delete_form=delete_form,
                                    notes_form=notes_form,
-                                   friend_profile_notes=is_friend.profile_notes,)
+                                   friend_profile_notes=is_friend.friend_notes,
+                                   now=now)
     else:
         flash("Looks like you are trying to view the profile of someone you are not\
               friends with. Do you want to create your own profile for a friend?", "danger")
@@ -634,7 +632,7 @@ def changefriendnotes():
                                      profile.profile_id, Friend.user_id ==
                                      current_user.id).one()
     if form.validate():
-        friendship.update({"profile_notes": form.notes.data,
+        friendship.update({"friend_notes": form.notes.data,
                            "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Notes updated'})
     else:
@@ -657,7 +655,7 @@ def clearfriendnotes():
                                      profile.profile_id, Friend.user_id ==
                                      current_user.id).one()
     if form.validate():
-        friendship.update({"profile_notes": None,
+        friendship.update({"friend_notes": None,
                            "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Notes updated'})
     else:
@@ -681,7 +679,7 @@ def findafriend():
                                                         Friend.user_id ==
                                                         current_user.id).first()
     if form.validate():
-        friendship.update({"profile_notes": None,
+        friendship.update({"friend_notes": None,
                            "last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Notes updated'})
     else:

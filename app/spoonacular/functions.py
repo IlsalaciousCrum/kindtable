@@ -13,11 +13,11 @@ def all_guest_diets(partyid):
     """Query that gets the diet of each guest coming to the party"""
 
     diet_set = set()
-    hostparty = Party.query.get(partyid)
-    party_guests = hostparty.guest_profiles
+    party = Party.query.get(partyid)
+    party_guests = party.guests
 
     for guest in party_guests:
-        diet = str(guest.diet.diet_type)
+        diet = str(guest.profiles.diet.diet_type)
         diet_set.add(diet)
 
     diet_string = ', '.join(diet_set)
@@ -30,10 +30,10 @@ def guest_diet(partyid):
 
     diet_ranking = []
     party = Party.query.get(partyid)
-    party_guests = party.guest_profiles
+    party_guests = party.guests
 
     for guest in party_guests:
-        diet_rank = guest.diet.ranking
+        diet_rank = guest.profiles.diet.ranking
         diet_ranking.append(diet_rank)
 
     most_limiting = min(diet_ranking)
@@ -48,10 +48,10 @@ def guest_avoidances(partyid):
 
     avoidance_set = set()
     party = Party.query.get(partyid)
-    party_guests = party.guest_profiles
+    party_guests = party.guests
 
     for guest in party_guests:
-        avoids = guest.avoidances
+        avoids = guest.profiles.avoidances
         for each in avoids:
                 avoidance_set.add(str(each.ingredient))
 
@@ -64,10 +64,10 @@ def guest_intolerances(partyid):
 
     intolerance_set = set()
     party = Party.query.get(partyid)
-    party_guests = party.guest_profiles
+    party_guests = party.guests
 
     for guest in party_guests:
-        intols = guest.intolerances
+        intols = guest.profiles.intolerances
         for each in intols:
                 intolerance_set.add(str(each.intol_name))
     intolerance_string = ', '.join(intolerance_set)

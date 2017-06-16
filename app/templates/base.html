@@ -83,7 +83,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
                         <ul class="dropdown-menu" id="friendsDropDown">
                             {% if current_user.valid_friends() is defined %}
-                            {% for friend in current_user.valid_friends() %}
+                            {% for friend in current_user.valid_friends()|sort(attribute='first_name')  %}
                                 <li class="myFriends">
                                     <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.profile_id) }}">
                                         {% if friend.first_name is not none %}{{ friend.first_name }}{% else %}{%endif %} {% if friend.last_name is not none %}{{ friend.last_name }}{% else %}{%endif %}
@@ -102,7 +102,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Parties<span class="caret"></span></a>
                         <ul class="dropdown-menu">
                             {% if current_user.parties %}
-                            {% for party in current_user.parties %}
+                            {% for party in current_user.parties|sort(attribute='datetime_of_party') %}
                             <li class="myParties"><a href="{{ url_for('profiles.show_party_profile', party_id = party.party_id) }}">{{  party.title  }}</a></li>
                             {% endfor %}
                             {% else %}

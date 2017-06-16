@@ -5,7 +5,7 @@ from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField
 from wtforms.validators import InputRequired, Length, Email, Optional, DataRequired, EqualTo
 from wtforms import ValidationError
 from wtforms.widgets import TextArea
-from ..models import Profile, Diet, User, Intolerance, Party, Friend, Party
+from ..models import Profile, Diet, User, Intolerance, Party, Friend
 from .. import db
 from flask import flash, redirect, url_for, request
 from flask_login import current_user
@@ -34,7 +34,7 @@ class LastNameForm(Form):
 class DietForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     diets = Diet.query.order_by(Diet.diet_type).all()
-    diet = RadioField('Diet you follow',
+    diet = RadioField('Diet followed',
                       choices=[(diet.diet_id, '{} - <span class="text-muted small">{}</span>'.format(diet.diet_type, diet.description)) for diet in diets],
                       validators=[DataRequired(message='Please choose a diet')], default="10", coerce=int)
     submit = SubmitField('Update')
@@ -42,7 +42,7 @@ class DietForm(Form):
 
 class DietReasonForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
-    diet_reason = TextField('Reason you follow this diet',
+    diet_reason = TextField('Reason diet is followed',
                             widget=TextArea(),
                             validators=[Length(1, 128, message="Limit 64 characters"), DataRequired(message='Please enter a reason or exit the window')])
     submit = SubmitField('Update')
@@ -68,7 +68,7 @@ class AddAvoidForm(Form):
                                        widget=TextArea(),
                                        validators=[InputRequired(message="Please enter an ingredient to avoid."),
                                                    Length(1, 64, message="Limit 64 characters")])
-    add_avoid_reason = TextField('Reason you would like to avoid this ingredient',
+    add_avoid_reason = TextField('Reason to avoid this ingredient',
                                  widget=TextArea(),
                                  validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
@@ -81,7 +81,7 @@ class UpdateAvoidForm(Form):
                                           widget=TextArea(),
                                           validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
                                                       Length(1, 64, message="Limit 64 characters")])
-    update_avoid_reason = TextField('Reason you would like to avoid this ingredient',
+    update_avoid_reason = TextField('Reason to avoid this ingredient',
                                     widget=TextArea(),
                                     validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
@@ -123,10 +123,8 @@ class AddNewFriendForm(Form):
 class AddGuestToPartyForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     friend_profile_id = HiddenField(validators=[InputRequired()])
-    party_query = Party.query.all()
-    parties = MultiCheckboxField('Invite to upcoming parties',
-                                 choices=[(party.party_id, '{} - <span class="text-muted small">{}</span>'.format(party.title, party.datetime_of_party)) for party in party_query],
-                                 coerce=int)
+    # user_id = current_user.id
+    parties = MultiCheckboxField('Invite to upcoming parties', coerce=int)
     submit = SubmitField('Update')
 
 

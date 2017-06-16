@@ -17,15 +17,17 @@
             </div>
             <div class="modal-body">
                 <div class = "row round_hidden_div" style="padding-top: 2em">
-                    {% if upcoming_parties %}
-                        <strong>Parties already invited to:</strong>
+                    {% if parties_invited %}
+                        Parties already invited to:
                         <ul>
-                            {% for party in upcoming_parties %}
+                            {% for party in parties_invited %}
+                                {% if party.datetime_of_party >= now %}
                                 <li>
-                                    <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
-                                        <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
-                                    </a>
+                                    {{ party.title}}
                                 </li>
+                                {% else %}
+                                <p>Not invited to any parties</p>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     {% from "_formhelpers.html" import render_field %}
@@ -39,7 +41,7 @@
                             Close
                         </button>
                     </form>
-                     <script src="{{ url_for('static', filename = 'js/InviteFriendToParties.js') }}" type="text/javascript"></script>
+                            <script src="{{ url_for('static', filename = 'js/inviteFriendToParties.js') }}" type="text/javascript"></script>
                     {% else %}
                     <span class="text-danger">Whoops! You will need to add at least one new party first before adding guests.</span>
                     {% endif %}
@@ -218,20 +220,21 @@
                     </div>
                 </div>
                 
+                   <h3>Upcoming Parties Invited To &emsp; <button type="button" class="btn btn-sm btn-success" href="#" data-toggle="modal" data-target="#inviteModal">Invite To More Parties</button></h3>
                 <div class="upcomingParties">
                     <div id="upcomingParties">
-                        <h3>Upcoming Parties Invited To</h3>
-                        <button type="button" class="btn btn-sm btn-success" href="#" data-toggle="modal" data-target="#inviteModal">
-                                Invite To Parties
-                        </button><br><br>
-                        {% if upcoming_parties %}
+                        {% if parties_invited %}
                             <ul>
-                                {% for party in upcoming_parties %}
+                                {% for party in parties_invited %}
+                                    {% if party.datetime_of_party >= now %}
                                     <li>
                                         <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
                                             <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
                                         </a>
                                     </li>
+                                    {% else %}
+                                    <span class="text-muted strong">No upcoming parties.</span>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         {% else %}
@@ -242,14 +245,18 @@
 
                 <h3>Past Parties Invited To</h3>
                 <div id="pastParties">
-                    {% if past_parties %}
+                    {% if parties_invited %}
                         <ul>
-                            {% for party in past_parties %}
+                            {% for party in parties_invited %}
+                                {% if party.datetime_of_party <= now %}
                                 <li>
                                     <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
                                         <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
                                     </a>
                                 </li>
+                                {% else %}
+                                <span class="text-muted strong">No past parties</span>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     {% else %}

@@ -466,10 +466,7 @@ class Party(BaseMixin, db.Model):
                         nullable=False)
     datetime_of_party = db.Column(db.DateTime(timezone=True), nullable=True)
     party_notes = db.Column(db.String(300), nullable=True)
-    guest_profiles = db.relationship('Profile',
-                                     secondary='party_guests',
-                                     lazy='joined',
-                                     backref='party')
+    guests = db.relationship('PartyGuest', backref='party')
     recipes = db.relationship('RecipeCard',
                               secondary='partyrecipes',
                               backref='parties',
@@ -530,6 +527,8 @@ class PartyGuest(BaseMixin, db.Model):
                          nullable=False)
     friend_profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),
                                   nullable=False)
+
+    profiles = db.relationship('Profile', backref='partyguest')
 
     def disinvite_guest(self):
         '''removes a guest from the party'''

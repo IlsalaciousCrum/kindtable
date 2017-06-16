@@ -124,7 +124,7 @@
                         <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(add_avoid_form.add_avoid_ingredient, cols="40", rows="1") }}
                         {{ render_field(add_avoid_form.add_avoid_reason, cols="65", rows="4", maxlength=128) }}
-                        <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
+                        <p class = "text-muted">The information about why they avoid this ingredient will show up on the recipe search page to help you make your guest more comfortable.</p>
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
                             Close
@@ -156,7 +156,7 @@
                         <input type="hidden" id="updateAvoidFormAvoidId" name="avoid_id"/>
                         {{ render_field(update_avoid_form.update_avoid_ingredient, cols="40", rows="1") }}
                         {{ render_field(update_avoid_form.update_avoid_reason, cols="65", rows="4", maxlength=128) }}
-                        <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
+                        <p class = "text-muted">The information about why they avoid this ingredient will show up on the recipe search page to help you make your guest more comfortable.</p>
                         <input type="submit" class="btn btn-sm btn-success" value="Submit">&emsp;
                         <button type="button" class="btn btn-sm btn-info" data-dismiss="modal" aria-label="Close">
                             Cancel
@@ -213,15 +213,17 @@
             </div>
             <div class="modal-body">
                 <div class = "row round_hidden_div" style="padding-top: 2em">
-                    {% if upcoming_parties %}
-                        <strong>Parties already invited to:</strong>
+                    {% if parties_invited %}
+                        Parties already invited to:
                         <ul>
-                            {% for party in upcoming_parties %}
+                            {% for party in parties_invited %}
+                                {% if party.datetime_of_party >= now %}
                                 <li>
-                                    <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
-                                        <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
-                                    </a>
+                                    {{ party.title}}
                                 </li>
+                                {% else %}
+                                <p>Not invited to any parties</p>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     {% from "_formhelpers.html" import render_field %}
@@ -438,9 +440,9 @@
                 </div>
 
                 <div id="remove" style="padding-top: 3em">
-                    <small>Don't want to be friends with this person on Kind Table anymore?</small>
+                    <small>Don't want to invite this person to anymore meals?</small>
                     <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#removeFriend">
-                        <span class="text-danger">Remove Friend</span>
+                        <span class="text-danger">Delete Friend Profile Permanently</span>
                     </button>
                 </div>
 
@@ -466,20 +468,21 @@
                 </div>
 
 
-                <h3>Upcoming Parties Invited To</h3>
+                <h3>Upcoming Parties Invited To &emsp; <button type="button" class="btn btn-sm btn-success" href="#" data-toggle="modal" data-target="#inviteModal">Invite To More Parties</button></h3>
                 <div class="upcomingParties">
                     <div id="upcomingParties">
-                        <button type="button" class="btn btn-sm btn-success" href="#" data-toggle="modal" data-target="#inviteModal">
-                                Invite To Parties
-                        </button><br><br>
-                        {% if upcoming_parties %}
+                        {% if parties_invited %}
                             <ul>
-                                {% for party in upcoming_parties %}
+                                {% for party in parties_invited %}
+                                    {% if party.datetime_of_party >= now %}
                                     <li>
                                         <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
                                             <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
                                         </a>
                                     </li>
+                                    {% else %}
+                                    <span class="text-muted strong">No upcoming parties.</span>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         {% else %}
@@ -490,14 +493,18 @@
 
                 <h3>Past Parties Invited To</h3>
                 <div id="pastParties">
-                    {% if past_parties %}
+                    {% if parties_invited %}
                         <ul>
-                            {% for party in past_parties %}
+                            {% for party in parties_invited %}
+                                {% if party.datetime_of_party <= now %}
                                 <li>
                                     <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
                                         <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
                                     </a>
                                 </li>
+                                {% else %}
+                                <span class="text-muted strong">No past parties</span>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     {% else %}
