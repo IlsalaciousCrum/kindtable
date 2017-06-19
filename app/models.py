@@ -9,6 +9,7 @@ import pytz
 from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, BadData, SignatureExpired
 import os
 from sqlalchemy import and_, or_
+from flask import redirect, url_for
 
 ##############################################################################
 # Model definitions
@@ -291,7 +292,7 @@ class Friend(BaseMixin, db.Model):
         return email_serializer.dumps({'friend_record_id': self.record_id, 'friend_profile_id': self.profile.profile_id, 'user_id': self.user_id})
 
     @classmethod
-    def process_email_token(self, token):
+    def process_email_token(self, token, current_user_id):
         email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
         try:
             data = email_serializer.loads(token)
@@ -307,6 +308,10 @@ class Friend(BaseMixin, db.Model):
                     print "bad data"
 
         friendship = Friend.query.get(data['friend_record_id'])
+
+        if data['user_id'] == current_user_id:
+            flash("Please log in.", "info")
+            return redirect(url_for('auth.logout'))
 
         print "Friend record id is " + str(data['friend_record_id'])
         print "Friend_profile_id is " + str(data['friend_profile_id'])
