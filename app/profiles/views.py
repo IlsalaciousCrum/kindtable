@@ -232,7 +232,6 @@ def connect_friends():
             flash('An connection request email has been sent to %s.'
                   % new_friend_profile.email, "success")
             return redirect(request.referrer)
-    
     elif request.method == 'POST' and not find_friend_form.validate():
         flash_errors(find_friend_form)
         return redirect(request.referrer)
@@ -248,7 +247,8 @@ def confirm_friendship_with_existing_user(token):
     """Validates an email token and confirms friendship between
     two existing users"""
 
-    friend_dict = Friend.process_email_token(token)
+    friend_dict = Friend.process_email_token(token=token,
+                                             current_user_id=current_user.id)
     print friend_dict
     if not friend_dict:
         abort(404)
