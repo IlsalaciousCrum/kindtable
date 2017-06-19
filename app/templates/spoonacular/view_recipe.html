@@ -5,7 +5,7 @@
     <div class="col-md-8 col-md-offset-2">
         <div class = "row round_div" style="padding-top: 2em">
             <h1>{{  title  }}</h1>
-            <form action="/spoonacular/addtorecipebox" method="POST">
+            <form action="{{ url_for('spoonacular.add_recipe_box') }}"  method="POST">
                 <div class="form-group">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="party_diets" value="{{  newdiets  }}">

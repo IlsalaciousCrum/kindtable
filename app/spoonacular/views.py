@@ -1,12 +1,11 @@
 """K(i)nd app views"""
 
-from flask import (render_template, request, flash, redirect, session, json)
+from flask import (render_template, request, flash, redirect, session, json, url_for)
 
 from . import spoonacular
 
 from app.models import (User, Cuisine, Course, Party,
                         PartyRecipes, RecipeCard, RecipeWorksFor)
-from .. import db
 
 from flask_login import login_required, current_user
 from ..decorators import email_confirmation_required
@@ -248,14 +247,14 @@ def add_recipe_box():
         party_recipe = PartyRecipes.query.filter(recipe_id == recipe_id, party_id == party_id).first()
         if party_recipe:
             flash("This recipe is already saved.", "warning")
-            return redirect("/searchrecipes")
+            return redirect(request.referrer)
         else:
             PartyRecipes.create_record(party_id=party_id,
                                        recipe_record_id=recipe_id,
                                        course_id=course_object.course_id,
                                        cuisine_id=cuisine_object.cuisine_id)
             flash("The recipe for %s has been saved." % title, "success")
-            return redirect("/spoonacular/searchrecipes")
+            return redirect(url_for('spoonacular.show_search_spoonacular'))
     else:
         recipe_image_url = request.form.get("recipe_image_url")
         recipe_url = request.form.get("recipe_url")
@@ -287,4 +286,4 @@ def add_recipe_box():
                                              guest_profile_id=guest.profile_id)
 
         flash("The recipe for %s has been saved to your recipe box." % title, "success")
-        return redirect("/spoonacular/searchrecipes")
+        return redirect(url_for('spoonacular.show_search_spoonacular'))

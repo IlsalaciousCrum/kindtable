@@ -236,9 +236,14 @@ class User(BaseMixin, UserMixin, db.Model):
         # Sublime flags ' == True,' as a syntax error but in this case, for SQLAlchemy,
         # this is the correct syntax.
 
+        db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
+                                                                       (or_(Friend.friendship_verified_by_email == True,
+                                                                        Profile.owned_by_user_id == self.id,
+                                                                        User.profile_id != Profile.owned_by_user_id))).all()
+
+
         return db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
                                                                        (or_(Friend.friendship_verified_by_email == True,
-                                                                        Friend.friendship_verified_by_facebook == True,
                                                                         Profile.owned_by_user_id == self.id,
                                                                         User.profile_id != Profile.owned_by_user_id))).all()
 
@@ -281,8 +286,6 @@ class Friend(BaseMixin, db.Model):
     friend_notes = db.Column(db.String(300), nullable=True)
     friendship_verified_by_email = db.Column(db.Boolean, unique=False,
                                              default=False)
-    friendship_verified_by_facebook = db.Column(db.Boolean, unique=False,
-                                                default=False)
     profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
 
