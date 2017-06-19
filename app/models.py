@@ -236,16 +236,14 @@ class User(BaseMixin, UserMixin, db.Model):
         # Sublime flags ' == True,' as a syntax error but in this case, for SQLAlchemy,
         # this is the correct syntax.
 
-        db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
-                                                                       (or_(Friend.friendship_verified_by_email == True,
-                                                                        Profile.owned_by_user_id == self.id,
-                                                                        User.profile_id != Profile.owned_by_user_id))).all()
-
+        verified_friends = db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
+                                                                                   (Friend.friendship_verified_by_email == True)).all()
+        personal_profiles = db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
+                                                                                   (Friend.friendship_verified_by_email == True)).all()
 
         return db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
-                                                                       (or_(Friend.friendship_verified_by_email == True,
-                                                                        Profile.owned_by_user_id == self.id,
-                                                                        User.profile_id != Profile.owned_by_user_id))).all()
+                                                                       (or_(Friend.friendship_verified_by_email == True),
+                                                                        (Friend.private_profile == True))).all()
 
     def delete_user(self):
         '''deletes a user and all records in affected tables'''
@@ -286,6 +284,8 @@ class Friend(BaseMixin, db.Model):
     friend_notes = db.Column(db.String(300), nullable=True)
     friendship_verified_by_email = db.Column(db.Boolean, unique=False,
                                              default=False)
+    private_profile = db.Column(db.Boolean, unique=False,
+                                default=False)
     profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
 
