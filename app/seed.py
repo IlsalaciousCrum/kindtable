@@ -196,10 +196,11 @@ def LoadTestPeople():
 
     Friend.create_record(user_id=1,
                          friend_profile_id=3,
-                         friendship_verified_by_email=False)
+                         private_profile=True,
+                         )
     Friend.create_record(user_id=1,
                          friend_profile_id=4,
-                         friendship_verified_by_email=False)
+                         private_profile=True)
 
     print "Friends added"
 

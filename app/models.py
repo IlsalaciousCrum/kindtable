@@ -282,23 +282,28 @@ class Friend(BaseMixin, db.Model):
                                              default=False)
     private_profile = db.Column(db.Boolean, unique=False,
                                 default=False)
-    profile = db.relationship('Profile', backref='friend')
+    friend_profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
 
     def generate_email_token(self):
         '''Creates an encrypted token to send via email to new user'''
 
         email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
-        return email_serializer.dumps({'friend_record_id': self.record_id, 'friend_profile_id': self.profile.profile_id, 'user_id': self.user_id})
+        return email_serializer.dumps({'friend_record_id': self.record_id, 'friend_profile_id': self.friend_profile.profile_id, 'user_id': self.user_id})
 
     @classmethod
     def process_email_token(self, token, current_user_id):
+        print 1
         email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
+        print 2
         try:
+            print 3
             data = email_serializer.loads(token)
         except BadSignature, e:
+            print 4
             print "Bad Signature"
             encoded_payload = e.payload
+            print 5
             if encoded_payload is not None:
                 print "data is not nothing"
                 try:
@@ -307,27 +312,31 @@ class Friend(BaseMixin, db.Model):
                 except BadData:
                     print "bad data"
 
+        print 6
         friendship = Friend.query.get(data['friend_record_id'])
 
         if data['user_id'] == current_user_id:
-            flash("Please log in.", "info")
-            return redirect(url_for('auth.logout'))
+            print 7
+            return "logout"
 
         print "Friend record id is " + str(data['friend_record_id'])
         print "Friend_profile_id is " + str(data['friend_profile_id'])
         print "user_id is " + str(data['user_id'])
 
         if not friendship:
+            print 8
             print "That friend record id does not exist."
             return False
 
         if data['friend_profile_id'] != friendship.friend_profile_id or data['user_id'] != friendship.user_id:
+            print 9
             print "The profile id or the user_id don't match the friend record"
             return False
         else:
+            print 10
             friendship.friendship_verified_by_email = True
             db.session.commit()
-            return {'friend_record_id': data['friend_record_id'], 'friend_profile_id': data['friend_profile_id'], 'user_id': data['user_id']}
+            return friendship
 
     def remove_friendship(self):
         '''Removes the friendship and all relevant records'''
@@ -349,12 +358,10 @@ class Friend(BaseMixin, db.Model):
         '''Provide helpful representation when printed.'''
 
         return '<Friend record_id=%s user_id=%s  friend_profile_id=%s \
-        friendship_verified_by_email=%s \
-        friendship_verified_by_facebook=%s>' % (self.record_id,
-                                                self.user_id,
-                                                self.friend_profile_id,
-                                                self.friendship_verified_by_email,
-                                                self.friendship_verified_by_facebook)
+        friendship_verified_by_email=%s>' % (self.record_id,
+                                             self.user_id,
+                                             self.friend_profile_id,
+                                             self.friendship_verified_by_email)
 
 
 class Intolerance(BaseMixin, db.Model):

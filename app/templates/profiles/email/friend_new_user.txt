@@ -16,7 +16,7 @@ registration.
 To become friends with {{ friend.first_name}} {{ friend.last_name  }}({{  friend.email  }}), click 
 on the following link and sign in to your KindTable account:
 
-{{ url_for('profiles.reg_confirm_friendship', token=token, _external=True) }}
+{{ url_for('profiles.confirm_friendship_with_new_user', token=token, _external=True) }}
 
 Sincerely,
 

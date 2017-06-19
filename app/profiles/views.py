@@ -240,33 +240,37 @@ def connect_friends():
                            find_friend_form=find_friend_form)
 
 
-@profiles.route('/non_reg_confirm_friendship/<token>', methods=['GET'])
+@profiles.route('/confirm_friendship_existing_user/<token>', methods=['GET'])
 @login_required
 @email_confirmation_required
 def confirm_friendship_with_existing_user(token):
     """Validates an email token and confirms friendship between
     two existing users"""
 
-    friend_dict = Friend.process_email_token(token=token,
-                                             current_user_id=current_user.id)
-    print friend_dict
-    if not friend_dict:
+    friendship = Friend.process_email_token(token=token,
+                                            current_user_id=current_user.id)
+    if friendship == "logout":
+        return redirect(url_for('auth.logout'))
+    elif friendship == "false":
+        flash("There seems to be an error. Please email kindtableapp@gmail.com with what you were doing when the error happened. Thank you.")
+    elif not friendship:
         abort(404)
     else:
-        new_friend = User.query.get(friend_dict['user_id'])
+        print friendship
+        friend = User.query.get(friendship.user_id)
+
         Friend.create_record(user_id=current_user.id,
-                             friend_profile_id=new_friend.profile_id,
+                             friend_profile_id=friend.profile.profile_id,
                              friendship_verified_by_email=True)
-        flash("Congratulations! You are now friends!", "success")
-        return redirect('profiles/friendprofile/%s' % new_friend.profile_id)
+        flash("Congratulations! You are now friends with %s!" % str(friend.profile.first_name), "success")
+        return redirect('profiles/friendprofile/%s' % friend.profile.profile_id)
 
 
-@profiles.route('/reg_confirm_friendship/<token>', methods=['GET'])
+@profiles.route('/confirm_friendship_new_user/<token>', methods=['GET'])
 @login_required
 @email_confirmation_required
 def confirm_friendship_with_new_user(token):
-    """Validates an email token and confirms friendship between
-    two existing users"""
+    """Validates an email token and registers a new user"""
 
     friendship = Friend.process_email_token(token)
     if not friendship:
