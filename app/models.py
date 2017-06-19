@@ -236,14 +236,9 @@ class User(BaseMixin, UserMixin, db.Model):
         # Sublime flags ' == True,' as a syntax error but in this case, for SQLAlchemy,
         # this is the correct syntax.
 
-        verified_friends = db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
-                                                                                   (Friend.friendship_verified_by_email == True)).all()
-        personal_profiles = db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
-                                                                                   (Friend.friendship_verified_by_email == True)).all()
-
         return db.session.query(Profile).join(Friend).join(User).filter(and_(Friend.user_id == self.id),
-                                                                       (or_(Friend.friendship_verified_by_email == True),
-                                                                        (Friend.private_profile == True))).all()
+                                                                       (or_(Friend.friendship_verified_by_email == True,
+                                                                        (Friend.private_profile == True)))).all()
 
     def delete_user(self):
         '''deletes a user and all records in affected tables'''

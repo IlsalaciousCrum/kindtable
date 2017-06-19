@@ -17,7 +17,8 @@ from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
 
 from datetime import datetime
 
-from ..decorators import email_confirmation_required
+from ..decorators import email_confirmation_required, flash_errors
+
 
 from ..email import send_email
 
@@ -231,6 +232,11 @@ def connect_friends():
             flash('An connection request email has been sent to %s.'
                   % new_friend_profile.email, "success")
             return redirect(request.referrer)
+    
+    elif request.method == 'POST' and not find_friend_form.validate():
+        flash_errors(find_friend_form)
+        return redirect(request.referrer)
+
     return render_template("profiles/find_a_friend.html",
                            find_friend_form=find_friend_form)
 
