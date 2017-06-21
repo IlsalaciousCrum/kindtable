@@ -201,3 +201,28 @@ class FindaFriendForm(Form):
                                            Length(1, 64),
                                            Email()])
     submit = SubmitField('Update')
+
+
+class PartyTitleForm(Form):
+    party_id = HiddenField(validators=[InputRequired()])
+    title = StringField('Title',
+                        validators=[InputRequired(message="Please tell us what to you call your party."),
+                                    Length(1, 64, message="Limit 120 characters")])
+    submit = SubmitField('Update')
+
+
+class PartyDatetimeForm(Form):
+    party_id = HiddenField(validators=[InputRequired()])
+    date = DateField('New date', format='%Y-%m-%d',
+                     render_kw={"placeholder": "MM / DD / YYYY"})
+    hour = TimeField('New time', format='%H:%M')
+    submit = SubmitField('Update')
+
+    def validate_date(self, field):
+        print "checking valid date"
+        today = date.today()
+        print today
+        if field.data < date.today():
+            print "triggering the validation but somehow not flashing"
+            raise ValidationError('Date in the past. Please pick a date from the future')
+            return redirect(request.referrer)

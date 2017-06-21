@@ -14,7 +14,8 @@ from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
                     AddAvoidForm, UpdateAvoidForm, IntoleranceForm,
                     AddNewPartyForm, DeleteFriendForm, ChangeFriendEmailForm,
                     FriendNotesForm, FindaFriendForm, AddGuestToPartyForm,
-                    AddNewPartyForm, ManageGuestListForm)
+                    AddNewPartyForm, ManageGuestListForm, PartyTitleForm,
+                    PartyDatetimeForm)
 
 from datetime import datetime
 
@@ -26,6 +27,8 @@ from ..email import send_email
 import pytz
 
 from pytz import timezone
+
+import time
 
 
 @profiles.route('/dashboard', methods=['GET'])
@@ -292,14 +295,31 @@ def show_party_profile(party_id):
 
     party = Party.query.get(party_id)
     manage_guests_form = ManageGuestListForm(request.form)
+    titleform = PartyTitleForm(request.form)
+    datetimeform = PartyDatetimeForm(request.form)
+
+    _datetime_ = party.datetime_of_party
+
+    party_date = _datetime_.astimezone(timezone(session['timezone']))
+
+    naive = party_date.replace(tzinfo=None)
+
+    party_date_date = naive
+    party_date_time = naive.time()
+
+    datetimeform.date.data = party_date_date
+    datetimeform.hour.data = party_date_time
+
     friends = current_user.friends
     manage_guests_form.friends.choices = [(friend.friend_profile_id, ("{0} {1} ({2})").format(friend.friend_profile.first_name, friend.friend_profile.last_name, friend.friend_profile.email)) for friend in friends]
-
+    titleform.title.data = party.title
     party_guests = party.guests
     manage_guests_form.friends.data = [guest.friend_profile_id for guest in party_guests]
 
     return render_template("profiles/party_profile.html", party=party,
-                           manage_guests_form=manage_guests_form)
+                           manage_guests_form=manage_guests_form,
+                           titleform=titleform,
+                           datetimeform=datetimeform)
 
 
 @profiles.route('/add_new_party', methods=['GET', 'POST'])
@@ -769,6 +789,56 @@ def manageguestlist():
                 guest.disinvite_guest()
                 party.update({"last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Guests updated'})
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@profiles.route('/changetitle.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def changetitle():
+    """Takes an Ajax request and changes a party's title"""
+
+    form = PartyTitleForm(request.form)
+    party = Party.query.get(form.party_id.data)
+    if request.method == 'POST' and form.validate():
+        party.update({"title": form.title.data,
+                      "last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Party title updated'})
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@profiles.route('/partydatetime', methods=['POST'])
+@login_required
+@email_confirmation_required
+def party_datetime():
+    """Takes an Ajax request and changes a party's title"""
+
+    form = PartyDatetimeForm(request.form)
+    print form.date.data
+    print form.hour.data
+
+    if request.method == 'POST' and form.validate():
+        session_timezone = session['timezone']
+        _datetime_ = datetime.combine(form.date.data, form.hour.data)
+        tz = timezone(session_timezone)
+        party_date = tz.localize(_datetime_)
+        party = Party.query.get(form.party_id.data)
+        party.update({"datetime_of_party": party_date, "last_updated": datetime.utcnow()})
+        _display_datetime = (party.datetime_of_party).astimezone(tz)
+        monkey_datetime = _display_datetime.strftime('%A, %B %d, %Y %I:%M %p')
+        if monkey_datetime[-8] == '0':
+            monkey_datetime = monkey_datetime[:-8] + monkey_datetime[-7:]
+        return monkey_datetime
     else:
         for field, error in form.errors.items():
             flash(u"Error in %s -  %s" % (
