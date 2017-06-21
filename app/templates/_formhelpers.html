@@ -39,6 +39,11 @@ def flash_errors(form):
             flash(u"Error in the <strong>%s</strong> field - %s" %
                   (getattr(form, field).label.text, error), 'danger')
 
+
+{% macro render_no_label_field(field) %}
+  <dd>{{ field(**kwargs)|safe }}
+{% endmacro %}
+
 <!-- http://bear-z.com/python/render-bootstrap-3-forms-with-wtforms-and-jinja/
  -->
 

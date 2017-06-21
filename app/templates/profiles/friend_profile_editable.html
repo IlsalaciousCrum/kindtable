@@ -18,8 +18,8 @@
                     <form action="{{ url_for('profiles.changefirstname') }}" class="form form-horizontal" method="post" role="form" id="changeFirstName">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(first_name_form.first_name,  cols="40", rows="1") }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        {{ render_field(first_name_form.first_name,  style="width: 75%", rows="1") }}<br>
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
@@ -43,8 +43,8 @@
                     <form action="{{ url_for('profiles.changelastname') }}" class="form form-horizontal" method="post" role="form" id="changeLastName">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(last_name_form.last_name, cols="40", rows="1") }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        {{ render_field(last_name_form.last_name, style="width: 75%", rows="1") }}<br>
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
@@ -69,7 +69,7 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(diet_form.diet) }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
@@ -94,9 +94,8 @@
                     <form action="{{ url_for('profiles.changedietreason') }}" class="form form-horizontal" method="post" role="form" id="changeDietReason">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(diet_reason_form.diet_reason, cols="65", rows="4", maxlength=128) }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                        <button type="button" class="btn btn-sm btn-danger" id="clearDietReason">Delete reason</button>
+                        {{ render_field(diet_reason_form.diet_reason, style="width: 100%", rows="4", maxlength=128) }}<br>
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>&ensp;<button type="button" class="btn btn-sm btn-danger" id="clearDietReason">Delete reason</button>
                     </form>
                     <script src="{{ url_for('static', filename = 'js/dietReason.js') }}" type="text/javascript"></script>
                 </div>             
@@ -107,7 +106,7 @@
 
 
 <div class="modal fade" id="addAvoidModal" tabindex="-1" role="dialog" aria-labelledby="addAvoidModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addAvoidModalLabel">Add an Ingredient to Avoid</h5>
@@ -122,13 +121,10 @@
                     <form action="{{ url_for('profiles.addavoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(add_avoid_form.add_avoid_ingredient, cols="40", rows="1") }}
-                        {{ render_field(add_avoid_form.add_avoid_reason, cols="65", rows="4", maxlength=128) }}
+                        {{ render_field(add_avoid_form.add_avoid_ingredient, style="width: 75%", rows="1") }}
+                        {{ render_field(add_avoid_form.add_avoid_reason, style="width: 100%", rows="4", maxlength=128) }}
                         <p class = "text-muted">The information about why they avoid this ingredient will show up on the recipe search page to help you make your guest more comfortable.</p>
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
-                            Close
-                        </button>
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>
             </div>
@@ -154,11 +150,11 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         <input type="hidden" id="updateAvoidFormAvoidId" name="avoid_id"/>
-                        {{ render_field(update_avoid_form.update_avoid_ingredient, cols="40", rows="1") }}
-                        {{ render_field(update_avoid_form.update_avoid_reason, cols="65", rows="4", maxlength=128) }}
+                        {{ render_field(update_avoid_form.update_avoid_ingredient, style="width: 75%", rows="1") }}
+                        {{ render_field(update_avoid_form.update_avoid_reason, style="width: 100%", rows="4", maxlength=128) }}
                         <p class = "text-muted">The information about why they avoid this ingredient will show up on the recipe search page to help you make your guest more comfortable.</p>
-                        <input type="submit" class="btn btn-sm btn-success" value="Submit">&emsp;
-                        <button type="button" class="btn btn-sm btn-info" data-dismiss="modal" aria-label="Close">
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&emsp;
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
                             Cancel
                         </button>&emsp;
                         <button type="button" class="btn btn-sm btn-warning" id="deleteavoidreason">Delete the reason</button>
@@ -189,10 +185,7 @@
                         <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(intol_form.intolerances) }}
                         <p class = "text-muted">Selecting the allergy/intolerance groups that apply to you can help make sure that KindTable recipes will be safe for you. For example, gluten can be found in many <a href="https://celiac.org/live-gluten-free/glutenfreediet/sources-of-gluten/" title="The Celiac Disease Foundation's list of sources of gluten" target="_blank">non-wheat ingredients</a> and if you select gluten, we will be sure that recipes will not include those ingredients. But if you are sensitive only to wheat itself and not ingredients such as soy sauce, selecting "wheat" instead of "gluten" gives you and your hosts more options.</p>
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
-                            Close
-                        </button>
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>
             </div>
@@ -232,10 +225,7 @@
                         <input type="hidden" name="profile_id" value="{{  profile_id  }}"/>
                         <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(invite_form.parties) }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
-                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
-                            Close
-                        </button>
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                             <script src="{{ url_for('static', filename = 'js/inviteFriendToParties.js') }}" type="text/javascript"></script>
                     {% else %}
@@ -272,11 +262,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile_id  }}"/>
                         <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        <input type="submit" class="btn btn-lg btn-danger" value="Delete Friend"><br><br>
-                        
-                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
-                            Close
-                        </button>
+                        <input type="submit" class="btn btn-lg btn-danger" value="Delete Friend"><br><br><button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>
             </div>
@@ -302,9 +288,9 @@
                     <form action="{{ url_for('profiles.changefriendemail') }}" class="form form-horizontal" method="post" role="form" id="emailForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(email_form.email, cols="40", rows="1", maxlength=200) }}
-                        {{ render_field(email_form.email2, cols="40", rows="1", maxlength=200) }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        {{ render_field(email_form.email, style="width: 75%", rows="1", maxlength=200) }}
+                        {{ render_field(email_form.email2, style="width: 75%", rows="1", maxlength=200) }}<br>
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                      </form>
                     <script src="{{ url_for('static', filename = 'js/friendEmail.js') }}" type="text/javascript"></script>
                 </div>
@@ -330,8 +316,8 @@
                     <form action="{{ url_for('profiles.changefriendnotes') }}" class="form form-horizontal" method="post" role="form" id="notesForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(notes_form.notes, cols="65", rows="5", maxlength=300) }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        {{ render_field(notes_form.notes, style="width: 100%", rows="5", maxlength=300) }}
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-sm btn-danger" id="deletenote">Delete note</button>
                      </form>
                     <script src="{{ url_for('static', filename = 'js/friendNotes.js') }}" type="text/javascript"></script>

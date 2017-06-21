@@ -1,297 +1,117 @@
-
 {% extends 'base.html' %}
-{% block content %}
+{% block content %}  
 
-<div class="row well-spaced" style="padding-top: 3em">
-    <div class="col-md-8 col-md-offset-2">
-      
-        <div class = "row round_div" style="padding-top: 2em">
-            <h1>Party Profile: {{  party.title  }}</h1><br>
-            <div class="col-md-3">
-                 <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#AddGuests">Add guests</button><br>
+<!-- Modals -->
+<div class="modal fade" id="guestsModal" tabindex="-1" role="dialog" aria-labelledby="guestsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="guestsModalLabel">Manage the guest list</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-
-            <div class="col-md-8">
-                    <b>Guests:</b>
-               
-                    {% for guest in party.guests %}    
-                        <button type="button" class="btn btn-warning btn-block" data-toggle="tooltip" title="Click for more info about {% if guest.profiles.first_name is not none %}about {{ guest.profiles.first_name }}{% else %}{{  guest.profiles.email  }}{%endif %}" id="friend_info{{  guest.profiles.profile_id  }}" style="margin-top:5px">{{ guest.profiles.first_name }} {{guest.profiles.last_name }} ({{ guest.profiles.email }})</button>
-
-                        <div class="friend_info{{  guest.profiles.profile_id  }}"  hidden>
-                            
-                            <div class="row round_hidden_div">
-                                <div class="col-md-3">
-                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.profiles.profile_id  }} btn-block" data-toggle="modal" data-target="#guest_basic_info_change{{  guest.profiles.profile_id  }}" hidden>update<br>basic<br>info</button>
-                                
-
-                                </div>
-                                <div class="col-md-8" >
-                                        <b>First name:</b> {{ guest.profiles.first_name }}<br>
-                                        <b>Last name:</b> {{ guest.profiles.last_name }}<br>
-                                        <b>Email address:</b> {{ guest.profiles.email }}<br>
-                                        <b>Diet:</b> {{ guest.profiles.diet.diet_type }}<br>
-                                        <b>Diet Reason:</b> {{ guest.profiles.diet_reason }}<br>
-                                        
-                                </div>
-                            </div>    
-
-                            <div class="row round_hidden_div" style="padding-top: 2em">  
-                                <div class="col-md-3">
-                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.profiles.profile_id  }} btn-block" data-toggle="modal" data-target="#Intols{{  guest.profiles.profile_id  }}" hidden>update<br>intolerance<br>allergies</button>
-                                </div>
-                                <div class="col-md-6">
-                                <b>Intolerances/Allergies:</b><br>
-                                    <ul>
-                                        <li>{% for intolerance in guest.profiles.intolerances %}{{ intolerance.intol_name }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="row round_hidden_div" style="padding-top: 2em">
-                                <div class="col-md-3">
-                                    <button type="button" class="btn btn-success btn-xs change_buttons{{  guest.profiles.profile_id  }} btn-block" data-toggle="modal" data-target="#avoids{{ guest.profiles.profile_id  }}" hidden>update<br>ingredients<br>to avoid</button>
-                                </div>
-                                <div class="col-md-6">
-                                     <b>Ingredients to avoid:</b><br>
-                                    <ul>
-                                        {% for avoid in guest.profiles.avoidances %}
-                                        <li>{{ avoid.ingredient }} (<i>{{ avoid.reason}}</i>)</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                                    <!-- Modal has to be here -->
-                        <div id="guest_basic_info_change{{  guest.profiles.profile_id  }}" class="modal fade" role="dialog">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        <h4 class="modal-title">Update Basic Profile Information for {% if guest.profiles.first_name is not none %}{{ guest.profiles.first_name }}{% else %}{{  guest.profiles.email  }}{%endif %} {% if guest.profiles.last_name is not none %}{{ guest.profiles.last_name }}{%endif %}</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                         <form action="/update_user_from_party_profile" method="POST">
-                                            <div class="form-group">
-                                                <input type="hidden" name="friend_id" value="{{ guest.profiles.profile_id  }}">
-                                                <label>Email address</label> (required):
-                                                <input type="email" name="email" value="{{ guest.profiles.email }}" class="form-control" required>
-                                            </div><br>
-                                            <div class="form-group">
-                                                <label>Friend's first name (optional):</label>
-                                                <input type="text" name="first_name" class="form-control" value="{% if guest.profiles.first_name is not none %}{{ guest.profiles.first_name }}{% else %}{%endif %}">
-                                            </div><br>
-                                            <div class="form-group">
-                                                <label>Friend's last name (optional):</label>
-                                                <input type="text" name="last_name" class="form-control" value="{% if guest.profiles.last_name is not none %}{{ guest.profiles.last_name }}{% else %}{%endif %}">
-                                            </div><br>
-                                            <div class="form-group">
-                                                <label>Diet your friend prefers to eat (required):</label><br>
-                                                <select class="form-control" name="diet_type">
-                                                    {% for diet in diets %}
-                                                    <option value={{ diet.diet_id }}>{{ diet.diet_type }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div><br>
-                                            <div class="form-group">
-                                                <label>Reason they follow this diet (optional):</label>
-                                                <input type="text" name="diet_reason" class="form-control" value="{% if guest.profiles.diet_reason is not none %}{{ guest.profiles.diet_reason }}{% else %}{%endif %}">
-                                            </div><br>
-                                            <div class="form-group">
-
-                                                <input type="submit" value="update friend profile" class="btn btn-success">
-                                           
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                                                <!-- Modal Needs To Stay Here To Be in The For Loop -->
-                        <div id="Intols{{  guest.profiles.profile_id  }}" class="modal fade" role="dialog">
-                            <div class="modal-dialog">
-                                <!-- Modal content-->
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        <h4 class="modal-title">Add intolerances/allergies for {% if guest.profiles.first_name is not none %}{{ guest.profiles.first_name }}{% else %}{{  guest.profiles.email  }}{%endif %} {% if guest.profiles.last_name is not none %}{{ guest.profiles.last_name }}{%endif %}</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="/partyfriendintol" method="POST">
-                                            <input type="hidden" name="friend_id" value="{{ guest.profiles.profile_id  }}">
-                                            <div class="form-group">
-                                                    <input type="hidden" name="profile_id" value="{{ guest.profiles.profile_id  }}">
-                                                    <label>Select all that apply:</label><br>
-                                                    {% for intolerance in intol_list %}  
-                                                    <input type="checkbox" name="intol_ids" value={{ intolerance.intol_id }}>   {{ intolerance.intol_name }}<br>  
-                                                    {% endfor %}
-                                            </div><br>
-                                            <div class="form-group">
-                                                <input type="submit" value="Done" class="btn-success" id="intolDone">
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                                                <!-- Modal Needs To Stay Here To Be in The For Loop -->
-                        <div id="avoids{{  guest.profiles.profile_id  }}" class="modal fade" role="dialog">
-                            <div class="modal-dialog">
-                                <!-- Modal content-->
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                        <h4 class="modal-title">Add ingredients {% if guest.profiles.first_name is not none %}{{ guest.profiles.first_name }}{% else %}{{  guest.profiles.email  }}{%endif %} {% if guest.profiles.last_name is not none %}{{ guest.profiles.last_name }}{%endif %} would like to avoid</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="/partyfriendingredientadded" method="POST">
-                                            <div class="form-group">
-                                                    <input type="hidden" name="friend_id" value="{{ guest.profiles.profile_id  }}">
-                                                    <label>Ingredient to avoid:</label><br>
-                                                    <input type="text" name="ingredient" class="form-control">
-                                                    <label>Reason you would like to avoid this ingredient (optional):</label><br>
-                                                    <input type="text" name="reason" class="form-control">
-                                            </div><br>
-                                            <div class="form-group">
-                                                <input type="submit" value="Done" class="btn btn-success" id="avoidDone">
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-
-                    {% endfor %}
-                </ul>            
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.manageguestlist') }}" class="form form-horizontal" method="post" role="form" id="manage_guest_list_form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
+                        {{ render_field(manage_guests_form.friends) }}<br>
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>  
             </div>
         </div>
-  
-        
-        <div class = "row round_div" style="padding-top: 2em">
-            <div class="col-md-3">
-                {% if party.guests %}
-                <a href="{{ url_for('spoonacular.show_search_spoonacular') }}" class="btn btn-success btn-block">Add recipes<br>for this party</a></li>
-                {% else %}
-                {% endif %}
-            </div>
-            <div class="col-md-8">
-                <b>Recipes:</b><br>
-                    {% for recipe in party.recipes %} 
-                    <button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#SeeRecipe{{ recipe.recipe_record_id  }}" style="margin-top:5px">   
-                    {{ recipe.title }}</button>
+        <script src="{{ url_for('static', filename = 'js/manageGuestList.js') }}" type="text/javascript"></script>
+    </div>
+</div>
 
-            
-                    
-               
-
-            <!-- Modal -->
-                <div id="SeeRecipe{{ recipe.recipe_record_id  }}" class="modal fade" role="dialog">
-                   <div class="modal-dialog">
-                        <!-- Modal content-->
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 style="text-align:center" class="modal-title">{{  recipe.title  }}</h4>
-                            </div>
-                            <div class="modal-body">
-                                <a href="/recipe/{{  recipe.recipe_record_id  }}" target="_blank" class="btn btn-success btn-block">Open recipe in new window</a>
-                                <iframe src="/show_recipe/{{ recipe.recipe_record_id  }}" style="zoom:0.60" frameborder="0" height="1000" width="100%"></iframe>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
-                        {% endfor %}
-                     </ul>
+ <!-- End modals -->
 
 
+<!-- Begin content -->
 
+<h1 class="text-left" style="padding-left: 3em">{{  party.title  }}</h3>
 
-            
+    <div class="row well-spaced dashboard" style="padding-top: 3em">
+        <div class="col-md-4 col-md-offset-1">      
+            <div class = "row round_div" style="padding-top: 2em">
 
-                             
-
-                <!-- Modal -->
-                <div id="AddGuests" class="modal fade" role="dialog">
-                    <div class="modal-dialog">
-                        <!-- Modal content-->
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Add guests</h4>
-                            </div>
-                            <div class="modal-body">
-                                <form action="/guest_added" method="POST">
-                                    <div class="form-group">
-                                        <label>Select friends:</label><br>
-                                            {% for person in current_user.valid_friends() %}
-                                            <input type="checkbox" name="guests" value={{ person.profile_id }}> {{ person.first_name}} {{ person.last_name }} ({{ person.email }})<br>
-                                            {% endfor %}  
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="hidden" name="party_id" value="{{ party.party_id }}">
-                                        <input type="submit" value="Add guest" class="btn btn-success">
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+                <div class='lastUpdated'>
+                    <div id='lastUpdated' class="text-muted small" style='padding-bottom: 1em'>
+                        Last updated {{ moment(party.last_updated).format('LLLL') }}
                     </div>
                 </div>
-    
+                <div class="title">
+                    <div id="title">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#titleModal">
+                            <span class="glyphicon glyphicon-pencil text-info" title="Change the party title" aria-hidden="true"></span>
+                        </button>&emsp; <strong>Title:</strong>&emsp;{{  party.title  }}
+                    </div>
+                </div>
+                <div class="date">
+                    <div id="date">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change the date or time of the party" data-target="#dateModal">
+                            <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
+                        </button>&emsp; <strong>Date:</strong>&emsp;{{ moment(party.datetime_of_party).format('LLLL') }}
+                    </div>
+                </div>
+                <div class="noted">
+                    <div id="notes">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change the notes for the party" data-target="#notesModal">
+                            <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
+                        </button>&emsp; <strong>Notes:</strong>&emsp;{{ party.party_notes }}
+                    </div>
+                </div>
 
- 
+                <div class="guests">
+                    <div id="guests">
 
-    <script>
-    "use strict";
-    $("#addGuest").click(function(){
-        $("#addGuest").hide();
-        $("#addGuestForm").toggle();
-        console.log("show form");
-    });
+                        <h3>Guests
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#guestsModal">
+                                Manage guest list
+                            </button></h3>
+                            
+                            {% if party.guests %}
+                                {% for guest in party.guests %}
+                                {% if guest.profiles.profile_id != current_user.profile_id %}
+                                <a href="{{ url_for('profiles.show_friend_profile', friend_id=guest.profiles.profile_id) }}">
+                                <span style="font-size: 125%">{{  guest.profiles.first_name  }} {{  guest.profiles.last_name  }}</span></a> - <span class="text-muted">({{  guest.profiles.email  }})</span><br>
+                                {% endif %}
+                                {% endfor %}
+                            {% else %}
+                            No guests invited yet.
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    $("#addNewFriend").click(function(){
-        $("#addNewFriend").toggle();
-        $(".addFriendForm").show();
-        console.log("show form");
-    });
+        <div class="col-md-5 col-md-offset-1">      
+            <div class = "row round_div" style="padding-top: 2em">
+                
+                <div class='recipes'>
+                    <div id="recipes" style="padding-top: 1em">
+                        
+                        <h3>Recipes</h3>
+                        {% if party.recipes %}
+                            {% for recipe in party.recipes %}
+                                <a href="{{ url_for('spoonacular.show_saved_recipe', record_id=recipe.recipe_record_id) }}"><span style="font-size: 125%">{{ recipe.title }}</span></a><br>
+                                Recipe works for:
+                                <ul>
+                                {% for guest in recipe.recipe_works_for %}
+                                    <li>{{  guest.first_name  }} {{  guest.last_name  }}</a><span class="text-muted">({{  guest.email  }})</span></li>
+                                {% endfor %}
+                            </ul>
+                            {% endfor %}
+                        {% else %}
+                            No recipes added yet for this party.
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
-    $("#close3").click(function(){
-        $("#addNewFriend").toggle();
-        $("#close3").toggle();
-        $(".addFriendForm").hide();
-
-        console.log("show form");
-    });
-    
-    {% for guest in party.guests %}
-    $("#update_friend_at_party{{  guest.profiles.profile_id  }}").click(function(){
-        $(".update_friend_at_party{{  guest.profiles.profile_id  }}").toggle();
-        $(".intols{{  guest.profiles.profile_id  }}").toggle();
-        $(".avoids{{  guest.profiles.profile_id  }}").toggle();
-        console.log("show form");
-    });
-
-    $("#friend_info{{  guest.profiles.profile_id  }}").click(function(){        
-        $(".friend_info{{  guest.profiles.profile_id  }}").toggle();
-        console.log("show form");
-    });
-
-    
-    $("#close{{  guest.profiles.profile_id  }}").click(function(){
-        $("#update_friend_at_party{{  guest.profiles.profile_id  }}").show();
-        $(".update_friend_at_party{{  guest.profiles.profile_id  }}").toggle();
-        console.log("show form");
-    });
-
-    
-    {% endfor %}
-
-    $(document).ready(function(){
-    $('[data-toggle="tooltip"]').tooltip();
-    });
-
-      </script>
-    </script>
-    {% endblock %}
+{% endblock %}

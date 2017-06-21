@@ -13,7 +13,8 @@ from flask_login import login_required, current_user
 from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
                     AddAvoidForm, UpdateAvoidForm, IntoleranceForm,
                     AddNewPartyForm, DeleteFriendForm, ChangeFriendEmailForm,
-                    FriendNotesForm, FindaFriendForm, AddGuestToPartyForm)
+                    FriendNotesForm, FindaFriendForm, AddGuestToPartyForm,
+                    AddNewPartyForm, ManageGuestListForm)
 
 from datetime import datetime
 
@@ -23,6 +24,8 @@ from ..decorators import email_confirmation_required, flash_errors
 from ..email import send_email
 
 import pytz
+
+from pytz import timezone
 
 
 @profiles.route('/dashboard', methods=['GET'])
@@ -287,22 +290,51 @@ def confirm_friendship_with_new_user(token):
 def show_party_profile(party_id):
     """Show the party profile"""
 
-    session_token = session.get("session_token")
-    user = User.query.filter_by(session_token=session_token).first()
-    this_user = user.profile
-    friends = user.friends
-    parties = user.parties
-    session['party_id'] = party_id
-    diets = Diet.query.order_by(Diet.diet_type).all()
     party = Party.query.get(party_id)
-    intol_list = Intolerance.query.order_by(Intolerance.intol_name).all()
+    manage_guests_form = ManageGuestListForm(request.form)
+    friends = current_user.friends
+    manage_guests_form.friends.choices = [(friend.friend_profile_id, ("{0} {1} ({2})").format(friend.friend_profile.first_name, friend.friend_profile.last_name, friend.friend_profile.email)) for friend in friends]
+
+    party_guests = party.guests
+    manage_guests_form.friends.data = [guest.friend_profile_id for guest in party_guests]
 
     return render_template("profiles/party_profile.html", party=party,
-                           this_user=this_user,
-                           diets=diets,
-                           intol_list=intol_list,
-                           friends=friends,
-                           parties=parties)
+                           manage_guests_form=manage_guests_form)
+
+
+@profiles.route('/add_new_party', methods=['GET', 'POST'])
+@login_required
+@email_confirmation_required
+def add_new_party():
+    """Serves the template and processes the form to add a new party"""
+
+    add_party_form = AddNewPartyForm(request.form)
+    print add_party_form.party_name.data
+    print add_party_form.date.data
+    print add_party_form.hour.data
+    print add_party_form.notes.data
+
+    # format for date setter  %Y-%m-%d %H:%M:%S"
+
+    if request.method == 'POST' and add_party_form.validate():
+        session_timezone = session['timezone']
+        _datetime_ = datetime.combine(add_party_form.date.data, add_party_form.hour.data)
+        tz = timezone(session_timezone)
+        party_date = tz.localize(_datetime_)
+        new_party = Party.create_record(title=add_party_form.party_name.data,
+                                        datetime_of_party=party_date,
+                                        user_id=current_user.id,
+                                        party_notes=add_party_form.notes.data)
+        PartyGuest.create_record(party_id=new_party.party_id,
+                                 friend_profile_id=current_user.profile_id)
+        flash("Success! Who would you like to invite to your party?", "success")
+        return redirect("profiles/party_profile/%s" % new_party.party_id)
+    elif request.method == 'POST' and not add_party_form.validate():
+        flash_errors(add_party_form)
+        return redirect(request.referrer)
+    else:
+        return render_template("profiles/add_a_party.html",
+                               add_party_form=add_party_form)
 
 
 # Only JSON routes below for AJAX calls
@@ -459,7 +491,7 @@ def addavoid():
     if form.validate() and profile.owned_by_user_id == current_user.id:
         print 4
         already_added = db.session.query(IngToAvoid
-                                         ).filter(IngToAvoid.ingredient ==
+                                         ).filter(IngToAvoid.profile_id == profile.profile_id, IngToAvoid.ingredient ==
                                                   form.add_avoid_ingredient.data).all()
         print 5
         if already_added:
@@ -700,21 +732,43 @@ def findafriend():
         return redirect(request.referrer)
 
 
-@profiles.route('/add_new_party.json', methods=['POST'])
+@profiles.route('/manageguestlist.json', methods=['POST'])
 @login_required
 @email_confirmation_required
-def add_new_party():
-    """Takes an Ajax request and adds a new party"""
+def manageguestlist():
+    """Takes an Ajax request and updates PartyGuest table"""
 
-    form = FriendNotesForm(request.form)
-    profile = Profile.query.get(form.friend_profile_id.data)
-    friendship = Friend.query.filter(Friend.friend_profile_id ==
-                                     profile.profile_id, Friend.user_id ==
-                                     current_user.id).one()
-    if form.validate():
-        friendship.update({"profile_notes": None,
-                           "last_updated": datetime.utcnow()})
-        return jsonify(data={'message': 'Notes updated'})
+    form = ManageGuestListForm(request.form)
+    friends = current_user.friends
+    form.friends.choices = [(friend.friend_profile_id,
+                            ("{0} {1} ({2})").format(friend.friend_profile.first_name,
+                                                     friend.friend_profile.last_name,
+                                                     friend.friend_profile.email)) for friend in friends]
+    party = Party.query.get(int(form.party_id.data))
+
+    if request.method == 'POST' and form.validate():
+        query = db.session.query(PartyGuest
+                                 ).filter(PartyGuest.party_id ==
+                                          party.party_id).all()
+        party_guests = [(guest.friend_profile_id) for guest in query]
+
+        for guest in form.friends.data:
+            if guest in party_guests:
+                pass
+            elif guest not in party_guests:
+                PartyGuest.create_record(party_id=party.party_id,
+                                         friend_profile_id=guest)
+                party.update({"last_updated": datetime.utcnow()})
+        for guest in party_guests:
+            if guest not in form.friends.data:
+                guest = db.session.query(PartyGuest
+                                         ).filter(PartyGuest.party_id ==
+                                                  party.party_id,
+                                                  PartyGuest.friend_profile_id ==
+                                                  guest).one()
+                guest.disinvite_guest()
+                party.update({"last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Guests updated'})
     else:
         for field, error in form.errors.items():
             flash(u"Error in %s -  %s" % (

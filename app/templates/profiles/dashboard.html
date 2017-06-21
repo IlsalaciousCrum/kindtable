@@ -18,8 +18,8 @@
                     <form action="{{ url_for('profiles.changefirstname') }}" class="form form-horizontal" method="post" role="form" id="changeFirstName">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_field(first_name_form.first_name,  cols="40", rows="1") }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        {{ render_field(first_name_form.first_name,  style="width: 75%", rows="1") }}<br>
+                        <input type="submit" class="btn btn-sm btn-info btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
@@ -43,8 +43,8 @@
                     <form action="{{ url_for('profiles.changelastname') }}" class="form form-horizontal" method="post" role="form" id="changeLastName">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_field(last_name_form.last_name, cols="40", rows="1") }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        {{ render_field(last_name_form.last_name, style="width: 75%", rows="1") }}<br>
+                        <input type="submit" class="btn btn-sm btn-info btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
@@ -69,7 +69,7 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
                         {{ render_field(diet_form.diet) }}
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-info btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
@@ -94,9 +94,9 @@
                     <form action="{{ url_for('profiles.changedietreason') }}" class="form form-horizontal" method="post" role="form" id="changeDietReason">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_field(diet_reason_form.diet_reason, cols="65", rows="4", maxlength=128) }}
-                        <input type="submit" class="btn btn-sm btn-success" value="Submit">&emsp;
-                        <button type="button" class="btn btn-sm btn-warning" data-dismiss="modal" aria-label="Close">
+                        {{ render_field(diet_reason_form.diet_reason, style="width: 100%", rows="4", maxlength=128) }}
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&emsp;
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
                             Cancel
                         </button>&emsp;
                         <button type="button" class="btn btn-sm btn-danger" id="clearDietReason">Delete reason</button>
@@ -125,10 +125,10 @@
                     <form action="{{ url_for('profiles.addavoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_field(add_avoid_form.add_avoid_ingredient, cols="40", rows="1") }}
-                        {{ render_field(add_avoid_form.add_avoid_reason, cols="65", rows="4", maxlength=128) }}
+                        {{ render_field(add_avoid_form.add_avoid_ingredient, style="width: 75%", rows="1") }}
+                        {{ render_field(add_avoid_form.add_avoid_reason, style="width: 100%", rows="4", maxlength=128) }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
                             Close
                         </button>
@@ -158,11 +158,11 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
                         <input type="hidden" id="updateAvoidFormAvoidId" name="avoid_id"/>
-                        {{ render_field(update_avoid_form.update_avoid_ingredient, cols="40", rows="1") }}
-                        {{ render_field(update_avoid_form.update_avoid_reason, cols="65", rows="4", maxlength=128) }}
+                        {{ render_field(update_avoid_form.update_avoid_ingredient, style="width: 75%", rows="1") }}
+                        {{ render_field(update_avoid_form.update_avoid_reason, style="width: 100%", rows="4", maxlength=128) }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
-                        <input type="submit" class="btn btn-sm btn-success" value="Submit">&emsp;
-                        <button type="button" class="btn btn-sm btn-info" data-dismiss="modal" aria-label="Close">
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&emsp;
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
                             Cancel
                         </button>&emsp;
                         <button type="button" class="btn btn-sm btn-warning" id="deleteavoidreason">Delete the reason</button>
@@ -193,7 +193,7 @@
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
                         {{ render_field(intol_form.intolerances) }}
                         <p class = "text-muted">Selecting the allergy/intolerance groups that apply to you can help make sure that KindTable recipes will be safe for you. For example, gluten can be found in many <a href="https://celiac.org/live-gluten-free/glutenfreediet/sources-of-gluten/" title="The Celiac Disease Foundation's list of sources of gluten" target="_blank">non-wheat ingredients</a> and if you select gluten, we will be sure that recipes will not include those ingredients. But if you are sensitive only to wheat itself and not ingredients such as soy sauce, selecting "wheat" instead of "gluten" gives you and your hosts more options.</p>
-                        <input type="submit" class="btn btn-sm btn-default" value="Submit">
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
                             Close
                         </button>
@@ -261,7 +261,7 @@
                     <div id='intols' style="padding-top: 1em">
                         {% if profile.intolerances %}
                             <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add another allergy/intolerance group" data-target="#intolModal">
-                                <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>&ensp; <span class="glyphicon glyphicon-plus text-info" aria-hidden="true"></span>
+                                <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
                             </button>&emsp; <strong>Allergies/intolerances:</strong>
                             <ul>
                                 {% for intolerance in profile.intolerances|sort(attribute='intol_name') %}

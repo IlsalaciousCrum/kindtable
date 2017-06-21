@@ -24,8 +24,8 @@
                 {% from "_formhelpers.html" import render_field %}
                     <form action="{{ url_for('auth.store_avoid') }}" class="form form-horizontal" method="POST" role="form" id="addAvoidForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        {{ render_field(add_avoid_form.add_avoid_ingredient, cols="40", rows="1") }}
-                        {{ render_field(add_avoid_form.add_avoid_reason, cols="65", rows="4", maxlength=128) }}
+                        {{ render_field(add_avoid_form.add_avoid_ingredient, style="width: 75%") }}
+                        {{ render_field(add_avoid_form.add_avoid_reason, style="width: 100%", rows="4", maxlength=128) }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
                         <input type="submit" class="btn btn-sm btn-default" value="Submit">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
@@ -56,8 +56,8 @@
                     <form action="{{ url_for('auth.update_stored_avoid') }}" class="form form-horizontal" method="POST" role="form" id="updateAvoidForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="original_key" />
-                        {{ render_field(update_avoid_form.update_avoid_key, cols="40", rows="1") }}
-                        {{ render_field(update_avoid_form.update_avoid_value, cols="65", rows="4", maxlength=128) }}
+                        {{ render_field(update_avoid_form.update_avoid_key, style="width: 75%") }}
+                        {{ render_field(update_avoid_form.update_avoid_value, style="width: 100%", rows="4", maxlength=128) }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
                         <input type="submit" class="btn btn-sm btn-success" value="Submit">&emsp;
                         <button type="button" class="btn btn-sm btn-info" data-dismiss="modal" aria-label="Close">
@@ -108,11 +108,11 @@
             {% from "_formhelpers.html" import render_field %}
             <form class="form form-horizontal" method="post" role="form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            {{ render_field(form.first_name, cols="40", rows="1")  }}
-            {{ render_field(form.last_name, cols="40", rows="1")  }}
-            {{ render_field(form.email, cols="40", rows="1")  }}
-            {{ render_field(form.password)   }}
-            {{ render_field(form.password2)   }}
+            {{ render_field(form.first_name, style="width: 75%")  }}
+            {{ render_field(form.last_name, style="width: 75%")  }}
+            {{ render_field(form.email, style="width: 75%")  }}
+            {{ render_field(form.password, style="width: 75%")   }}
+            {{ render_field(form.password2, style="width: 75%")   }}
         </div>
     </div>
 
@@ -129,7 +129,7 @@
             {{ form.diet_reason.label}}&ensp;<a role="button" tabindex="0" data-container="body" data-toggle="popover" data-html='true' data-trigger="focus" data-placement="top" title="Reason you follow this diet" data-content="The diet reason field is optional, we show that information to your friends 
             so they can make better decisions about how to make you feel comfortable
             and welcome at their table."><span class="glyphicon glyphicon-info-sign text-info"></span></a>
-            {{ form.diet_reason(cols="40", rows="4", maxlength=128)  }}
+            {{ form.diet_reason(style="width: 100%", rows="4", maxlength=128)  }}
           
         </div>
     </div>

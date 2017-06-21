@@ -17,8 +17,8 @@
     {% from "_formhelpers.html" import render_field %}
         <form action="{{ url_for('profiles.connect_friends') }}" class="form form-horizontal" method="post" role="form" id="connectFriend">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            {{ render_field(find_friend_form.friend_email,  cols="40", rows="1") }}
-            <input type="submit" class="btn btn-sm btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+            {{ render_field(find_friend_form.friend_email, style="width: 75%", rows="1") }}<br>
+            <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
         </form>
     </div>
     

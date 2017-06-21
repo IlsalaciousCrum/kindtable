@@ -13,4 +13,7 @@ from datetime import datetime, date
 from wtforms_components import DateRange
 
 
-# placeholder for forms I have not created yet
+class MultiCheckboxField(SelectMultipleField):
+    widget = widgets.ListWidget(prefix_label=False)
+    option_widget = widgets.CheckboxInput()
+

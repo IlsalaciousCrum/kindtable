@@ -34,9 +34,6 @@ def login():
     reset_password_request_form = PasswordResetRequestForm(request.form,
                                                            prefix="a")
 
-    print "The next line is it"
-    print login_form.remember_me.data
-
     if request.method == 'POST' and login_form.validate():
         email = login_form.email.data
         user = db.session.query(User).join(Profile).filter(Profile.email ==
@@ -46,6 +43,7 @@ def login():
         if user is not None and user.verify_password(login_form.password.data):
             session['remember_me'] = login_form.remember_me.data
             login_user(user, remember=login_form.remember_me.data)
+            session['timezone'] = str(login_form.timezone.data)
             session['session_token'] = user.session_token
             flash('You are now logged in', 'success')
             return redirect(request.args.get('next') or url_for('main.index'))
@@ -121,6 +119,7 @@ def password_reset(token):
 def logout():
     logout_user()
     session.clear()
+    flash("You are now logged out")
     return redirect(url_for('main.index'))
 
 
@@ -340,3 +339,4 @@ def change_email():
     return render_template('auth/change_email.html',
                            form=form,
                            profile_id=current_user.profile.profile_id)
+

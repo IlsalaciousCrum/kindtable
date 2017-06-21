@@ -1,23 +1,22 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="row well-spaced" style="padding-top: 3em">
-        <div class="col-md-4 col-md-offset-4">
-            <div class = "row round_div" style="padding-top: 2em">
-                <h1>Create a party</h1><br>
-
-                <form action="/party_added" method="POST">
-                    <div class="form-group">
-                        <label>Create a name for your party:</label>
-                        <input type="text" name="title" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-
-                        <input type="submit" value="Create a party" class="btn btn-success btn-block">
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+<div class="modal-header">
+    <h4 class="modal-title" id="addPartyModalLabel">Create a New Party</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
 </div>
-{% endblock %}
+<div class="modal-body">
+    <div class = "row round_hidden_div" style="padding-top: 2em">
+    <div id="ff-flashedalert"></div>
+
+    {% from "_formhelpers.html" import render_field, render_inline_field %}
+        <form action="{{ url_for('profiles.add_new_party') }}" class="form form-horizontal" method="post" role="form" id="addParty">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            {{ render_field(add_party_form.party_name, style="width: 75%", rows="1") }}<br>
+            {{ render_field(add_party_form.date) }}<br>
+            {{ render_field(add_party_form.hour, value="19:00") }}
+            {{ render_field(add_party_form.notes, style="width: 100%", rows="4") }}<br>
+            <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+        </form>
+    </div>
+    
+</div>

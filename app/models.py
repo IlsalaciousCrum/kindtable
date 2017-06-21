@@ -481,28 +481,7 @@ class Party(BaseMixin, db.Model):
                               secondary='partyrecipes',
                               backref='parties',
                               lazy='joined')
-
-    @property
-    def date(self):
-        raise AttributeError('This is UTC time. Use the class method')
-
-    @date.setter
-    def date(self, plaintext, local_timezone):
-        """Converts a local time to a UTC time"""
-
-        local = pytz.timezone(local_timezone)
-        naive = datetime.datetime.strptime(plaintext, "%Y-%m-%d %H:%M:%S")
-        local_dt = local.localize(naive, is_dst=None)
-        self.datetime_of_party = local_dt.astimezone(pytz.utc)
-        db.session.commit
-
-    def party_in_local_time(self, local_timezone):
-        """Converts the stored UTC time to the local time of the user"""
-
-        fmt = fmt = '%A %B %s, %Y %H:%M %Z'
-        UTC_dt = self.datetime_of_party
-        local_date_time = UTC_dt.astimezone(local_timezone)
-        return local_date_time.strftime(fmt)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
     def discard_party(self):
         '''Removes the party and any dependent records'''
@@ -543,10 +522,10 @@ class PartyGuest(BaseMixin, db.Model):
     def disinvite_guest(self):
         '''removes a guest from the party'''
 
-        bookmarked_recipes = RecipeWorksFor.query.filter_by(guest_profile_id=self.profile_id).all()
+        bookmarked_recipes = RecipeWorksFor.query.filter_by(guest_profile_id=self.friend_profile_id).all()
         if bookmarked_recipes:
             for recipe in bookmarked_recipes:
-                recipe.discard_recipe
+                recipe.discard_works_for()
         self._delete_()
         db.session.commit()
 
