@@ -198,7 +198,7 @@
     <div class="modal-dialog">
         <div class="modal-content" role="document">
             <div class="modal-header">
-                <h4 class="modal-title" id="inviteModalLabel">Invite {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend.friend_profile.email }}{%endif %} To A Party</h4>
+                <h4 class="modal-title" id="inviteModalLabel">Invite {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend_profile.email }}{%endif %} To A Party</h4>
                 <div id="flashedalert"></div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -242,7 +242,7 @@
     <div class="modal-dialog">
         <div class="modal-content" role="document">
             <div class="modal-header">
-                <h4 class="modal-title" id="removeFriendModalLabel">Remove {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend.friend_profile.email }}{%endif %}</h4>
+                <h4 class="modal-title" id="removeFriendModalLabel">Remove {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend_profile.email }}{%endif %}</h4>
                 <div id="flashedalert"></div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -338,7 +338,7 @@
 
 <h1 class="text-left" style="padding-left: 3em">Your Profile for {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }} {{  friend_profile.last_name  }}
 {% else %}
-    {{ friend.friend_profile.email }}
+    {{ friend_profile.email }}
 {%endif %}</h3>
 
     <div class="row well-spaced dashboard" style="padding-top: 3em">

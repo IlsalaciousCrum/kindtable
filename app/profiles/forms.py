@@ -124,7 +124,6 @@ class AddNewFriendForm(Form):
 class AddGuestToPartyForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     friend_profile_id = HiddenField(validators=[InputRequired()])
-    # user_id = current_user.id
     parties = MultiCheckboxField('Invite to upcoming parties', coerce=int)
     submit = SubmitField('Update')
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from passlib.hash import bcrypt
 from . import db, login_manager
 from flask import flash
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 import pytz
 from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, BadData, SignatureExpired
 import os
@@ -126,6 +126,25 @@ class Profile(BaseMixin, db.Model):
         if self.intolerances:
             for intolerance in self.intolerances:
                 intolerance._delete_()
+
+        if self.avoidances:
+            for ingredient in self.avoidances:
+                ingredient._delete_()
+
+        this_user = current_user
+
+        friendship = Friend.query.filter(Friend.user_id == this_user.id,
+                                         Friend.friend_profile_id == self.profile_id).first()
+        if friendship:
+            friendship.remove_friendship()
+
+        parties_invited = PartyGuest.query.filter(PartyGuest.friend_profile_id == self.profile_id).all()
+        for party in parties_invited:
+            party.discard_party()
+
+        _worksfor = RecipeWorksFor.query.filter(RecipeWorksFor.guest_profile_id == self.profile_id).all()
+        for recipe in _worksfor:
+            recipe.discard_works_for()
 
         if self.avoidances:
             for ingredient in self.avoidances:

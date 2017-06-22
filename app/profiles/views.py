@@ -242,6 +242,25 @@ def add_friend_profile():
     """Loads the add_friend_profile modal contents and processes a request to
     make a private profile"""
 
+    add_friend_form = FindaFriendForm(request.form)
+    this_user = current_user
+    if request.method == 'POST' and add_friend_form.validate():
+        existing_profile = Profile.query.filter(Profile.email == add_friend_form.friend_email.data, Profile.owned_by_user_id == this_user.id).first()
+        if existing_profile:
+            flash("Looks like you already have a private profile for this person. Would you like to edit this one?")
+            return redirect('profiles/friendprofile/%s' % existing_profile.profile_id)
+        else:
+            new_friend_profile = Profile.create_record(email=add_friend_form.friend_email.data,
+                                                       owned_by_user_id=this_user.id)
+            Friend.create_record(user_id=current_user.id,
+                                 friend_profile_id=new_friend_profile.profile_id,
+                                 private_profile=True)
+            flash("Success! You can start editing information about your friend here. You don't have to add their first and last name but it will make the site easier to navigate")
+            return redirect('profiles/friendprofile/%s' % new_friend_profile.profile_id)
+    else:
+        return render_template("profiles/add_friend_profile.html",
+                               add_friend_form=add_friend_form)
+
 
 @profiles.route('/confirm_friendship_existing_user/<token>', methods=['GET'])
 @login_required
