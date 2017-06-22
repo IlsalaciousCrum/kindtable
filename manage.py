@@ -6,7 +6,7 @@ import os
 from app import create_app, db
 from app.models import (User, Profile, Friend, ProfileIntolerance, Intolerance,
                         Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party,
-                        RecipeCard, PartyRecipes, RecipeWorksFor)
+                        RecipeCard, PartyRecipes)
 from Flask_script import Manager, Shell, Server
 from flask_migrate import Migrate, MigrateCommand
 from jinja2 import StrictUndefined
@@ -30,7 +30,7 @@ def make_shell_context():
                 ProfileIntolerance=ProfileIntolerance, Intolerance=Intolerance,
                 Diet=Diet, Cuisine=Cuisine, Course=Course, IngToAvoid=IngToAvoid,
                 PartyGuest=PartyGuest, Party=Party, RecipeCard=RecipeCard,
-                PartyRecipes=PartyRecipes, RecipeWorksFor=RecipeWorksFor)
+                PartyRecipes=PartyRecipes)
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)

@@ -17,3 +17,7 @@ class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
 
+
+class SearchForm(Form):
+    party_id = HiddenField(validators=[InputRequired()])
+    submit = SubmitField('Update')

@@ -6,7 +6,7 @@ from . import profiles
 from .. import db
 
 from ..models import (User, Profile, Intolerance, Party, PartyGuest,
-                      IngToAvoid, ProfileIntolerance, Friend, RecipeWorksFor)
+                      IngToAvoid, ProfileIntolerance, Friend)
 
 from flask_login import login_required, current_user
 
@@ -96,7 +96,7 @@ def show_friend_profile(friend_id):
     if is_friend:
         friend_profile = Profile.query.get(friend_id)
 
-        _parties_invited = db.session.query(PartyGuest).filter(Party.user_id == current_user.id, PartyGuest.friend_profile_id == friend_id).all()
+        _parties_invited = db.session.query(PartyGuest).join(Party).filter(Party.user_id == current_user.id, Party.user_id != friend_profile.owned_by_user_id, PartyGuest.friend_profile_id == friend_id).all()
 
         parties_invited = [partyguest.party for partyguest in _parties_invited]
 
@@ -312,35 +312,42 @@ def confirm_friendship_with_new_user(token):
 def show_party_profile(party_id):
     """Show the party profile"""
 
-    party = Party.query.get(party_id)
-    manage_guests_form = ManageGuestListForm(request.form)
-    titleform = PartyTitleForm(request.form)
-    datetimeform = PartyDatetimeForm(request.form)
-    partynotesform = PartyNotesForm(request.form)
-    partynotesform.notes.data = party.party_notes
-    _datetime_ = party.datetime_of_party
+    is_your_party = Party.query.filter(Party.user_id ==
+                                       current_user.id).first()
+    if is_your_party:
+        session['party_id'] = party_id
+        party = Party.query.get(party_id)
+        manage_guests_form = ManageGuestListForm(request.form)
+        titleform = PartyTitleForm(request.form)
+        datetimeform = PartyDatetimeForm(request.form)
+        partynotesform = PartyNotesForm(request.form)
+        partynotesform.notes.data = party.party_notes
+        _datetime_ = party.datetime_of_party
 
-    party_date = _datetime_.astimezone(timezone(session['timezone']))
+        party_date = _datetime_.astimezone(timezone(session['timezone']))
 
-    naive = party_date.replace(tzinfo=None)
+        naive = party_date.replace(tzinfo=None)
 
-    party_date_date = naive
-    party_date_time = naive.time()
+        party_date_date = naive
+        party_date_time = naive.time()
 
-    datetimeform.date.data = party_date_date
-    datetimeform.hour.data = party_date_time
+        datetimeform.date.data = party_date_date
+        datetimeform.hour.data = party_date_time
 
-    friends = current_user.friends
-    manage_guests_form.friends.choices = [(friend.friend_profile_id, ("{0} {1} ({2})").format(friend.friend_profile.first_name, friend.friend_profile.last_name, friend.friend_profile.email)) for friend in friends]
-    titleform.title.data = party.title
-    party_guests = party.guests
-    manage_guests_form.friends.data = [guest.friend_profile_id for guest in party_guests]
+        friends = current_user.friends
+        manage_guests_form.friends.choices = [(friend.friend_profile_id, ("{0} {1} ({2})").format(friend.friend_profile.first_name, friend.friend_profile.last_name, friend.friend_profile.email)) for friend in friends]
+        titleform.title.data = party.title
+        party_guests = party.guests
+        manage_guests_form.friends.data = [guest.friend_profile_id for guest in party_guests]
 
-    return render_template("profiles/party_profile.html", party=party,
-                           manage_guests_form=manage_guests_form,
-                           titleform=titleform,
-                           datetimeform=datetimeform,
-                           partynotesform=partynotesform)
+        return render_template("profiles/party_profile.html", party=party,
+                               manage_guests_form=manage_guests_form,
+                               titleform=titleform,
+                               datetimeform=datetimeform,
+                               partynotesform=partynotesform)
+    else:
+        flash("At this time, you may only view your own parties. What a neat feature to add, though!")
+        return redirect(request.referrer)
 
 
 @profiles.route('/add_new_party', methods=['GET', 'POST'])

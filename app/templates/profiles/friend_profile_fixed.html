@@ -180,7 +180,7 @@
                         {% if friend_profile.avoidances %}
                             <strong>Ingredients they would like to avoid:</strong> 
                             <ul>
-                                {% for avoid in profile.avoidances|sort(attribute='ingredient') %}
+                                {% for avoid in friend_profile.avoidances|sort(attribute='ingredient') %}
                                     <li style="list-style: none;">
                                         <strong>{{ avoid.ingredient }}</strong> - (<i>{{ avoid.reason}}</i>)
                                     </li>

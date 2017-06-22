@@ -123,12 +123,6 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@auth.route('/clear')
-def clear_session():
-    session.clear()
-    return redirect(url_for('auth.register'))
-
-
 @auth.route('/add_intols.json', methods=['POST'])
 def store_intols():
     '''Store allergies/intolerances for registration'''
@@ -340,3 +334,14 @@ def change_email():
                            form=form,
                            profile_id=current_user.profile.profile_id)
 
+
+@auth.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    """Deletes a user's account and all of their data"""
+
+    this_user = current_user
+    profile = this_user.profile
+    this_user.delete_user()
+    profile.remove_profile()
+    return redirect(url_for('auth.logout'))

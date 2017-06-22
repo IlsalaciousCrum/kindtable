@@ -1,11 +1,11 @@
 """K(i)nd app views"""
 
-from flask import (render_template, request, flash, redirect, session, json, url_for)
+from flask import (render_template, jsonify, request, flash, redirect, session, json, url_for)
 
 from . import spoonacular
 
 from app.models import (User, Cuisine, Course, Party,
-                        PartyRecipes, RecipeCard, RecipeWorksFor)
+                        PartyRecipes, RecipeCard)
 
 from flask_login import login_required, current_user
 from ..decorators import email_confirmation_required
@@ -131,10 +131,11 @@ def preview_saved_recipe(record_id):
     this_user = User.query.filter_by(session_token=session_token).first()
     this_recipe = RecipeCard.query.get(record_id)
     recipe_id = this_recipe.recipe_id
-    works_for = json.loads(this_recipe.works_for)
+    partyrecipe = PartyRecipes.query.filter(PartyRecipes.recipe_record_id == this_recipe.recipe_record_id).first()
     ingredients = spoonacular_recipe_ingredients(recipe_id)
     instructions = spoonacular_recipe_instructions(recipe_id)
     party = Party.query.get(this_recipe.party_id)
+    works_for = json.dumps(partyrecipe.works_for_json)
 
     avoid = guest_avoidances(party.party_id)
     intolerances = guest_intolerances(party.party_id)
@@ -145,9 +146,9 @@ def preview_saved_recipe(record_id):
                            party=party,
                            avoid=avoid,
                            intolerances=intolerances,
-                           works_for=works_for,
                            ingredients=ingredients,
-                           instructions=instructions)
+                           instructions=instructions,
+                           works_for=works_for)
 
 
 @spoonacular.route('/recipe/<int:record_id>')
@@ -160,7 +161,6 @@ def show_saved_recipe(record_id):
     this_user = User.query.filter_by(session_token=session_token).first()
     this_recipe = RecipeCard.query.get(record_id)
     recipe_id = this_recipe.recipe_id
-    works_for = json.loads(this_recipe.works_for)
     ingredients = spoonacular_recipe_ingredients(recipe_id)
     instructions = spoonacular_recipe_instructions(recipe_id)
     party = Party.query.get(this_recipe.party_id)
@@ -173,7 +173,6 @@ def show_saved_recipe(record_id):
                            party=party,
                            avoid=avoid,
                            intolerances=intolerances,
-                           works_for=works_for,
                            ingredients=ingredients,
                            instructions=instructions)
 
@@ -185,8 +184,7 @@ def show_recipe():
     """Preview a recipe not yet saved, from the recipe search page"""
 
     if request.method == 'POST':
-        session_token = session.get("session_token")
-        this_user = User.query.filter_by(session_token=session_token).first()
+        this_user = current_user
         party_id = session.get("party_id")
         recipe_id = request.form.get("recipe_id")
         avoids = session.get("avoids")
@@ -199,6 +197,7 @@ def show_recipe():
         recipe_url = request.form.get("recipe_url")
         ingredients = spoonacular_recipe_ingredients(recipe_id)
         instructions = spoonacular_recipe_instructions(recipe_id)
+        party = Party.query.get(party_id)
 
         return render_template("spoonacular/view_recipe.html",
                                recipe_id=recipe_id,
@@ -233,11 +232,11 @@ def add_recipe_box():
     course = session.get("course")
     course_object = Course.query.filter_by(course_name=course).first()
 
-    # Creates the -workfor- json
-
     avoids = session.get("avoids")
     intols = session.get("intols")
     diets = session.get("diets")
+
+    works_for = jsonify(data={'avoids': avoids, 'diets': diets, intols: 'intols'})
 
     party = Party.query.filter_by(party_id=party_id).first()
 
@@ -252,7 +251,8 @@ def add_recipe_box():
             PartyRecipes.create_record(party_id=party_id,
                                        recipe_record_id=recipe_id,
                                        course_id=course_object.course_id,
-                                       cuisine_id=cuisine_object.cuisine_id)
+                                       cuisine_id=cuisine_object.cuisine_id,
+                                       works_for_json=works_for)
             flash("The recipe for %s has been saved." % title, "success")
             return redirect(url_for('spoonacular.show_search_spoonacular'))
     else:
@@ -279,11 +279,6 @@ def add_recipe_box():
                                    recipe_record_id=new_recipe.recipe_record_id,
                                    course_id=course_object.course_id,
                                    cuisine_id=cuisine_object.cuisine_id)
-
-        for guest in party.guest_profiles:
-            if guest.diet.diet_type in diets and guest.avoidances in avoids and guest.intolerances in intols:
-                RecipeWorksFor.create_record(recipe_card_id=party_id,
-                                             guest_profile_id=guest.profile_id)
 
         flash("The recipe for %s has been saved to your recipe box." % title, "success")
         return redirect(url_for('spoonacular.show_search_spoonacular'))

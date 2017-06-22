@@ -155,3 +155,8 @@ class ChangeEmailForm(Form):
     def validate_email(self, field):
         if db.session.query(User).join(Profile).filter(Profile.email == field.data, User.profile_id == Profile.profile_id).first():
             raise ValidationError('That email address is already registered.')
+
+
+class DeleteAccountForm(Form):
+    profile_id = HiddenField(validators=[InputRequired()])
+    submit = SubmitField('Update')

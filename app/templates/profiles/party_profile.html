@@ -195,7 +195,7 @@
                                 {% for guest in party.guests %}
                                 {% if guest.profiles.profile_id != current_user.profile_id %}
                                 <a href="{{ url_for('profiles.show_friend_profile', friend_id=guest.profiles.profile_id) }}">
-                                <span style="font-size: 125%">{{  guest.profiles.first_name  }} {{  guest.profiles.last_name  }}</span></a> - <span class="text-muted">({{  guest.profiles.email  }})</span><br>
+                                <span style="font-size: 125%">{%if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}{% endif %}</span></a> <span class="text-muted">{%if guest.profiles.first_name and guest.profiles.last_name %}- ({{  guest.profiles.email  }}){% elif guest.profiles.first_name and not guest.profiles.last_name %}- ({{  guest.profiles.email  }}){% else%}{% endif %}</span><br>
                                 {% endif %}
                                 {% endfor %}
                             {% else %}
@@ -220,15 +220,12 @@
                     <div id="recipes" style="padding-top: 1em">
                         
                         <h3>Recipes</h3>
+                        <a href="{{  url_for('spoonacular.show_search_spoonacular')  }}" class="btn btn-sm btn-info" role="button">Search for Recipes</a><br><br>
+
+
                         {% if party.recipes %}
                             {% for recipe in party.recipes %}
                                 <a href="{{ url_for('spoonacular.show_saved_recipe', record_id=recipe.recipe_record_id) }}"><span style="font-size: 125%">{{ recipe.title }}</span></a><br>
-                                Recipe works for:
-                                <ul>
-                                {% for guest in recipe.recipe_works_for %}
-                                    <li>{{  guest.first_name  }} {{  guest.last_name  }}</a><span class="text-muted">({{  guest.email  }})</span></li>
-                                {% endfor %}
-                            </ul>
                             {% endfor %}
                         {% else %}
                             No recipes added yet for this party.

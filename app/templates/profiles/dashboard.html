@@ -205,6 +205,44 @@
     </div>
 </div>
 
+<div class="modal fade" id="deleteAccount" tabindex="-1" role="dialog" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="deleteAccountModalLabel">Delete Your Account</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                        
+                    <div class="alert alert-warning" role="alert">    
+                        
+                        <span class="text-danger">Caution: Are you sure this is what you want to do? All information you have saved will
+                            be permanently deleted. While we are sad to see you go, you can still sign up again later.
+                        </span>
+                    </div>
+
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('auth.delete_account') }}" class="form form-horizontal" method="POST" role="form" id="deleteForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
+                        <input type="submit" class="btn btn-lg btn-danger" value="Delete Account"><br><br>
+                        
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
+                            Close
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
 <!-- Begin content -->
 
 <h1 class="text-left" style="padding-left: 3em">Dashboard</h1>
@@ -297,6 +335,13 @@
                     </div>
                 </div>
 
+                <div id="remove" style="padding-top: 3em">
+                    <small>Don't want to use Kind Table anymore?</small>
+                    <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#deleteAccount">
+                        <span class="text-danger">Delete Your Account</span>
+                    </button>
+                </div>
+
             </div>
         </div>
 
@@ -320,22 +365,6 @@
                     {% endif %}
                 </div>
 
-                <div id="recipes">
-                <h3>Bookmarked recipes</h3>
-                    {% if recipes %}
-                        <ul>
-                            {% for party in recipes %}
-                                {% for recipe in party %}
-                                <li>
-                                    <a href="{{ url_for('spoonacular.show_saved_recipe', record_id=recipe.recipe_record_id) }}">{{ recipe.title }}</a>
-                                </li>
-                                {% endfor %}
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <span class="text-muted strong">No recipes bookmarked yet</span>
-                    {% endif %}
-                </div>
                 <h3>Upcoming Parties</h3>
                 <div id="upcomingparties">
                     {% if upcoming_parties %}
