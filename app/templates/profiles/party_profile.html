@@ -83,6 +83,68 @@
     </div>
 </div>
 
+<div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="notesModalLabel">Party notes</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.changepartynotes') }}" class="form form-horizontal" method="post" role="form" id="notesForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
+                        {{ render_field(partynotesform.notes, style="width: 100%", rows="5", maxlength=300) }}
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-sm btn-danger" id="deletenote">Delete note</button>
+                     </form>
+                    <script src="{{ url_for('static', filename = 'js/partyNotes.js') }}" type="text/javascript"></script>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="modal fade" id="discardParty" tabindex="-1" role="dialog" aria-labelledby="discardPartyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="discardPartyModalLabel">Discard {{  party.title  }}</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                        
+                    <div class="alert alert-warning" role="alert">    
+                        <span class="text-danger">Caution: Are you sure this is what you want to do? All information you have saved about this party and will
+                            be permanently deleted. You can still build it later with a fresh start, but you might want to save/print recipes now.
+                        </span>
+                    </div>
+
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('profiles.discardparty') }}" class="form form-horizontal" method="POST" role="form" id="discardPartyForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
+                        <input type="submit" class="btn btn-lg btn-danger" value="Discard Party">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+
  <!-- End modals -->
 
 
@@ -113,8 +175,8 @@
                         </button>&emsp; <strong>Date:</strong>&emsp;<span class="dtm-dtm">{{ moment(party.datetime_of_party).format('LLLL') }}</span>
                     </div>
                 </div>
-                <div class="noted">
-                    <div id="notes">
+                <div class="party_notes">
+                    <div id="party_notes">
                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change the notes for the party" data-target="#notesModal">
                             <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
                         </button>&emsp; <strong>Notes:</strong>&emsp;{{ party.party_notes }}
@@ -140,6 +202,13 @@
                             No guests invited yet.
                             {% endif %}
                     </div>
+                </div>
+
+                <div id="discardParty" style="padding-top: 3em">
+                    <small>Want to discard this party?</small>
+                    <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#discardParty">
+                        <span class="text-danger">Delete Party Permanently</span>                                                                                                                                                                                                                                                                                                                                                      
+                    </button>
                 </div>
             </div>
         </div>

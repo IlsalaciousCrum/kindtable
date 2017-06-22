@@ -5,8 +5,8 @@ from . import profiles
 
 from .. import db
 
-from ..models import (User, Profile, Diet, Intolerance, Party, PartyGuest,
-                      IngToAvoid, ProfileIntolerance, Friend)
+from ..models import (User, Profile, Intolerance, Party, PartyGuest,
+                      IngToAvoid, ProfileIntolerance, Friend, RecipeWorksFor)
 
 from flask_login import login_required, current_user
 
@@ -14,8 +14,8 @@ from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
                     AddAvoidForm, UpdateAvoidForm, IntoleranceForm,
                     AddNewPartyForm, DeleteFriendForm, ChangeFriendEmailForm,
                     FriendNotesForm, FindaFriendForm, AddGuestToPartyForm,
-                    AddNewPartyForm, ManageGuestListForm, PartyTitleForm,
-                    PartyDatetimeForm)
+                    ManageGuestListForm, PartyTitleForm, PartyDatetimeForm,
+                    PartyNotesForm, DeletePartyForm)
 
 from datetime import datetime
 
@@ -27,8 +27,6 @@ from ..email import send_email
 import pytz
 
 from pytz import timezone
-
-import time
 
 
 @profiles.route('/dashboard', methods=['GET'])
@@ -172,60 +170,51 @@ def show_friend_profile(friend_id):
         return redirect(request.referrer)
 
 
-# @profiles.route('/add_a_new_party_form', methods=['GET', 'POST'])
-# @login_required
-# @email_confirmation_required
-# def add_a_new_party():
-#     """Loads modal content for creating a new party"""
-
-
 @profiles.route('/connect_friends', methods=['GET', 'POST'])
 @login_required
 @email_confirmation_required
 def connect_friends():
-    """Loads modal content for connecting a new friend and processes the request"""
+    """Processes a request to send a friend request"""
 
     find_friend_form = FindaFriendForm(request.form)
     if request.method == 'POST' and find_friend_form.validate():
-        existing_user = db.session.query(Profile
-                                         ).join(User
+        this_user = current_user
+        existing_user = db.session.query(User
+                                         ).join(Profile
                                                 ).filter(Profile.email ==
                                                          find_friend_form.friend_email.data,
                                                          Profile.profile_id ==
                                                          User.profile_id).first()
-        if existing_user:
-            already_connected_friends = Friend.query.filter(Friend.user_id ==
-                                                            current_user.id,
-                                                            Friend.friend_profile_id ==
-                                                            existing_user.profile_id).first()
-            if already_connected_friends:
-                flash("Looks like you are already connected to %s, you can find\
-                      their profile information from the navigation bar above or\
-                      on your dashboard." % find_friend_form.friend_email.data,
-                      "warning")
+        friend_request = Friend.query.filter(Friend.user_id == this_user.id,
+                                             Friend.friend_profile_id ==
+                                             existing_user.profile_id).first()
+
+        if find_friend_form.friend_email.data == this_user.profile.email:
+            flash("You just tried to friend yourself. :) Would you like to add someone else?")
+            return redirect(request.referrer)
+        elif existing_user:
+            if Friend.already_friends(this_user, existing_user):
+                flash("Looks like you are already connected to that person, would you like to add someone else?")
                 return redirect(request.referrer)
-            if existing_user:
+            elif friend_request and friend_request.friend_request_sent:
+                flash("Looks like you have already sent this person a friend request. Maybe check with them personally or create a friend profile for them yourself?")
+                return redirect(request.referrer)
+            else:
                 friendship = Friend.create_record(user_id=current_user.id,
                                                   friend_profile_id=existing_user.profile_id)
                 token = friendship.generate_email_token()
-                send_email(to=existing_user.email,
+                send_email(to=existing_user.profile.email,
                            subject=' {0} {1}({2}) wants to connect\
                            on KindTable'.format(current_user.profile.first_name,
                                                 current_user.profile.last_name,
                                                 current_user.profile.email),
                            template='profiles/email/friend_existing_user',
-                           profile=existing_user,
+                           profile=existing_user.profile,
                            friend=current_user.profile,
                            token=token)
                 friendship.update({"friend_request_sent": True})
-                flash('An connection request email has been sent to %s.'
-                      % existing_user.email, "success")
-                return redirect(request.referrer)
-            if already_connected_friends.friend_request_sent is True:
-                flash("Looks like you have already sent this person a friend\
-                      request. Maybe check with them personally or create a friend\
-                      profile for them yourself?", "danger")
-                return redirect(request.referrer)
+                flash('A connection request email has been sent to %s.' % existing_user.profile.email, "success")
+                return redirect(url_for('profiles.show_dashboard'))
         else:
             new_friend_profile = Profile.create_record(email=find_friend_form.friend_email.data)
             friendship = Friend.create_record(user_id=current_user.id,
@@ -235,15 +224,23 @@ def connect_friends():
                        subject=' %s %s wants to connect on KindTable',
                        template='profiles/email/friend_new_user',
                        friend=current_user.profile, token=token)
-            flash('An connection request email has been sent to %s.'
+            flash('A connection request email has been sent to %s.'
                   % new_friend_profile.email, "success")
-            return redirect(request.referrer)
+            return redirect(url_for('profiles.show_dashboard'))
     elif request.method == 'POST' and not find_friend_form.validate():
         flash_errors(find_friend_form)
         return redirect(request.referrer)
+    else:
+        return render_template("profiles/find_a_friend.html",
+                               find_friend_form=find_friend_form)
 
-    return render_template("profiles/find_a_friend.html",
-                           find_friend_form=find_friend_form)
+
+@profiles.route('/add_friend_profile', methods=['GET', 'POST'])
+@login_required
+@email_confirmation_required
+def add_friend_profile():
+    """Loads the add_friend_profile modal contents and processes a request to
+    make a private profile"""
 
 
 @profiles.route('/confirm_friendship_existing_user/<token>', methods=['GET'])
@@ -253,9 +250,12 @@ def confirm_friendship_with_existing_user(token):
     """Validates an email token and confirms friendship between
     two existing users"""
 
+    current_user_id = current_user.id
+
     friendship = Friend.process_email_token(token=token,
-                                            current_user_id=current_user.id)
+                                            current_user_id=current_user_id)
     if friendship == "logout":
+        flash("Oops! Looks likes another user was still logged in on this computer. We have logged them out. Please follow the link from your email again.")
         return redirect(url_for('auth.logout'))
     elif friendship == "false":
         flash("There seems to be an error. Please email kindtableapp@gmail.com with what you were doing when the error happened. Thank you.")
@@ -265,7 +265,7 @@ def confirm_friendship_with_existing_user(token):
         print friendship
         friend = User.query.get(friendship.user_id)
 
-        Friend.create_record(user_id=current_user.id,
+        Friend.create_record(user_id=current_user_id,
                              friend_profile_id=friend.profile.profile_id,
                              friendship_verified_by_email=True)
         flash("Congratulations! You are now friends with %s!" % str(friend.profile.first_name), "success")
@@ -297,7 +297,8 @@ def show_party_profile(party_id):
     manage_guests_form = ManageGuestListForm(request.form)
     titleform = PartyTitleForm(request.form)
     datetimeform = PartyDatetimeForm(request.form)
-
+    partynotesform = PartyNotesForm(request.form)
+    partynotesform.notes.data = party.party_notes
     _datetime_ = party.datetime_of_party
 
     party_date = _datetime_.astimezone(timezone(session['timezone']))
@@ -319,7 +320,8 @@ def show_party_profile(party_id):
     return render_template("profiles/party_profile.html", party=party,
                            manage_guests_form=manage_guests_form,
                            titleform=titleform,
-                           datetimeform=datetimeform)
+                           datetimeform=datetimeform,
+                           partynotesform=partynotesform)
 
 
 @profiles.route('/add_new_party', methods=['GET', 'POST'])
@@ -622,7 +624,7 @@ def deleteavoid():
 def add_to_party():
     """Takes an Ajax request and adds a guest to parties"""
 
-    form = AddToPartiesForm(request.form)
+    form = AddGuestToPartiesForm(request.form)
     if form.validate():
         pass
     else:
@@ -640,17 +642,35 @@ def delete_friend():
     """Takes an Ajax request and deletes a friend"""
 
     form = DeleteFriendForm(request.form)
-    if form.validate():
-        friend_profile = Profile.query.get(form.friend_profile_id.data)
-        friendship = db.session.query(Friend).filter(Friend.user_id ==
-                                                     current_user.id,
-                                                     Friend.friend_profile_id ==
-                                                     form.friend_profile_id.data).all()
+    friend_profile = Profile.query.get(form.friend_profile_id.data)
+    friendship1 = db.session.query(Friend).filter(Friend.user_id ==
+                                                  current_user.id,
+                                                  Friend.friend_profile_id ==
+                                                  form.friend_profile_id.data).first()
+    works_for1 = RecipeWorksFor.query.filter(RecipeWorksFor.user_id == current_user.id,
+                                             RecipeWorksFor.guest_profile_id == form.friend_profile_id.data).all()
+    if request.method == 'POST' and form.validate():
         if friend_profile.owned_by_user_id == current_user.id:
-            friendship.remove_friendship()
+            if works_for1:
+                for record in works_for1:
+                    record.discard_works_for()
             friend_profile.remove_profile()
         else:
-            friendship.remove_friendship()
+            works_for2 = RecipeWorksFor.query.filter(RecipeWorksFor.user_id == friend_profile.owned_by_user_id,
+                                                     RecipeWorksFor.guest_profile_id == current_user.profile_id).all()
+            friendship2 = db.session.query(Friend).filter(Friend.user_id ==
+                                                          friend_profile.owned_by_user_id,
+                                                          Friend.friend_profile_id ==
+                                                          current_user.profile_id).first()
+            if works_for1:
+                for record in works_for1:
+                    record.discard_works_for()
+            if works_for2:
+                for record in works_for2:
+                    record.discard_works_for()
+            friendship2.remove_friendship()
+
+        friendship1.remove_friendship()
         flash("Friend removed from your account.")
         return redirect(url_for('profiles.show_dashboard'))
     else:
@@ -839,6 +859,68 @@ def party_datetime():
         if monkey_datetime[-8] == '0':
             monkey_datetime = monkey_datetime[:-8] + monkey_datetime[-7:]
         return monkey_datetime
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@profiles.route('/changepartynotes.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def changepartynotes():
+    """Takes an Ajax request and changes a note on the Party table"""
+
+    form = PartyNotesForm(request.form)
+    print form.notes.data
+    print form.party_id.data
+    party = Party.query.get(form.party_id.data)
+    print party
+    if request.method == 'POST' and form.validate():
+        party.update({"party_notes": form.notes.data,
+                      "last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Notes updated'})
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@profiles.route('/clearpartynote.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def clearpartynotes():
+    """Takes an Ajax request and clears a note on the Party table"""
+
+    form = PartyNotesForm(request.form)
+    party = Party.query.get(form.party_id.data)
+    if request.method == 'POST' and form.validate():
+        party.update({"party_notes": None,
+                      "last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Notes updated'})
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@profiles.route('/discardparty.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def discardparty():
+    """Takes an Ajax request and deletes a party and all of it's associated records"""
+
+    form = DeletePartyForm(request.form)
+    party = Party.query.get(form.party_id.data)
+    if request.method == 'POST' and form.validate():
+        party.discard_party()
+        return redirect(url_for('profiles.show_dashboard'))
     else:
         for field, error in form.errors.items():
             flash(u"Error in %s -  %s" % (

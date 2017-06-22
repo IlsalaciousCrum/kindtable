@@ -258,11 +258,15 @@
                     </div>
 
                     {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('profiles.add_to_party') }}" class="form form-horizontal" method="POST" role="form" id="deleteForm">
+                    <form action="{{ url_for('profiles.delete_friend') }}" class="form form-horizontal" method="POST" role="form" id="deleteForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile_id  }}"/>
                         <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        <input type="submit" class="btn btn-lg btn-danger" value="Delete Friend"><br><br><button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        <input type="submit" class="btn btn-lg btn-danger" value="Delete Friend"><br><br>
+                        
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
+                            Close
+                        </button>
                     </form>
                 </div>
             </div>

@@ -293,47 +293,24 @@ class Friend(BaseMixin, db.Model):
 
     @classmethod
     def process_email_token(self, token, current_user_id):
-        print 1
         email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
-        print 2
         try:
-            print 3
             data = email_serializer.loads(token)
-        except BadSignature, e:
-            print 4
-            print "Bad Signature"
-            encoded_payload = e.payload
-            print 5
-            if encoded_payload is not None:
-                print "data is not nothing"
-                try:
-                    d = email_serializer.load_payload(encoded_payload)
-                    print d
-                except BadData:
-                    print "bad data"
+        except:
+            flash("It looks like there is something wrong with your token. Please email kindtableapp@gmail.com")
+            return False
 
-        print 6
         friendship = Friend.query.get(data['friend_record_id'])
 
         if data['user_id'] == current_user_id:
-            print 7
             return "logout"
 
-        print "Friend record id is " + str(data['friend_record_id'])
-        print "Friend_profile_id is " + str(data['friend_profile_id'])
-        print "user_id is " + str(data['user_id'])
-
         if not friendship:
-            print 8
-            print "That friend record id does not exist."
             return False
 
         if data['friend_profile_id'] != friendship.friend_profile_id or data['user_id'] != friendship.user_id:
-            print 9
-            print "The profile id or the user_id don't match the friend record"
             return False
         else:
-            print 10
             friendship.friendship_verified_by_email = True
             db.session.commit()
             return friendship
@@ -353,6 +330,16 @@ class Friend(BaseMixin, db.Model):
 
         self._delete_()
         db.session.commit()
+
+    @classmethod
+    def already_friends(self, user, friend_user):
+        friendship1 = Friend.query.filter(Friend.user_id == user.id, Friend.friend_profile_id == friend_user.profile_id).first()
+        friendship2 = Friend.query.filter(Friend.user_id == friend_user.id, Friend.friend_profile_id == user.profile_id).first()
+
+        if friendship1 and friendship2:
+            return True
+        else:
+            return False
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -486,8 +473,8 @@ class Party(BaseMixin, db.Model):
     def discard_party(self):
         '''Removes the party and any dependent records'''
 
-        if self.party_guests:
-            for invite in self.party_guests:
+        if self.guests:
+            for invite in self.guests:
                 invite._delete_()
         if self.recipes:
             for party_recipe in self.recipes:
@@ -574,6 +561,7 @@ class RecipeWorksFor(BaseMixin, db.Model):
     __tablename__ = 'worksfor'
 
     record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    user_id = db.Column(db.Integer,db.ForeignKey('users.id'), nullable=False)
     recipe_card_id = db.Column(db.Integer,
                                db.ForeignKey('recipecard.recipe_record_id'),
                                nullable=False)

@@ -226,3 +226,17 @@ class PartyDatetimeForm(Form):
             print "triggering the validation but somehow not flashing"
             raise ValidationError('Date in the past. Please pick a date from the future')
             return redirect(request.referrer)
+
+
+class PartyNotesForm(Form):
+    party_id = HiddenField(validators=[InputRequired()])
+    notes = StringField('Party notes',
+                        widget=TextArea(),
+                        validators=[InputRequired('No notes added.'),
+                                    Length(1, 300)])
+    submit = SubmitField('Update')
+
+
+class DeletePartyForm(Form):
+    party_id = HiddenField(validators=[InputRequired()])
+    submit = SubmitField('Update')
