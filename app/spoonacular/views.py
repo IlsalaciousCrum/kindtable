@@ -112,8 +112,6 @@ def rerun_search():
     session['intols'] = newintols
     session['avoids'] = newavoids
 
-    raise Exception
-
     return redirect(url_for("spoonacular.show_search_spoonacular"))
 
 

@@ -73,17 +73,25 @@ def spoonacular_request(party_id, diet, intols, avoids, cuisine, course):
     diet = new_guest_diet(diet)
     cuisine = Cuisine.query.get(cuisine)
     cuisine = str(cuisine.cuisine_name)
+    if cuisine == "any":
+        cuisine = ""
 
     course = Course.query.get(course)
     course = str(course.course_name)
-
-    # diet is coming through wrong
+    if course == "any":
+        course = ""
 
     url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
-    headers = {"X-Mashape-Key": os.environ['SECRET_KEY'], "Accept": "application/json"}
+    headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
     payload = {'query': 'recipe', 'diet': str(diet), 'type': course, 'cuisine': cuisine,
                'number': 100, 'intolerances': str(intolerance_string),
-               'excludeIngredients': avoid_string, 'instructionsRequired': False}
+               'excludeIngredients': avoid_string}
+
+    # url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
+    # headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
+    # payload = {'query': 'recipe', 'diet': diet, 'type': 'any',
+    #            'number': 300, 'intolerances': intolerance_string, 'excludeIngredients': avoid_string}
+    # response = requests.get(url, headers=headers, params=payload)
 
     print payload
 
