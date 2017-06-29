@@ -6,7 +6,7 @@ from . import profiles
 from .. import db
 
 from ..models import (User, Profile, Intolerance, Party, PartyGuest,
-                      IngToAvoid, ProfileIntolerance, Friend)
+                      IngToAvoid, ProfileIntolerance, Friend, PartyRecipes)
 
 from flask_login import login_required, current_user
 
@@ -21,10 +21,13 @@ from datetime import datetime
 
 from ..decorators import email_confirmation_required, flash_errors
 
+from ..functions import (guest_avoidances, guest_intolerances)
 
 from ..email import send_email
 
 import pytz
+
+import json
 
 from pytz import timezone
 
@@ -65,9 +68,6 @@ def show_dashboard():
                                                       current_user.id,
                                                       Party.datetime_of_party >=
                                                       datetime.utcnow()).order_by(Party.datetime_of_party).all()
-    this_users_parties = db.session.query(Party).filter(Party.user_id == current_user.id).all()
-
-    recipes = [[recipe for recipe in party.recipes] for party in this_users_parties]
 
     return render_template("/profiles/dashboard.html",
                            profile=profile,
@@ -79,8 +79,7 @@ def show_dashboard():
                            add_avoid_form=add_avoid_form,
                            update_avoid_form=update_avoid_form,
                            past_parties=past_parties,
-                           upcoming_parties=upcoming_parties,
-                           recipes=recipes)
+                           upcoming_parties=upcoming_parties)
 
 
 @profiles.route('/friendprofile/<int:friend_id>', methods=['GET'])
@@ -334,6 +333,18 @@ def show_party_profile(party_id):
         datetimeform.date.data = party_date_date
         datetimeform.hour.data = party_date_time
 
+        session['cuisine'] = 1
+        session['course'] = 1
+
+        get_avoid = guest_avoidances(party_id)
+        get_intolerance = guest_intolerances(party_id)
+        party_guests = PartyGuest.query.filter(PartyGuest.party_id == party_id).all()
+        party_diets = list(set(guest.profiles.diet.diet_type for guest in party_guests))
+
+        session['diets'] = party_diets
+        session['intols'] = get_intolerance
+        session['avoids'] = get_avoid
+
         friends = current_user.friends
         manage_guests_form.friends.choices = [(friend.friend_profile_id, ("{0} {1} ({2})").format(friend.friend_profile.first_name, friend.friend_profile.last_name, friend.friend_profile.email)) for friend in friends]
         titleform.title.data = party.title
@@ -383,6 +394,7 @@ def add_new_party():
     else:
         return render_template("profiles/add_a_party.html",
                                add_party_form=add_party_form)
+
 
 
 # Only JSON routes below for AJAX calls

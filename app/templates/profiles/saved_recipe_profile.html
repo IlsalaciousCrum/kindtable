@@ -6,30 +6,26 @@
 
         <div class = "row round_div" style="padding-top: 2em">
 
-         <h1>{{  this_recipe.title  }}</h1>
-         <p style="text-align: center">This recipe is saved to the RecipeBox for <a href="/party_profile/{{  party.party_id  }}">{{  party.title  }}</a><br>
-            <a href="{{  this_recipe.recipe_url  }}" target="_blank">View recipe at Spoonacular</a></p>
+         <h1>{{  this_recipe.recipes.title  }}</h1>
+         <p style="text-align: center">This recipe is saved for your party: <a href="/party_profile/{{  party.party_id  }}">{{  party.title  }}</a><br>
+            <a href="{{  this_recipe.recipes.recipe_url  }}" target="_blank">View recipe at Spoonacular</a></p>
 
             <b>Safe for:</b>
             <ul>
                 {% for key, value in works_for.iteritems() %}
-            </li>{{  key  }}: {% for each in value %}{{  each  }}{% if not loop.last %}, {% endif %}{% endfor %}</li><br>{% endfor %}
+            </li><strong>{{  key  }}:</strong> {% for each in value %}{{  each  }}{% if not loop.last %}, {% endif %}{% endfor %}</li><br>{% endfor %}
         </ul>
 
 
         <b>Ingredients</b>
-        <ul>{% for each in ingredients %}
-            <li>{{  each.decode('utf-8')  }}</li>
-            {% endfor %}</ul>
+        {% for key, value in ingredients.iteritems() %}
+
             <b>Instructions</b>
-            <ul>{% for each in instructions %}
-                <li>{{  each.decode('utf-8') }}</li>
-            {% endfor %}</ul>
-            </ul>
+            {{  instructions  }}
 
 
 
-            <img src="{{  this_recipe.recipe_image_url  }}" alt="{{  this_recipe.title  }}" class="img-fluid center" >
+            <img src="{{  this_recipe.recipes.recipe_image_url  }}" alt="{{  this_recipe.recipes.title  }}" class="img-fluid center" >
 
         </div>
     </div>

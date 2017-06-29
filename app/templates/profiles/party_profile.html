@@ -223,9 +223,9 @@
                         <a href="{{  url_for('spoonacular.show_search_spoonacular')  }}" class="btn btn-sm btn-info" role="button">Search for Recipes</a><br><br>
 
 
-                        {% if party.recipes %}
-                            {% for recipe in party.recipes %}
-                                <a href="{{ url_for('spoonacular.show_saved_recipe', record_id=recipe.recipe_record_id) }}"><span style="font-size: 125%">{{ recipe.title }}</span></a><br>
+                        {% if party.party_recipes %}
+                            {% for partyrecipe in party.party_recipes %}
+                                <a href="{{ url_for('spoonacular.show_saved_recipe', record_id=partyrecipe.record_id) }}"><span style="font-size: 125%">{{ partyrecipe.recipes.title }}</span></a><br>
                             {% endfor %}
                         {% else %}
                             No recipes added yet for this party.

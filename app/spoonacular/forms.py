@@ -21,3 +21,24 @@ class MultiCheckboxField(SelectMultipleField):
 class SearchForm(Form):
     party_id = HiddenField(validators=[InputRequired()])
     submit = SubmitField('Update')
+
+
+class RecipeSearch(Form):
+    intols = HiddenField(validators=[InputRequired()])
+    cuisine = HiddenField(validators=[InputRequired()])
+    course = HiddenField(validators=[InputRequired()])
+    newdiets = HiddenField(validators=[InputRequired()])
+    avoids = HiddenField(validators=[InputRequired()])
+    recipe_id = HiddenField(validators=[InputRequired()])
+
+
+class SeeRecipe(Form):
+    recipe_id = HiddenField(validators=[InputRequired()])
+    submit = SubmitField('Update')
+
+
+class SaveRecipe(Form):
+    recipe_id = HiddenField(validators=[InputRequired()])
+    notes = StringField('Recipe notes',
+                        widget=TextArea())
+    submit = SubmitField('Update')

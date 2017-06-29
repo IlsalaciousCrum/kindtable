@@ -476,10 +476,8 @@ class Party(BaseMixin, db.Model):
     datetime_of_party = db.Column(db.DateTime(timezone=True), nullable=True)
     party_notes = db.Column(db.String(300), nullable=True)
     guests = db.relationship('PartyGuest', backref='party')
-    recipes = db.relationship('RecipeCard',
-                              secondary='partyrecipes',
-                              backref='parties',
-                              lazy='joined')
+    party_recipes = db.relationship('PartyRecipes', backref='parties',
+                                    lazy='joined')
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
     def discard_party(self):
@@ -539,11 +537,10 @@ class RecipeCard(BaseMixin, db.Model):
     recipe_id = db.Column(db.String(120), nullable=False)
     title = db.Column(db.String(120), nullable=False)
     recipe_image_url = db.Column(db.String(300), nullable=False)
-    recipe_url = db.Column(db.String(300), nullable=False)
-    ingredients = db.Column(db.String(2000), nullable=True)
-    instructions = db.Column(db.String(2000), nullable=True)
-
-    party_recipes = db.relationship('PartyRecipes', backref='recipecard')
+    spoonacular_recipe_url = db.Column(db.String(300), nullable=False)
+    source_recipe_url = db.Column(db.String(300), nullable=False)
+    ingredients = db.Column(db.PickleType)
+    instructions = db.Column(db.PickleType)
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -578,12 +575,14 @@ class PartyRecipes(BaseMixin, db.Model):
                            db.ForeignKey('cuisines.cuisine_id'),
                            nullable=False)
     works_for = db.Column(db.String(2000), nullable=True)
+    recipe_notes = db.Column(db.String(300), nullable=True)
     course = db.relationship('Course',
                              backref='party_recipes',
                              lazy='joined')
     cuisine = db.relationship('Cuisine',
                               backref='party_recipes',
                               lazy='joined')
+    recipes = db.relationship('RecipeCard', backref='partyrecipes')
 
     def discard_recipe(self):
         '''Discards a recipe saved for a party'''

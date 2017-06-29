@@ -25,23 +25,20 @@
 
         <ul>
             <li><b>Ingredients</b></li>
-            <ul>{% for each in ingredients %}
+            <ul>{% for each in this_recipe.ingredients %}
                 <li>{{  each  }}</li>
-                {% endfor %}</ul>
-
+                {% endfor %}
             </ul>
+         </ul>
 
-            <ul>
-                <li><b>Instructions</b></li>
-                <ul>{% for each in instructions %}
-                    <li>{{  each }}</li>
-                    {% endfor %}</ul>
-                </ul>
-                <div>
-
-                   
-
-
+        <ul>
+            <li><b>Instructions</b></li>
+            <ul>{% for each in this_recipe.instructions %}
+                <li>{{  each }}</li>
+                {% endfor %}
+            </ul>
+        </ul>
+    <div>
 
                     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
                 </div>

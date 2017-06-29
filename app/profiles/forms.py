@@ -149,7 +149,8 @@ class AddNewPartyForm(Form):
                              validators=[InputRequired(message="What would you like to call your event?"),
                                          Length(1, 64, message="Limit 64 characters")])
     date = DateField('Date', format='%Y-%m-%d',
-                     render_kw={"placeholder": "MM / DD / YYYY"})
+                     render_kw={"placeholder": "MM / DD / YYYY"},
+                     validators=[InputRequired()])
     hour = TimeField('Time')
     notes = StringField('Notes about event',
                         widget=TextArea())
@@ -213,7 +214,8 @@ class PartyTitleForm(Form):
 class PartyDatetimeForm(Form):
     party_id = HiddenField(validators=[InputRequired()])
     date = DateField('New date', format='%Y-%m-%d',
-                     render_kw={"placeholder": "MM / DD / YYYY"})
+                     render_kw={"placeholder": "MM / DD / YYYY"},
+                     validators=[InputRequired()])
     hour = TimeField('New time', format='%H:%M')
     submit = SubmitField('Update')
 
