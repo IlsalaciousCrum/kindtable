@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h4 class="modal-title" id="addFriendProfileModalLabel">Create Your Own Private Profile For a Friend</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body">
+    <div class = "row round_hidden_div" style="padding-top: 2em">
+    <div id="ff-flashedalert"></div>
+      <p class="text-muted">Good choice! Enter your friends email below to get started. After submitting the form, you will be redirected to your new profile for your friend where you can add all of the information you know about your friend's eating habits. Or you could just hand over the keyboard to them so they can fill out the information themselves.</p>
+
+    {% from "_formhelpers.html" import render_field %}
+        <form action="{{ url_for('profiles.add_friend_profile') }}" class="form form-horizontal" method="post" role="form" id="connectFriend">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            {{ render_field(add_friend_form.friend_email, style="width: 75%", rows="1") }}<br>
+            <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+        </form>
+    </div>
+</div>
