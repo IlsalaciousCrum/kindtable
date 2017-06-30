@@ -113,7 +113,6 @@ class Profile(BaseMixin, db.Model):
             return False
 
         if data['profile_id'] != self.profile_id and data['email'] != self.email:
-            print "The profile ids or the email adress don't match"
             return False
         else:
             self.email_verified = True
@@ -205,14 +204,11 @@ class User(BaseMixin, UserMixin, db.Model):
         try:
             data = registration_serializer.loads(str(token))
         except:
-            print "can't load token"
             return False
 
         if data['profile_id'] != self.profile.profile_id and data['email'] != self.profile.email:
-            print "user_id did not match"
             return False
         else:
-            print "I'm happy to change your password"
             self.password = new_password
             db.session.commit()
             return True
@@ -238,7 +234,6 @@ class User(BaseMixin, UserMixin, db.Model):
         user = User.query.get(data['id'])
         #Check Password and return user or None
         if user:
-            print "loading user "
             return user
         else:
             return None
@@ -539,8 +534,10 @@ class RecipeCard(BaseMixin, db.Model):
     recipe_image_url = db.Column(db.String(300), nullable=False)
     spoonacular_recipe_url = db.Column(db.String(300), nullable=False)
     source_recipe_url = db.Column(db.String(300), nullable=False)
-    ingredients = db.Column(db.PickleType)
-    instructions = db.Column(db.PickleType)
+    ingredients = db.Column(db.String(2000))
+    instructions = db.Column(db.String(2000))
+
+    party_recipes = db.relationship('PartyRecipes')
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''
@@ -551,7 +548,8 @@ class RecipeCard(BaseMixin, db.Model):
                              self.recipe_id,
                              self.title,
                              self.recipe_image_url,
-                             self.recipe_url,
+                             self.spoonacular_recipe_url,
+                             self.source_recipe_url,
                              self.ingredients,
                              self.instructions)
 
@@ -582,7 +580,7 @@ class PartyRecipes(BaseMixin, db.Model):
     cuisine = db.relationship('Cuisine',
                               backref='party_recipes',
                               lazy='joined')
-    recipes = db.relationship('RecipeCard', backref='partyrecipes')
+    recipes = db.relationship('RecipeCard')
 
     def discard_recipe(self):
         '''Discards a recipe saved for a party'''

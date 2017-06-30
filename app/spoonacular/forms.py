@@ -38,6 +38,7 @@ class SeeRecipe(Form):
 
 
 class SaveRecipe(Form):
+    
     recipe_id = HiddenField(validators=[InputRequired()])
     notes = StringField('Recipe notes',
                         widget=TextArea())

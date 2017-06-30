@@ -17,8 +17,10 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     "use strict";
-    $('#recipe_close_button').on('click', (function (event) {
-    $('#seeRecipeModal').modal('toggle');
-    $( "#loadRecipeHere" ).empty();
-    }));
+    $('.printButton').click(function(){
+         $("#recipePrintWindow").print();
+    });
 });
+
+
+

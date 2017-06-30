@@ -117,18 +117,17 @@ def LoadSeedData():
 
     print "loaded Cuisines"
 
-    Course.create_record(course_id="1", course_name="any")
-    Course.create_record(course_id="2", course_name="main course")
-    Course.create_record(course_id="3", course_name="side dish")
-    Course.create_record(course_id="4", course_name="dessert")
-    Course.create_record(course_id="5", course_name="appetizer")
-    Course.create_record(course_id="6", course_name="salad")
-    Course.create_record(course_id="7", course_name="bread")
-    Course.create_record(course_id="8", course_name="breakfast")
-    Course.create_record(course_id="9", course_name="soup")
-    Course.create_record(course_id="10", course_name="beverage")
-    Course.create_record(course_id="11", course_name="sauce")
-    Course.create_record(course_id="12", course_name="drink")
+    Course.create_record(course_id="1", course_name="main course")
+    Course.create_record(course_id="2", course_name="side dish")
+    Course.create_record(course_id="3", course_name="dessert")
+    Course.create_record(course_id="4", course_name="appetizer")
+    Course.create_record(course_id="5", course_name="salad")
+    Course.create_record(course_id="6", course_name="bread")
+    Course.create_record(course_id="7", course_name="breakfast")
+    Course.create_record(course_id="8", course_name="soup")
+    Course.create_record(course_id="9", course_name="beverage")
+    Course.create_record(course_id="10", course_name="sauce")
+    Course.create_record(course_id="11", course_name="drink")
 
     print "loaded Courses"
 

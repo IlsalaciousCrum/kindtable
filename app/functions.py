@@ -78,20 +78,12 @@ def spoonacular_request(party_id, diet, intols, avoids, cuisine, course):
 
     course = Course.query.get(course)
     course = str(course.course_name)
-    if course == "any":
-        course = ""
 
     url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
     headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
     payload = {'query': 'recipe', 'diet': str(diet), 'type': course, 'cuisine': cuisine,
                'number': 100, 'intolerances': str(intolerance_string),
                'excludeIngredients': avoid_string}
-
-    # url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
-    # headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
-    # payload = {'query': 'recipe', 'diet': diet, 'type': 'any',
-    #            'number': 300, 'intolerances': intolerance_string, 'excludeIngredients': avoid_string}
-    # response = requests.get(url, headers=headers, params=payload)
 
     print payload
 
@@ -153,12 +145,16 @@ def spoonacular_recipe_information(recipe_id):
     ingredients_list = json.dumps(((each["originalString"]) for each in spoon['extendedIngredients']), iterable_as_array=True)
     print ingredients_list
 
-    instructions = spoon['analyzedInstructions']
+    if len(spoon['analyzedInstructions']) == 0:
+        instructions = json.dumps("Instructions located at the 'Original Recipe Source' link below")
+    else:
+        instructions_list = []
+        for each in spoon['analyzedInstructions']:
+            for step in each['steps']:
+                instructions_list.append(step['step'])
 
-    print instructions
-
-    instructions_list = json.dumps((((step['step']) for step in each['steps']) for each in instructions), iterable_as_array=True)
+        instructions = json.dumps(instructions_list)
 
     return {'title': title, 'image_url': image, 'source_url': sourceUrl,
             'spoonacular_url': spoonacular_url, 'ingredients_list': ingredients_list,
-            'instructions_list': instructions_list, 'recipe_id': _id}
+            'instructions_list': instructions, 'recipe_id': _id}

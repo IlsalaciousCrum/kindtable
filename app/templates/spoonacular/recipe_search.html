@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
 
+<div class="alert alert-info" style="display: none" id="add-success">
+    <strong>Success!</strong> The recipe for <span id="alert-recipe-title" style="font-weight: bold"></span></strong> has been added to the menu for <strong><span id="alert-recipe-party-title" style="font-weight: bold"></strong></span>.
+</div><br><br>
 
 
 <div id="loadRecipeHere"></div>
- <script src="{{ url_for('static', filename = 'js/recipeSearch.js') }}" type="text/javascript"></script> 
+<script src="{{ url_for('static', filename = 'js/recipeSearch.js') }}" type="text/javascript"></script> 
 
-<div class="recipe_page round_div">
+<div class="lb1 recipe_page round_div">
 <div class="row">
     <div class="col-md-4 side_column">
         <div class="row display_guest">
@@ -21,7 +24,11 @@
         </div>
 
         <!-- End of recipe search information -->
-        <div class="row">                            
+        <div class="search_form row">      
+        <div class="alert alert-info alert-dismissible" style="display: none" id="add-success">
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <strong>Success!</strong> The recipe for <span id="alert-recipe-title" style="font-weight: bold"></span></strong> has been added to the menu for <strong><span id="alert-recipe-party-title" style="font-weight: bold"></strong></span>.
+</div><br><br>                      
             <form class="horizontal" action="{{  (url_for('spoonacular.rerun_search'))  }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
@@ -54,7 +61,6 @@
                         
                 </div>
                 {% endfor %}
-
 
                     <h4 class="form-control-static">Intolerances/Allergies:</h4>
                     

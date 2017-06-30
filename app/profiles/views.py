@@ -334,7 +334,7 @@ def show_party_profile(party_id):
         datetimeform.hour.data = party_date_time
 
         session['cuisine'] = 1
-        session['course'] = 2
+        session['course'] = 1
 
         get_avoid = guest_avoidances(party_id)
         get_intolerance = guest_intolerances(party_id)

@@ -1,57 +1,66 @@
 <div class="modal fade" id="seeRecipeModal" tabindex="-1" role="dialog" aria-labelledby="seeRecipeLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="seeRecipeLabel">Recipe Preview</h5>
-                <button type="button" class=" close recipe_close_button" data-dismiss="modal" aria-label="Close">
+            <div class="lb1 modal-header">
+                <h4 class="modal-title" id="seeRecipeLabel">Recipe Preview</h5><br>
+                <button type="button" class="close recipe_close_button>" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
+            <script src="{{ url_for('static', filename = 'js/previewRecipe.js') }}" type="text/javascript"></script> 
             <div class="modal-body">
                 <div class = "row round_hidden_div" style="padding-top: 2em">
-
-                    <h1>{{  info['title']  }}</h1>
-                    <br><br>
-                    {% if saved_recipe %}
-                    <span class="text-info">This recipe is already saved</span>
-                    {% else %}
-                    {% from "_formhelpers.html" import render_field %}
-                        <form action="{{ url_for('spoonacular.add_recipe_box') }}" class="form form-horizontal" method="post" role="form" id="saveRecipe">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="recipe_id" value="{{  recipe_id  }}"/>
-                            {{ render_field(form.notes,  placeholder="  Type your notes here", id="note_input", style="width: 100%", rows="3",  maxlength=300) }}
-                            <input type="submit" class="btn btn-success" value="Save Recipe">&ensp;<button type="button" class="btn btn-sm btn-default recipe_close_button" data-dismiss="modal">Close</button>
-                        </form>
-
-                    {% endif %}
-                    <br>
-                    <b>Course:</b> {{  course  }}<br><br>
-                    <b>Cuisine:</b> {{  cuisine  }} <br><br>
-            
-                    <b>Safe for:</b>
-                    <ul>
-                        <li><b>Diets:</b> {% for diet in newdiets %} {{  diet  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-                        <li><b>Intolerances:</b> {% for intol in intols %}{{  intol  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-                        <li><b>Avoids:</b> {% for avoid in avoids %}{{  avoid  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
-                    </ul>
-
-                   <b>Ingredients</b></li>
-                        <ul>{% for each in ingredients %}
-                            <li>{{  each  }}</li>
-                            {% endfor %}
+                    <div class="recipePrintWindow">
+                        <span id="party_title" style="display: none">{{  title  }}</span>
+                        <h1><span id="recipe_title">{{  info['title']  }}</span></h1>
+                        <div class="lb1" id="form_div">
+                            <br><br>
+                            {% if not saved_recipe %}
+                                {% from "_formhelpers.html" import render_field %}
+                                    <form action="{{ url_for('spoonacular.add_recipe_box') }}" class="form form-horizontal" method="post" role="form" id="saveform">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                        <input type="hidden" name="recipe_id" value="{{  recipe_id  }}"/>
+                                            {{ render_field(saveform.notes,  placeholder="  Type your notes here", id="note_input", style="width: 100%", rows="3",  maxlength=300) }}
+                                        <input type="submit" class="btn btn-lg btn-success" id="saveRecipeButton" value="Save Recipe">
+                                    </form>
+                            {% endif %}
+                        </div>
+                            <br><button type="button" class="btn btn-sm btn-info print" onClick="window.print();return false">Print</button>&emsp;<button type="button" class="btn btn-sm btn-default recipe_close_button" data-dismiss="modal">Close</button><br><br>
+                        <b>Course:</b> {{  course  }}<br><br>
+                        <b>Cuisine:</b> {{  cuisine  }} <br><br>
+                
+                        <b>Safe for:</b>
+                        <ul>
+                            <li><b>Diets:</b> {% for diet in newdiets %} {{  diet  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                            <li><b>Intolerances:</b> {% for intol in intols %}{{  intol  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                            <li><b>Avoids:</b> {% for avoid in avoids %}{{  avoid  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
                         </ul>
 
-                    <b>Instructions</b>
-                    <ul>{% for each in instructions %}
-                        {% for step in each %}
-                        <li>{{  step  }}</li>
-                        {% endfor %}
-                        {% endfor %}
-                    </ul>
+                       <b>Ingredients</b></li>
+                            <ul>{% for each in ingredients %}
+                                <li>{{  each  }}</li>
+                                {% endfor %}
+                            </ul>
 
-                    <a href="{{  info['source_url']  }}" target="_blank">Original Recipe Source</a>&emsp;-&emsp;<a href="{{  info['spoonacular_url']  }}" target="_blank">View this recipe at Spoonacular</a>
-                    <img class="img-responsive img-rounded center" alt="Responsive image" src="{{  info['image_url']  }}" alt="{{  info['title']  }}" ><br><br><br>
+                        <b>Instructions</b>
+                        <ul>{% if instructions is string %}
+                            {{  instructions  }}
+                            {% else %}
+                            {% for step in instructions %}
+                            <li>{{  step  }}</li>
+                            {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div>
 
+                    <script>
+
+                    </script>
+
+                    <div class="lb1">
+                        <a href="{{  info['source_url']  }}" target="_blank">Original Recipe Source</a>&emsp;-&emsp;<a href="{{  info['spoonacular_url']  }}" target="_blank">View this recipe at Spoonacular</a>
+                        <img class="img-responsive img-rounded center" alt="Responsive image" src="{{  info['image_url']  }}" alt="{{  info['title']  }}" ><br><br><br>
+                    </div>
                 </div>    
             </div>
         </div>    
