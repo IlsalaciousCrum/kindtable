@@ -29,6 +29,7 @@
                         <b>Course:</b> {{  course  }}<br><br>
                         <b>Cuisine:</b> {{  cuisine  }} <br><br>
                 
+                        {% if not saved_recipe %}
                         <b>Safe for:</b>
                         <ul>
                             <li><b>Diets:</b> {% for diet in newdiets %} {{  diet  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
@@ -51,6 +52,11 @@
                             {% endfor %}
                             {% endif %}
                         </ul>
+                        {% else %}
+                        {% endif %}
+                            
+
+
                     </div>
 
                     <script>

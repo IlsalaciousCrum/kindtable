@@ -215,10 +215,11 @@
                                     {{ party.title}}
                                 </li>
                                 {% else %}
-                                <p>Not invited to any parties</p>
+                                    <p>Not invited to any parties</p>
                                 {% endif %}
                             {% endfor %}
                         </ul>
+                    {% endif %}
                     {% from "_formhelpers.html" import render_field %}
                     <form action="{{ url_for('profiles.add_to_party') }}" class="form form-horizontal" method="POST" role="form" id="inviteForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -228,7 +229,7 @@
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                             <script src="{{ url_for('static', filename = 'js/inviteFriendToParties.js') }}" type="text/javascript"></script>
-                    {% else %}
+                    {% if not parties %}
                     <span class="text-danger">Whoops! You will need to add at least one new party first before adding guests.</span>
                     {% endif %}
                 </div>
@@ -429,19 +430,6 @@
                     </div>
                 </div>
 
-                <div id="remove" style="padding-top: 3em">
-                    <small>Don't want to invite this person to anymore meals?</small>
-                    <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#removeFriend">
-                        <span class="text-danger">Delete Friend Profile Permanently</span>
-                    </button>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="col-md-5 col-md-offset-1">      
-            <div class = "row round_div" style="padding-top: 2em">
-                
                 <div class='friend_notes'>
                     <div id="friend_notes" style="padding-top: 1em">
                         
@@ -457,17 +445,29 @@
                     </div>
                 </div>
 
+                <div id="remove" style="padding-top: 3em">
+                    <small>Don't want to invite this person to anymore meals?</small>
+                    <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#removeFriend">
+                        <span class="text-danger">Delete Friend Profile Permanently</span>
+                    </button>
+                </div>
 
-                <h3>Upcoming Parties Invited To &emsp; <button type="button" class="btn btn-sm btn-success" href="#" data-toggle="modal" data-target="#inviteModal">Invite To More Parties</button></h3>
+            </div>
+        </div>
+
+        <div class="col-md-5 col-md-offset-1">      
+            <div class = "row round_div" style="padding-top: 2em">
+                
+                <button type="button" class="btn btn-sm btn-info pull-right" href="#" data-toggle="modal" data-target="#inviteModal">Invite To More Parties</button>
+
+                <h3>Upcoming Parties Invited</h3>
                 <div class="upcomingParties">
                     <div id="upcomingParties">
                         {% if parties_invited %}
                             <ul>
                                 {% for party in parties_invited %}
                                     {% if party.datetime_of_party >= now %}
-                                    <li>
-                                        <a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}">
-                                            <h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
+                                    <li><a href="{{ url_for('profiles.show_party_profile', party_id=party.party_id) }}"><h4>{{ party.title}}<small><br>Scheduled for {{ moment(party.datetime_of_party).format('LLLL') }}</small></h4>
                                         </a>
                                     </li>
                                     {% else %}
@@ -481,7 +481,7 @@
                     </div>
                 </div>
 
-                <h3>Past Parties Invited To</h3>
+                <h3>Past Parties Invited</h3>
                 <div id="pastParties">
                     {% if parties_invited %}
                         <ul>

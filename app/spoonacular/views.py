@@ -4,7 +4,7 @@ from flask import (render_template, request, flash, redirect, session, json, url
 
 from . import spoonacular
 
-from app.models import (User, Cuisine, Course, Party,
+from app.models import (User, Profile, Cuisine, Course, Party,
                         PartyRecipes, RecipeCard, PartyGuest)
 
 from flask_login import login_required, current_user
@@ -16,7 +16,9 @@ from ..functions import (guest_avoidances, guest_intolerances,
 
 from .. import db
 
-from .forms import (SaveRecipe)
+from .forms import (SaveRecipe, RecipeNotesForm, DeleteRecipeForm, EmailMenuForm)
+
+from ..email import send_email
 
 
 @spoonacular.route('/recipe/<int:record_id>')
@@ -68,9 +70,16 @@ def show_search_spoonacular():
     course = session["course"]
     cuisine = session["cuisine"]
 
+    try:
+        offset = session["offset"]
+    except:
+        session["offset"] = 0
+        offset = 0
+
     responses = spoonacular_request(party_id=party_id, diet=diets,
                                     intols=intols, avoids=avoids,
-                                    cuisine=cuisine, course=course)
+                                    cuisine=cuisine, course=course,
+                                    offset=offset)
 
     print "This is number"
     print responses.get('number', None)
@@ -91,7 +100,8 @@ def show_search_spoonacular():
                            party_intols=get_intolerance,
                            cuisine=cuisine,
                            course=course,
-                           result_number=result_number)
+                           result_number=result_number,
+                           offset=offset)
 
 
 @spoonacular.route('/rerun_search', methods=["POST"])
@@ -114,24 +124,75 @@ def rerun_search():
     return redirect(url_for("spoonacular.show_search_spoonacular"))
 
 
-@spoonacular.route('/show_recipe/<int:record_id>')
+@spoonacular.route('/load_more_recipes')
 @login_required
 @email_confirmation_required
-def preview_saved_recipe(record_id):
+def load_more_recipes():
+    """Loads more recipes."""
+
+    offset = session['offset'] + 100
+    session['offset'] = offset
+
+    return redirect(url_for("spoonacular.show_search_spoonacular"))
+
+
+@spoonacular.route('/saved_recipe/<int:record_id>')
+@login_required
+@email_confirmation_required
+def saved_recipe(record_id):
     """Show a recipe preview of recipes saved in the RecipeCard table, from the party page"""
 
-    session_token = session.get("session_token")
-    this_user = current_user
-    this_recipe = RecipeCard.query.get(record_id)
-    partyrecipe = PartyRecipes.query.filter(PartyRecipes.recipe_record_id == this_recipe.recipe_record_id).first()
-    party = Party.query.get(this_recipe.party_id)
-    works_for = json.dumps(partyrecipe.works_for_json)
+    notesForm = RecipeNotesForm(request.form)
+    discardRecipeForm = DeleteRecipeForm(request.form)
+    party_recipe = PartyRecipes.query.get(record_id)
+    notesForm.notes.data = party_recipe.recipe_notes
+    party = Party.query.get(party_recipe.party_id)
+    card = RecipeCard.query.get(party_recipe.recipe_record_id)
 
-    return render_template("spoonacular/recipe_preview.html",
-                           this_user=this_user,
-                           this_recipe=this_recipe,
+    ingredients = json.loads(card.ingredients)
+    instructions = json.loads(card.instructions)
+
+    works_for = json.loads(party_recipe.works_for)
+    works_for_name = []
+    for guest in party.guests:
+        add = True
+        if guest.profiles.avoidances:
+            for avoid in guest.profiles.avoidances:
+                if avoid.ingredient in works_for['avoids']:
+                    pass
+                else:
+                    add = False
+        if guest.profiles.diet.diet_type in works_for['diets']:
+            pass
+        else:
+            add = False
+        if guest.profiles.intolerances:
+            for intol in guest.profiles.intolerances:
+                if intol.intol_name in works_for['intols']:
+                    pass
+                else:
+                    add = False
+        if add is True:
+            if guest.profiles.first_name and guest.profiles.last_name:
+                name = guest.profiles.first_name + " " + guest.profiles.last_name
+            elif guest.profiles.first_name:
+                name = guest.profiles.first_name + " (" + guest.profiles.email + ")"
+            else:
+                name = guest.profiles.email
+            works_for_name.append(name)
+        else:
+            continue
+
+    return render_template("spoonacular/saved_recipe.html",
+                           party_recipe=party_recipe,
                            party=party,
-                           works_for=works_for)
+                           card=card,
+                           works_for=works_for,
+                           works_for_name=works_for_name,
+                           notesForm=notesForm,
+                           discardRecipeForm=discardRecipeForm,
+                           ingredients=ingredients,
+                           instructions=instructions)
 
 
 @spoonacular.route('/see_recipe/<int:recipe_id>')
@@ -214,9 +275,16 @@ def add_recipe_box():
         works_for_dump = json.dumps({'avoids': tuple(avoids), 'diets': tuple(diets), 'intols': tuple(intols)})
 
         recipe_exists = RecipeCard.query.filter(RecipeCard.recipe_id == recipe_id).first()
+        print recipe_exists
         if recipe_exists:
             saved_recipe_card_id = recipe_exists.recipe_record_id
             title = recipe_exists.title
+            PartyRecipes.create_record(party_id=party_id,
+                                       recipe_record_id=saved_recipe_card_id,
+                                       course_id=course,
+                                       cuisine_id=cuisine,
+                                       recipe_notes=notes,
+                                       works_for=works_for_dump)
         else:
             info = session["info"]
             title = info["title"]
@@ -236,12 +304,12 @@ def add_recipe_box():
 
             saved_recipe_card_id = new_recipe.recipe_record_id
 
-        PartyRecipes.create_record(party_id=party_id,
-                                   recipe_record_id=saved_recipe_card_id,
-                                   course_id=course,
-                                   cuisine_id=cuisine,
-                                   recipe_notes=notes,
-                                   works_for=works_for_dump)
+            PartyRecipes.create_record(party_id=party_id,
+                                       recipe_record_id=saved_recipe_card_id,
+                                       course_id=course,
+                                       cuisine_id=cuisine,
+                                       recipe_notes=notes,
+                                       works_for=works_for_dump)
         return jsonify(data={'message': 'Recipe saved'})
     else:
         for field, error in saveform.errors.items():
@@ -250,3 +318,94 @@ def add_recipe_box():
                   error[0]), 'danger')
         return redirect(request.referrer)
 
+
+@spoonacular.route('/discardrecipe.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def discardrecipe():
+    """Takes an Ajax request and deletes a PartyRecipe"""
+
+    form = DeleteRecipeForm(request.form)
+    recipe = PartyRecipes.query.get(form.recipe_id.data)
+    if request.method == 'POST' and form.validate():
+        recipe.discard_recipe()
+        flash("Recipe removed from menu")
+        return redirect(url_for('profiles.show_party_profile', party_id=form.party_id.data))
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@spoonacular.route('/changerecipenotes.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def changerecipenotes():
+    """Takes an Ajax request and changes a note on the PartyRecipes table"""
+
+    form = RecipeNotesForm(request.form)
+    recipe = PartyRecipes.query.get(form.recipe_id.data)
+    if request.method == 'POST' and form.validate():
+        recipe.update({"recipe_notes": form.notes.data})
+        return jsonify(data={'message': 'Notes updated'})
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@spoonacular.route('/clearrecipenote.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def clearrecipenotes():
+    """Takes an Ajax request and clears a note on the PartyRecipes table"""
+
+    form = RecipeNotesForm(request.form)
+    recipe = PartyRecipes.query.get(form.recipe_id.data)
+    if request.method == 'POST' and form.validate():
+        recipe.update({"recipe_notes": None})
+        return jsonify(data={'message': 'Notes updated'})
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@spoonacular.route('/emailmenu.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def email_menu():
+    """Takes an Ajax request and email's the menu to the user"""
+
+    form = EmailMenuForm(request.form)
+    if request.method == 'POST' and form.validate():
+        profile = Profile.query.get(current_user.profile_id)
+        party = Party.query.get(form.party_id.data)
+        recipes = []
+
+        for recipe in party.party_recipes:
+            recipes.append({'title': recipe.recipes.title,
+                            'spoonacular_recipe_url': recipe.recipes.spoonacular_recipe_url,
+                            'source_recipe_url': recipe.recipes.source_recipe_url,
+                            'instructions': json.loads(recipe.recipes.instructions),
+                            'ingredients': json.loads(recipe.recipes.ingredients),
+                            'party': party,
+                            'first_name': profile.first_name})
+
+        send_email(to=profile.email, subject=' Menu for %s' % party.title,
+                   template='profiles/email/email_menu',
+                   first_name=profile.first_name, recipes=recipes,
+                   party=party)
+        return jsonify(data={'message': 'Email sent'})
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)

@@ -88,10 +88,14 @@ def show_dashboard():
 def show_friend_profile(friend_id):
     """Show logged in user's friends profile"""
 
+    user = current_user
+
     is_friend = Friend.query.filter(Friend.user_id ==
-                                    current_user.id,
+                                    user.id,
                                     Friend.friend_profile_id ==
                                     friend_id).first()
+    parties = Party.query.filter(Party.user_id == current_user.id).all()
+
     if is_friend:
         friend_profile = Profile.query.get(friend_id)
 
@@ -150,7 +154,8 @@ def show_friend_profile(friend_id):
                                    email_form=email_form,
                                    friend_profile_notes=is_friend.friend_notes,
                                    notes_form=notes_form,
-                                   now=now)
+                                   now=now,
+                                   parties=parties)
         elif is_friend and is_friend.friendship_verified_by_email:
             now = datetime.now(pytz.utc)
             return render_template("/profiles/friend_profile_fixed.html",
@@ -162,7 +167,8 @@ def show_friend_profile(friend_id):
                                    delete_form=delete_form,
                                    notes_form=notes_form,
                                    friend_profile_notes=is_friend.friend_notes,
-                                   now=now)
+                                   now=now,
+                                   parties=parties)
     else:
         flash("Looks like you are trying to view the profile of someone you are not\
               friends with. Do you want to create your own profile for a friend?", "danger")
@@ -351,11 +357,59 @@ def show_party_profile(party_id):
         party_guests = party.guests
         manage_guests_form.friends.data = [guest.friend_profile_id for guest in party_guests]
 
+        collated_recipes = []
+        if party.party_recipes:
+            for recipe in party.party_recipes:
+                works_for = json.loads(recipe.works_for)
+                works = []
+                for guest in party.guests:
+                    add = True
+                    if guest.profiles.avoidances:
+                        for avoid in guest.profiles.avoidances:
+                            print 3
+                            if avoid.ingredient in works_for['avoids']:
+                                pass
+                            else:
+                                add = False
+                                print 4
+                    if guest.profiles.diet.diet_type in works_for['diets']:
+                        pass
+                    else:
+                        add = False
+                    if guest.profiles.intolerances:
+                        for intol in guest.profiles.intolerances:
+                            print 6
+                            if intol.intol_name in works_for['intols']:
+                                pass
+                            else:
+                                add = False
+                    if add is True:
+                        if guest.profiles.first_name and guest.profiles.last_name:
+                            name = guest.profiles.first_name + " " + guest.profiles.last_name
+                        elif guest.profiles.first_name:
+                            name = guest.profiles.first_name + " (" + guest.profiles.email + ")"
+                        else:
+                            name = guest.profiles.email
+                        works.append(name)
+                    else:
+                        continue
+                    recipe_dict = {'title': recipe.recipes.title,
+                                   'record_id': recipe.record_id,
+                                   'image_url': recipe.recipes.recipe_image_url,
+                                   'works_for': json.loads(recipe.works_for),
+                                   'notes': recipe.recipe_notes,
+                                   'works_for_guests': works,
+                                   'course': recipe.course.course_name,
+                                   'cuisine': recipe.cuisine.cuisine_name}
+                collated_recipes.append(recipe_dict)
+        else:
+            collated_recipes = ""
         return render_template("profiles/party_profile.html", party=party,
                                manage_guests_form=manage_guests_form,
                                titleform=titleform,
                                datetimeform=datetimeform,
-                               partynotesform=partynotesform)
+                               partynotesform=partynotesform,
+                               collated_recipes=collated_recipes)
     else:
         flash("At this time, you may only view your own parties. What a neat feature to add, though!")
         return redirect(request.referrer)
@@ -384,8 +438,9 @@ def add_new_party():
                                         datetime_of_party=party_date,
                                         user_id=current_user.id,
                                         party_notes=add_party_form.notes.data)
-        PartyGuest.create_record(party_id=new_party.party_id,
-                                 friend_profile_id=current_user.profile_id)
+        new_guest = PartyGuest.create_record(party_id=new_party.party_id,
+                                             friend_profile_id=current_user.profile_id)
+        print new_guest
         flash("Success! Who would you like to invite to your party?", "success")
         return redirect("profiles/party_profile/%s" % new_party.party_id)
     elif request.method == 'POST' and not add_party_form.validate():
@@ -394,7 +449,6 @@ def add_new_party():
     else:
         return render_template("profiles/add_a_party.html",
                                add_party_form=add_party_form)
-
 
 
 # Only JSON routes below for AJAX calls
@@ -839,13 +893,16 @@ def manageguestlist():
                 party.update({"last_updated": datetime.utcnow()})
         for guest in party_guests:
             if guest not in form.friends.data:
-                guest = db.session.query(PartyGuest
-                                         ).filter(PartyGuest.party_id ==
-                                                  party.party_id,
-                                                  PartyGuest.friend_profile_id ==
-                                                  guest).one()
-                guest.disinvite_guest()
-                party.update({"last_updated": datetime.utcnow()})
+                if guest == current_user.profile_id:
+                    pass
+                else:
+                    guest = db.session.query(PartyGuest
+                                             ).filter(PartyGuest.party_id ==
+                                                      party.party_id,
+                                                      PartyGuest.friend_profile_id ==
+                                                      guest).one()
+                    guest.disinvite_guest()
+                    party.update({"last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Guests updated'})
     else:
         for field, error in form.errors.items():

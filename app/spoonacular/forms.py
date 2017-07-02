@@ -38,8 +38,25 @@ class SeeRecipe(Form):
 
 
 class SaveRecipe(Form):
-    
     recipe_id = HiddenField(validators=[InputRequired()])
     notes = StringField('Recipe notes',
                         widget=TextArea())
     submit = SubmitField('Update')
+
+
+class RecipeNotesForm(Form):
+    recipe_id = HiddenField(validators=[InputRequired()])
+    notes = StringField('Recipe notes',
+                        widget=TextArea(), validators=[Length(1, 300)])
+    submit = SubmitField('Update')
+
+
+class DeleteRecipeForm(Form):
+    recipe_id = HiddenField(validators=[InputRequired()])
+    party_id = HiddenField(validators=[InputRequired()])
+    submit = SubmitField('Update')
+
+
+class EmailMenuForm(Form):
+    party_id = HiddenField(validators=[InputRequired()])
+    submit = SubmitField('Email Menu')

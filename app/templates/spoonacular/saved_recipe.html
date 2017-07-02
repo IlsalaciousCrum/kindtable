@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block content %}  
+
+<!-- Modals -->
+
+<div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="notesModalLabel">Recipe notes</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('spoonacular.changerecipenotes') }}" class="form form-horizontal" method="post" role="form" id="notesForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="recipe_id" value="{{  party_recipe.record_id  }}"/>
+                        {{ render_field(notesForm.notes, style="width: 100%", rows="5", maxlength=300) }}
+                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-sm btn-danger" id="deletenote">Delete note</button>
+                     </form>
+                    <script src="{{ url_for('static', filename = 'js/recipeNotes.js') }}" type="text/javascript"></script>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<div class="modal fade" id="discardRecipe" tabindex="-1" role="dialog" aria-labelledby="discardRecipeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" role="document">
+            <div class="modal-header">
+                <h4 class="modal-title" id="discardRecipeModalLabel">Discard {{  card.title  }}</h4>
+                <div id="flashedalert"></div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class = "row round_hidden_div" style="padding-top: 2em">
+                        
+                    <div class="alert alert-warning" role="alert">    
+                        <span class="text-danger">Caution: Are you sure this is what you want to do? All information you have saved about this recipe and will
+                            be permanently deleted.
+                        </span>
+                    </div>
+
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('spoonacular.discardrecipe') }}" class="form form-horizontal" method="POST" role="form" id="discardRecipeForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="recipe_id" value="{{  party_recipe.record_id  }}"/>
+                        <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
+                        <input type="submit" class="btn btn-lg btn-danger" value="Discard Recipe">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+
+ <!-- End modals -->
+
+
+<!-- Begin content -->
+
+
+
+    <div class="row well-spaced dashboard" style="padding-top: 3em">
+        <div class="col-md-8 col-md-offset-2">      
+            <div class = "row round_div" style="padding-top: 2em">
+                <h1>{{  card.title  }}</h3>
+                <br><button type="button" class="btn btn-info print" onClick="window.print();return false">Print</button>&emsp;
+                <button type="button" class="btn btn-warning" data-toggle="modal" title="Change the notes for the recipe" data-target="#discardRecipe">Discard recipe</button>
+
+
+                <a href="{{  url_for('profiles.show_party_profile', party_id=party.party_id)  }}" class="btn btn-info btn-sm pull-right" role="button">Back to party</a><br><br>
+
+
+                <div class="recipe_notes">
+                    <div id="recipe_notes">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change the notes for the recipe" data-target="#notesModal">
+                            <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
+                        </button>&emsp; <b>Your recipe notes:</b>&emsp;{{  party_recipe.recipe_notes  }}<br><br>
+                    </div>
+                </div>
+
+                    <b>Course:</b> {{  party_recipe.course.course_name  }}<br><br>
+                    <b>Cuisine:</b> {{  party_recipe.cuisine.cuisine_name  }} <br><br>
+            
+                    <b>Safe for: {{  works_for_name|length  }} out of {{  party.guests|length  }} guests.</b>
+                    <ul>
+                        <li><b>Safe for:</b> {% for guest in works_for_name %}{{  guest  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                        <li><b>Diets:</b> {% for diet in works_for['diets'] %} {{  diet  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                        <li><b>Intolerances:</b> {% for intol in works_for['intols'] %}{{  intol  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                        <li><b>Avoids:</b> {% for avoid in works_for['avoids'] %}{{  avoid  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>
+                    </ul>
+
+                   <b>Ingredients</b></li>
+                        <ul>{% for each in ingredients %}
+                            <li>{{  each  }}</li>
+                            {% endfor %}
+                        </ul>
+
+                    <b>Instructions</b>
+                    <ul>{% if instructions is string %}
+                            {{  instructions  }}
+                        {% else %}
+                            {% for step in instructions %}
+                            <li>{{  step  }}</li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+
+                <div class="lb1">
+                    <a href="{{  card.source_recipe_url  }}" target="_blank">Original Recipe Source</a>&emsp;-&emsp;<a href="{{  card.spoonacular_recipe_url  }}" target="_blank">View this recipe at Spoonacular</a>
+                    <img class="img-responsive img-rounded center" alt="Responsive image" src="{{  card.recipe_image_url  }}" alt="{{  card.title  }}" ><br><br><br>
+                </div>
+         
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

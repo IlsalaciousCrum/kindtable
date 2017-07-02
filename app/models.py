@@ -470,7 +470,8 @@ class Party(BaseMixin, db.Model):
                         nullable=False)
     datetime_of_party = db.Column(db.DateTime(timezone=True), nullable=True)
     party_notes = db.Column(db.String(300), nullable=True)
-    guests = db.relationship('PartyGuest', backref='party')
+    guests = db.relationship('PartyGuest', backref='party',
+                             lazy='joined')
     party_recipes = db.relationship('PartyRecipes', backref='parties',
                                     lazy='joined')
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
@@ -481,8 +482,8 @@ class Party(BaseMixin, db.Model):
         if self.guests:
             for invite in self.guests:
                 invite._delete_()
-        if self.recipes:
-            for party_recipe in self.recipes:
+        if self.party_recipes:
+            for party_recipe in self.party_recipes:
                 party_recipe._delete_()
 
         self._delete_()
@@ -515,12 +516,12 @@ class PartyGuest(BaseMixin, db.Model):
 
         self._delete_()
 
-        def __repr__(self):
-            '''Provide helpful representation when printed.'''
+    def __repr__(self):
+        '''Provide helpful representation when printed.'''
 
-            return '<PartyGuest record_id=%s party_id=%s friend_profile_id=%s>' % (self.record_id,
-                                                                                   self.party_id,
-                                                                                   self.friend_profile_id)
+        return '<PartyGuest record_id=%s party_id=%s friend_profile_id=%s>' % (self.record_id,
+                                                                               self.party_id,
+                                                                               self.friend_profile_id)
 
 
 class RecipeCard(BaseMixin, db.Model):
@@ -542,16 +543,9 @@ class RecipeCard(BaseMixin, db.Model):
     def __repr__(self):
         '''Provide helpful representation when printed.'''
 
-        return '<RecipeCard recipe_record_id=%s recipe_id=%s title=%s \
-        recipe_image_url=%s recipe_url=%s ingredients=%s \
-        instructions=%s>' % (self.recipe_record_id,
-                             self.recipe_id,
-                             self.title,
-                             self.recipe_image_url,
-                             self.spoonacular_recipe_url,
-                             self.source_recipe_url,
-                             self.ingredients,
-                             self.instructions)
+        return '<RecipeCard recipe_record_id=%s recipe_id=%s title=%s>' % (self.recipe_record_id,
+                                                                           self.recipe_id,
+                                                                           self.title)
 
 
 class PartyRecipes(BaseMixin, db.Model):

@@ -25,10 +25,6 @@
 
         <!-- End of recipe search information -->
         <div class="search_form row">      
-        <div class="alert alert-info alert-dismissible" style="display: none" id="add-success">
-    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        <strong>Success!</strong> The recipe for <span id="alert-recipe-title" style="font-weight: bold"></span></strong> has been added to the menu for <strong><span id="alert-recipe-party-title" style="font-weight: bold"></strong></span>.
-</div><br><br>                      
             <form class="horizontal" action="{{  (url_for('spoonacular.rerun_search'))  }}" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="form-group">
@@ -54,9 +50,18 @@
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" class="alertme" name="diets" value="{{  diet }}" checked><strong>{{  diet|capitalize  }}</strong><br>
-                        {% for guest in party.guests %}{% if guest.profiles.diet.diet_type == diet %}
-                        <a href="#" data-toggle="tooltip" data-placement="right" title='Reason: "{{  guest.profiles.diet_reason}}"'>
-                            {%if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}{% endif %}</a><br>{% endif %}{% endfor %}
+                        {% for guest in party.guests %}
+                            {% if guest.profiles.diet.diet_type == diet %}
+                                <a href="#" data-toggle="tooltip" data-placement="right" title='Reason: "{{  guest.profiles.diet_reason}}"'>
+                                    {% if guest.profiles.first_name and guest.profiles.last_name %}
+                                        {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}
+                                    {% elif guest.profiles.first_name and not guest.profiles.last_name %}
+                                        {{  guest.profiles.first_name}}
+                                    {% else %}
+                                        {{  guest.profiles.email  }}
+                                    {% endif %}</a><br>
+                            {% endif %}
+                        {% endfor %}
                     </label>
                         
                 </div>
@@ -126,7 +131,9 @@
 
                             </div>
                         
-                        <input type="submit" id="recipe-form-submit"value="Click for more variety" class="btn btn-success btn-lg btn-block">                              
+                        
+                        <input type="submit" id="recipe-form-submit"value="Click for more variety" class="btn btn-success btn-lg btn-block">                 
+                        
                     </form>
                     
                 </div>    
@@ -136,15 +143,22 @@
             <div class="col-md-8 recipe_results side_column" id="recipe_results">
 
                 {% for i in range(result_number) %}
-                <div class="col-md-6 recipe">
-                    <h4><a href="#" data-toggle="tooltip" data-placement="right" title="{{  responses['response'][i].get('title')  }}" >{{  responses['response'][i].get('title')|truncate(39, end=" (...)") }}</a></h4>
-                
-                    <button type="button" class="btn btn-sm btn-info recipe-button" data-toggle="modal" data-recipeid="{{ responses['response'][i].get('recipe_id') }}" data-target="#seeRecipeModal">View Recipe</button>
+                    <div class="col-md-6 recipe">
+                        <h4><a href="#" data-toggle="tooltip" data-placement="right" title="{{  responses['response'][i].get('title')  }}" >{{  responses['response'][i].get('title')|truncate(39, end=" (...)") }}</a></h4>
+                    
+                        <button type="button" class="btn btn-sm btn-info recipe-button" data-toggle="modal" data-recipeid="{{ responses['response'][i].get('recipe_id') }}" data-target="#seeRecipeModal">View Recipe</button>
 
-                        <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle displayed" width="250" height="250">
-                </div>
+                            <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle displayed" width="250" height="250">
+                    </div>
                 {% endfor %}
             </div>
-        </div>
+                        {% if offset < responses.get('totalResults', None) %}
+                <div class="row text-center">
+                    <br><br><br>
+                    <a href="{{  url_for('spoonacular.load_more_recipes')  }}" class="btn btn-lg btn-success" id="loadMoreRecipes">Load More Recipes</a>
+                </div>
+                {% endif %}
+
+            </div>
 
       {% endblock %}

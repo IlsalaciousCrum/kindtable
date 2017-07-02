@@ -2,6 +2,7 @@
 {% block content %}  
 
 <!-- Modals -->
+
 <div class="modal fade" id="guestsModal" tabindex="-1" role="dialog" aria-labelledby="guestsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -129,13 +130,6 @@
                             be permanently deleted. You can still build it later with a fresh start, but you might want to save/print recipes now.
                         </span>
                     </div>
-
-                    {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('profiles.discardparty') }}" class="form form-horizontal" method="POST" role="form" id="discardPartyForm">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
-                        <input type="submit" class="btn btn-lg btn-danger" value="Discard Party">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -149,6 +143,8 @@
 
 
 <!-- Begin content -->
+
+<span class="text-info alert alert-info pull-right" style="display: none;width: 100%" id="emailSuccess">An email with the menu has been sent to the email address you registered with.</span>
 
 <h1 class="text-left" style="padding-left: 3em">{{  party.title  }}</h3>
 
@@ -193,10 +189,28 @@
                             
                             {% if party.guests %}
                                 {% for guest in party.guests %}
-                                {% if guest.profiles.profile_id != current_user.profile_id %}
-                                <a href="{{ url_for('profiles.show_friend_profile', friend_id=guest.profiles.profile_id) }}">
-                                <span style="font-size: 125%">{%if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}{% endif %}</span></a> <span class="text-muted">{%if guest.profiles.first_name and guest.profiles.last_name %}- ({{  guest.profiles.email  }}){% elif guest.profiles.first_name and not guest.profiles.last_name %}- ({{  guest.profiles.email  }}){% else%}{% endif %}</span><br>
-                                {% endif %}
+                                    {% if guest.profiles.profile_id != current_user.profile_id %}
+                                        <a href="{{ url_for('profiles.show_friend_profile', friend_id=guest.profiles.profile_id) }}">
+                                        <span style="font-size: 135%">
+                                            {%if guest.profiles.first_name and guest.profiles.last_name %}
+                                                {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}
+                                            {% elif guest.profiles.first_name and not guest.profiles.last_name %}
+                                                {{  guest.profiles.first_name}}
+                                            {% else %}
+                                                {{  guest.profiles.email  }}
+                                            {% endif %}
+                                        </span>
+                                        </a>
+                                        {%if guest.profiles.first_name and guest.profiles.last_name %}- ({{  guest.profiles.email  }})
+                                        {% elif guest.profiles.first_name and not guest.profiles.last_name %}- ({{  guest.profiles.email  }})
+                                        {% endif %}<br>
+                                      
+                                        <ul>
+                                            <li><span class="text-muted"><strong>Diet:</strong> {{  guest.profiles.diet.diet_type}}
+                                                {% if guest.profiles.avoidances %}<br><strong>Ingredients avoided:</strong> {% for ingredient in guest.profiles.avoidances %}{{  ingredient.ingredient  }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}
+                                                {% if guest.profiles.intolerances %}<br><strong>Allegies/Intolerances:</strong> {% for intolerance in guest.profiles.intolerances %}{{  intolerance.intol_name  }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}</span></li>
+                                        </ul>
+                                    {% endif %}
                                 {% endfor %}
                             {% else %}
                             No guests invited yet.
@@ -219,17 +233,39 @@
                 <div class='recipes'>
                     <div id="recipes" style="padding-top: 1em">
                         
-                        <h3>Recipes</h3>
-                        <a href="{{  url_for('spoonacular.show_search_spoonacular')  }}" class="btn btn-sm btn-info" role="button">Search for Recipes</a><br><br>
+                    {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('spoonacular.email_menu') }}" class="form form-horizontal" method="post" role="form" id="emailMenuForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
+                        <input type="submit" class="btn btn-sm btn-primary pull-right" value="Email Menu To Yourself">
+                     </form>
+                    <script src="{{ url_for('static', filename = 'js/emailMenu.js') }}" type="text/javascript"></script>
 
+                        <h3>Menu</h3>
+                        <a href="{{  url_for('spoonacular.show_search_spoonacular')  }}" class="btn btn-info" role="button">Search for Recipes</a><br><br>
 
-                        {% if party.party_recipes %}
-                            {% for partyrecipe in party.party_recipes %}
-                                <a href="{{ url_for('spoonacular.show_saved_recipe', record_id=partyrecipe.record_id) }}"><span style="font-size: 125%">{{ partyrecipe.recipes.title }}</span></a><br>
+                        {% if collated_recipes %}
+                            {% for recipe in collated_recipes %}
+                                <a href="{{ url_for('spoonacular.saved_recipe', record_id=recipe['record_id']) }}" target="_blank"><span style="font-size: 125%">{{  recipe['title']  }}</span></a><br>
+                                    <ul>
+                                        <li>
+                                            <span class="text-muted">
+                                                {% if recipe['works_for_guests'] %}
+                                            <strong>Works for {{  recipe['works_for_guests']|length  }} out of {{  party.guests|length  }} guests</strong>:<br> {% for person in recipe['works_for_guests'] %}{{  person  }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}<br>
+                                        </li>
+                                            {% if recipe['notes'] %}
+                                                <li>
+                                                    <span class="text-muted"><strong>Recipe Notes:</strong> {{  recipe['notes']  }}</span>
+                                                </li>
+                                            {% endif %}
+                                            <li><span class="text-muted"><strong>Course:</strong> {{  recipe['course']  }}</span></li>
+                                            <li><span class="text-muted"><strong>Cuisine:</strong> {{  recipe['cuisine']  }}</span></li>
+                                    </ul>
                             {% endfor %}
                         {% else %}
                             No recipes added yet for this party.
                         {% endif %}
+                    </span>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,50 @@
+Dear {{  first_name }},
+
+Here is the menu you have planned for your party "{{  party.title}}":
+
+Here are links to the recipes on Spoonacular:
+
+{% for recipe in recipes %}
+{{  recipe['title']  }} - {{  recipe['spoonacular_recipe_url']  }}
+{% endfor %}
+
+And here are the recipes from their original sites:
+
+{% for recipe in recipes %}
+
+{% endfor %}
+
+Or if you prefer to work from a print out:
+
+{% for recipe in recipes %}
+{{  recipe['title']  }}
+
+Ingredients:
+
+{% for each in recipe['ingredients'] %}
+{{  each  }}<br>
+{% endfor %}
+                     
+Instructions:
+
+{% if recipe['instructions'] is string %}
+{{  recipe['instructions']  }}<br><br>
+Original recipe source: {{  recipe['title']  }} - {{  recipe['source_recipe_url']  }}
+{% else %}
+                            
+{% for step in recipe['instructions'] %}
+{{  step  }}
+{% endfor %}
+Original recipe source: {{  recipe['title']  }} - {{  recipe['source_recipe_url']  }}
+{% endif %}
+
+{% endfor %}
+
+
+Happy cooking! 
+
+Sincerely,
+
+Ilsa Gordon
+
+Kind Table

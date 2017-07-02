@@ -65,7 +65,7 @@ def guest_intolerances(party_id):
     return list(i_set)
 
 
-def spoonacular_request(party_id, diet, intols, avoids, cuisine, course):
+def spoonacular_request(party_id, diet, intols, avoids, cuisine, course, offset):
     """Assembles a new API request with new variables, to Spoonacular"""
 
     avoid_string = ', '.join(avoids)
@@ -80,11 +80,13 @@ def spoonacular_request(party_id, diet, intols, avoids, cuisine, course):
     course = str(course.course_name)
 
     url = 'https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/search'
-    headers = {"X-Mashape-Key": os.environ['SECRET_KEY']}
-    payload = {'query': 'recipe', 'diet': str(diet), 'type': course, 'cuisine': cuisine,
-               'number': 100, 'intolerances': str(intolerance_string),
-               'excludeIngredients': avoid_string}
+    headers = {"X-Mashape-Key": os.environ['SECRET_KEY'], "Accept": "application/json"}
+    payload = {'cuisine': cuisine, 'diet': str(diet), 'excludeIngredients': str(avoid_string),
+               'instructionsRequired': 'false', 'intolerances': str(intolerance_string),
+               'limitLicense': 'false', 'number': 100, 'offset': offset, 'query': 'recipe',
+               'type': course}
 
+    print "This is the payload"
     print payload
 
     response = requests.get(url, headers=headers, params=payload)

@@ -1,0 +1,45 @@
+<p>Dear {{ first_name }},</p>
+
+<p>Here is the menu you have planned for your party <a href={{  url_for('profiles.show_party_profile', party_id = party.party_id)  }}>{{  party.title}}</a>:</p>
+
+<p>Here are links to the recipes on Spoonacular:</p>
+
+{% for recipe in recipes %}
+<strong>{{  recipe['title']  }}</strong> - <a href="{{  recipe['spoonacular_recipe_url']  }}">{{  recipe['spoonacular_recipe_url']  }}</a><br><br>
+{% endfor %}
+
+Or if you prefer to work from a print out:
+
+{% for recipe in recipes %}
+<h3>{{  recipe['title']  }}</h3>
+
+<p><strong>Ingredients:</strong>
+
+{% for each in recipe['ingredients'] %}
+{{  each  }}<br>
+{% endfor %}</p>
+                     
+<p><strong>Instructions:</strong>
+
+{% if recipe['instructions'] is string %}
+{{  recipe['instructions']  }}<br><br>
+Original recipe source: <a href="{{  recipe['source_recipe_url']  }}">{{  recipe['source_recipe_url']  }}</a>
+{% else %}
+                            
+{% for step in recipe['instructions'] %}
+{{  step  }}
+{% endfor %}
+<br><br>Original recipe source: <a href="{{  recipe['source_recipe_url']  }}">{{  recipe['source_recipe_url']  }}</a>
+{% endif %}</p>
+
+
+{% endfor %}
+
+
+<p>Happy cooking!</p>
+
+<p>Sincerely,</p>
+
+<p>Ilsa Gordon</p>
+
+<p>Kind Table</p>
