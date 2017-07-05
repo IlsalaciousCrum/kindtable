@@ -229,3 +229,9 @@ class PartyNotesForm(Form):
 class DeletePartyForm(Form):
     party_id = HiddenField(validators=[InputRequired()])
     submit = SubmitField('Update')
+
+
+class InviteForm(Form):
+    profileid = HiddenField(validators=[InputRequired()])
+    parties = MultiCheckboxField("Add friend to parties", coerce=int)
+    submit = SubmitField('Update')

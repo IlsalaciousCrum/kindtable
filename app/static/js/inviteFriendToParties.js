@@ -1,20 +1,21 @@
 function showUpcomingParties(results) {
     "use strict";
     console.dir(results); // for debugging
-    $(".upcoming_parties").load(location.href + " #upcoming_parties");
+    $(".upcomingParties").load(location.href + " #upcomingParties");
     $(".modal.in").modal("hide");
 }
 
 $(document).ready(function() {
     "use strict";
     $('#inviteForm').on('submit', (function(event) {
+        console.log($('#inviteForm').serialize());
         event.preventDefault();
         var url = $('#inviteForm').attr('action');
         $.ajax({
             type: "POST",
             url: url,
             data: $('#inviteForm').serialize(),
-            success: showCurrentIntols
+            success: showUpcomingParties
         });
     }));
 

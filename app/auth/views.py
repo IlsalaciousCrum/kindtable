@@ -340,6 +340,9 @@ def change_email():
 def delete_account():
     """Deletes a user's account and all of their data"""
 
+    # TODO - this code sequence could potentially be shortened by using cascade="all,delete"
+    # on the model but perfect is the enemy of done.
+
     this_user = current_user
 
     if this_user.friends:

@@ -18,7 +18,7 @@ from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
                     AddNewPartyForm, DeleteFriendForm, ChangeFriendEmailForm,
                     FriendNotesForm, FindaFriendForm,
                     ManageGuestListForm, PartyTitleForm, PartyDatetimeForm,
-                    PartyNotesForm, DeletePartyForm)
+                    PartyNotesForm, DeletePartyForm, InviteForm)
 
 from datetime import datetime
 
@@ -97,15 +97,27 @@ def show_friend_profile(friend_id):
                                     user.id,
                                     Friend.friend_profile_id ==
                                     friend_id).first()
+
+    friend_profile = Profile.query.get(friend_id)
+
     parties = Party.query.filter(Party.user_id == current_user.id).all()
 
+    inviteform = InviteForm(request.form)
+
+    upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id,
+                                                      Party.datetime_of_party >= datetime.utcnow()).all()
+
+    upcoming_parties_invited_to = db.session.query(Party).join(PartyGuest).filter(Party.user_id == current_user.id,
+                                                                                  Party.datetime_of_party >= datetime.utcnow(),
+                                                                                  PartyGuest.friend_profile_id == friend_id).order_by(Party.datetime_of_party).all()
+
+    inviteform.parties.choices = [(party.party_id, party.title) for party in upcoming_parties]
+
+    inviteform.parties.data = [party.party_id for party in upcoming_parties_invited_to]
+
     if is_friend:
-        friend_profile = Profile.query.get(friend_id)
-
-        _parties_invited = db.session.query(PartyGuest).join(Party).filter(Party.user_id == current_user.id, Party.user_id != friend_profile.owned_by_user_id, PartyGuest.friend_profile_id == friend_id).all()
-
-        parties_invited = [partyguest.party for partyguest in _parties_invited]
-
+        parties_invited = db.session.query(Party).join(PartyGuest).filter(Party.user_id == current_user.id,
+                                                                          PartyGuest.friend_profile_id == friend_id).all()
         delete_form = DeleteFriendForm(request.form)
         email_form = ChangeFriendEmailForm(request.form)
         notes_form = FriendNotesForm(request.form)
@@ -148,7 +160,9 @@ def show_friend_profile(friend_id):
                                    friend_profile_notes=is_friend.friend_notes,
                                    notes_form=notes_form,
                                    now=now,
-                                   parties=parties)
+                                   parties=parties,
+                                   inviteform=inviteform,
+                                   upcoming_parties=upcoming_parties)
         elif is_friend and is_friend.friendship_verified_by_email:
             now = datetime.now(pytz.utc)
             return render_template("/profiles/friend_profile_fixed.html",
@@ -160,7 +174,9 @@ def show_friend_profile(friend_id):
                                    notes_form=notes_form,
                                    friend_profile_notes=is_friend.friend_notes,
                                    now=now,
-                                   parties=parties)
+                                   parties=parties,
+                                   inviteform=inviteform,
+                                   upcoming_parties=upcoming_parties)
     else:
         flash("Looks like you are trying to view the profile of someone you are not\
               friends with. Do you want to create your own profile for a friend?", "danger")
@@ -982,5 +998,58 @@ def discardparty():
         for field, error in form.errors.items():
             flash(u"Error in %s -  %s" % (
                   getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
+
+@profiles.route('/invitetoparties.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def invitetoparties():
+    """Takes an Ajax request and updates the PartyGuest table"""
+
+    inviteform = InviteForm(request.form)
+
+    upcoming_parties_invited_to = db.session.query(PartyGuest).join(Party).filter(Party.user_id == current_user.id, Party.datetime_of_party >=
+                                                                                  datetime.utcnow(),
+                                                                                  PartyGuest.friend_profile_id == inviteform.profileid.data).order_by(Party.datetime_of_party).all()
+
+    print "upcoming_parties_invited_to is below"
+    print upcoming_parties_invited_to
+
+    upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id,
+                                                      Party.datetime_of_party >= datetime.utcnow()).all()
+    inviteform.parties.choices = [(party.party_id, party.title) for party in upcoming_parties]
+
+    form_data = inviteform.parties.data
+
+    print form_data
+
+    profile_id = inviteform.profileid.data
+
+    print profile_id
+
+    if request.method == 'POST' and inviteform.validate():
+        print 1
+        if form_data is not None:
+            for choice in form_data:
+                print 2
+                PartyGuest.create_record(party_id=choice,
+                                         friend_profile_id=profile_id)
+            print 3
+        print "upcoming_parties below"
+        print upcoming_parties
+        for party in upcoming_parties_invited_to:
+            print 4
+            if party.party.party_id not in form_data:
+                print 5
+                party._delete_()
+        print 6
+        return jsonify(data={'message': 'PartyGuest updated'})
+    else:
+        print 7
+        for field, error in inviteform.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(inviteform, field).label.text,
                   error[0]), 'danger')
         return redirect(request.referrer)
