@@ -6,7 +6,7 @@ $(document).ready(function() {
         $( "#loadRecipeHere" ).empty();
         var $this = $(event.target).closest('button').data('recipeid');
         console.dir($this); // for debugging
-        $('#loadRecipeHere').load('/spoonacular/see_recipe/' + $this, function (response, status, xhr) {
+        $('#loadRecipeHere').load(Flask.url_for("spoonacular.see_recipe", {'recipe_id': $this}), function (response, status, xhr) {
             if (status == "success") {
                 $('#seeRecipeModal').modal('toggle');
                 $('#notes_input').focus();
@@ -21,6 +21,3 @@ $(document).ready(function() {
          $("#recipePrintWindow").print();
     });
 });
-
-
-

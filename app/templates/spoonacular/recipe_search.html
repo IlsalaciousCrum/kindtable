@@ -152,12 +152,6 @@
                     </div>
                 {% endfor %}
             </div>
-                        {% if offset < responses.get('totalResults', None) %}
-                <div class="row text-center">
-                    <br><br><br>
-                    <a href="{{  url_for('spoonacular.load_more_recipes')  }}" class="btn btn-lg btn-success" id="loadMoreRecipes">Load More Recipes</a>
-                </div>
-                {% endif %}
 
             </div>
 

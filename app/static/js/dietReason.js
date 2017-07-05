@@ -40,7 +40,7 @@ $(document).ready(function() {
     "use strict";
     $('#clearDietReason').on('click', (function(event) {
     
-        var url = "/profiles/cleardietreason.json";
+        var url = Flask.url_for("profiles.cleardietreason");
         $.ajax({
             type: "POST",
             url: url,

@@ -5,15 +5,10 @@ from wtforms import StringField, SubmitField, RadioField, HiddenField, TextField
 from wtforms.validators import InputRequired, Length, Email, Optional, DataRequired, EqualTo
 from wtforms import ValidationError
 from wtforms.widgets import TextArea
-from ..models import Profile, Diet, User, Intolerance, Party, Friend
+from ..models import Profile, Diet, User, Intolerance
 from .. import db
 from flask import flash, redirect, url_for, request
-from flask_login import current_user
-from wtforms_components import DateRange, TimeRange
 from wtforms_components import TimeField
-from datetime import datetime
-
-import time
 from datetime import date
 
 from wtforms.fields.html5 import DateField
@@ -119,13 +114,6 @@ class AddNewFriendForm(Form):
             flash('Email address already registered. Please log in.')
             raise ValidationError('Email address already registered. Please log in.')
             return redirect(url_for('main.login'))
-
-
-class AddGuestToPartyForm(Form):
-    profile_id = HiddenField(validators=[InputRequired()])
-    friend_profile_id = HiddenField(validators=[InputRequired()])
-    parties = MultiCheckboxField('Invite to upcoming parties', coerce=int)
-    submit = SubmitField('Update')
 
 
 class ManageGuestListForm(Form):

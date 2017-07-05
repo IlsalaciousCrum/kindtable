@@ -8,7 +8,6 @@ from wtforms.validators import (InputRequired, Length, Email, EqualTo, Optional,
 from wtforms.widgets import TextArea
 from ..models import Profile, Diet, User, Intolerance
 from .. import db
-from flask import flash, redirect, url_for
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -78,7 +77,6 @@ class IntoleranceForm(Form):
 class UpdateAvoidForm(Form):
     original_key = HiddenField()
     update_avoid_key = StringField('Change ingredient to avoid:',
-                                   widget=TextArea(),
                                    validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
                                                Length(1, 64, message="Limit 64 characters")])
     update_avoid_value = TextField('Change the reason you avoid this ingredient:',
@@ -89,7 +87,6 @@ class UpdateAvoidForm(Form):
 
 class AddAvoidForm(Form):
     add_avoid_ingredient = StringField('Ingredient to avoid:',
-                                       widget=TextArea(),
                                        validators=[InputRequired(message="Please enter an ingredient to avoid."),
                                                    Length(1, 64, message="Limit 64 characters")])
     add_avoid_reason = TextField('Reason you would like to avoid this ingredient:',

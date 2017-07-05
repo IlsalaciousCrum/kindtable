@@ -10,7 +10,7 @@ from .. import db
 
 from ..email import send_email
 
-from ..models import Profile, User, Diet, ProfileIntolerance, IngToAvoid
+from ..models import Profile, User, Diet, ProfileIntolerance, IngToAvoid, PartyGuest, Friend
 
 from ..decorators import flash_errors
 
@@ -341,7 +341,48 @@ def delete_account():
     """Deletes a user's account and all of their data"""
 
     this_user = current_user
-    profile = this_user.profile
-    this_user.delete_user()
-    profile.remove_profile()
-    return redirect(url_for('auth.logout'))
+
+    if this_user.friends:
+        for friend in this_user.friends:
+            friend.remove_friendship()
+
+    friendship = Friend.query.filter(Friend.friend_profile_id == this_user.profile.profile_id).all()
+    if friendship:
+        for friend in friendship:
+            friend.remove_friendship()
+
+    private_profiles = Profile.query.filter(Profile.owned_by_user_id == this_user.id).all()
+    if private_profiles:
+        for profile in private_profiles:
+            _intolerances = ProfileIntolerance.query.filter(ProfileIntolerance.profile_id == profile.profile_id).all()
+            if _intolerances:
+                for intolerance in _intolerances:
+                    intolerance._delete_()
+            if profile.avoidances:
+                for ingredient in profile.avoidances:
+                    ingredient._delete_()
+
+            parties_invited = PartyGuest.query.filter(PartyGuest.friend_profile_id == profile.profile_id).all()
+            if parties_invited:
+                for party in parties_invited:
+                    party.discard_party()
+            if profile.avoidances:
+                for ingredient in profile.avoidances:
+                    ingredient._delete_()
+
+    if this_user.parties:
+        for party in this_user.parties:
+            party.discard_party()
+
+    user_id = this_user.id
+
+    this_user._delete_()
+
+    private_profiles = Profile.query.filter(Profile.owned_by_user_id == user_id).all()
+    if private_profiles:
+        for profile in private_profiles:
+            profile.remove_profile()
+
+    logout_user()
+    session.clear()
+    return redirect(url_for('main.index'))

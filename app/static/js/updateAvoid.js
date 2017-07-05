@@ -12,9 +12,11 @@ $(document).ready(function() {
             $("#update_avoid_reason").val(results.data.reason);
         }
 
-        $.get("/profiles/getavoid.json", {id: avoid_id}, replaceAvoidFormValues);
+        $.get(Flask.url_for("profiles.getavoid"), {id: avoid_id}, replaceAvoidFormValues);
     }));
 });
+
+
 
 
 function showCurrentAvoids(results) {
@@ -57,7 +59,7 @@ $(document).ready(function() {
     "use strict";
     $('#deleteavoid').on('click', (function(event) {
     
-        var url = "/profiles/deleteavoid.json";
+        var url = Flask.url_for("profiles.deleteavoid");
         $.ajax({
             type: "POST",
             url: url,
@@ -65,6 +67,7 @@ $(document).ready(function() {
             success: showCurrentAvoids
         });
     }));
+
 
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {

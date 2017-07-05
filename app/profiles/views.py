@@ -1,3 +1,6 @@
+"""K(i)nd app views for the 'profiles' blueprint"""
+
+
 from flask import (render_template, redirect, url_for, flash, session,
                    request, jsonify, abort)
 
@@ -6,14 +9,14 @@ from . import profiles
 from .. import db
 
 from ..models import (User, Profile, Intolerance, Party, PartyGuest,
-                      IngToAvoid, ProfileIntolerance, Friend, PartyRecipes)
+                      IngToAvoid, ProfileIntolerance, Friend)
 
 from flask_login import login_required, current_user
 
 from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
                     AddAvoidForm, UpdateAvoidForm, IntoleranceForm,
                     AddNewPartyForm, DeleteFriendForm, ChangeFriendEmailForm,
-                    FriendNotesForm, FindaFriendForm, AddGuestToPartyForm,
+                    FriendNotesForm, FindaFriendForm,
                     ManageGuestListForm, PartyTitleForm, PartyDatetimeForm,
                     PartyNotesForm, DeletePartyForm)
 
@@ -103,15 +106,6 @@ def show_friend_profile(friend_id):
 
         parties_invited = [partyguest.party for partyguest in _parties_invited]
 
-        party_form = AddGuestToPartyForm(request.form)
-
-        all_users_parties = Party.query.filter(Party.user_id == current_user.id, Party.datetime_of_party >=
-                                               datetime.utcnow()).all()
-
-        not_invited = set(all_users_parties).difference(set(parties_invited))
-
-        party_form.parties.choices = [(party.party_id, party.title) for party in not_invited]
-
         delete_form = DeleteFriendForm(request.form)
         email_form = ChangeFriendEmailForm(request.form)
         notes_form = FriendNotesForm(request.form)
@@ -141,7 +135,6 @@ def show_friend_profile(friend_id):
                                    profile_id=current_user.profile.profile_id,
                                    friend_profile=friend_profile,
                                    parties_invited=parties_invited,
-                                   invite_form=party_form,
                                    profile=current_user.profile,
                                    delete_form=delete_form,
                                    intol_form=intol_form,
@@ -162,7 +155,6 @@ def show_friend_profile(friend_id):
                                    profile_id=current_user.profile.profile_id,
                                    friend_profile=friend_profile,
                                    parties_invited=parties_invited,
-                                   invite_form=party_form,
                                    profile=current_user.profile,
                                    delete_form=delete_form,
                                    notes_form=notes_form,
@@ -190,14 +182,14 @@ def connect_friends():
                                                          find_friend_form.friend_email.data,
                                                          Profile.profile_id ==
                                                          User.profile_id).first()
-        friend_request = Friend.query.filter(Friend.user_id == this_user.id,
-                                             Friend.friend_profile_id ==
-                                             existing_user.profile_id).first()
 
         if find_friend_form.friend_email.data == this_user.profile.email:
             flash("You just tried to friend yourself. :) Would you like to add someone else?")
             return redirect(request.referrer)
         elif existing_user:
+            friend_request = Friend.query.filter(Friend.user_id == this_user.id,
+                                                 Friend.friend_profile_id ==
+                                                 existing_user.profile_id).first()
             if Friend.already_friends(this_user, existing_user):
                 flash("Looks like you are already connected to that person, would you like to add someone else?")
                 return redirect(request.referrer)
@@ -351,8 +343,8 @@ def show_party_profile(party_id):
         session['intols'] = get_intolerance
         session['avoids'] = get_avoid
 
-        friends = current_user.friends
-        manage_guests_form.friends.choices = [(friend.friend_profile_id, ("{0} {1} ({2})").format(friend.friend_profile.first_name, friend.friend_profile.last_name, friend.friend_profile.email)) for friend in friends]
+        friends = current_user.valid_friends()
+        manage_guests_form.friends.choices = [(friend.profile_id, ("{0} {1} ({2})").format(friend.first_name, friend.last_name, friend.email)) for friend in friends]
         titleform.title.data = party.title
         party_guests = party.guests
         manage_guests_form.friends.data = [guest.friend_profile_id for guest in party_guests]
@@ -710,23 +702,6 @@ def deleteavoid():
         return redirect(request.referrer)
 
 
-@profiles.route('/addtoparty.json', methods=['POST'])
-@login_required
-@email_confirmation_required
-def add_to_party():
-    """Takes an Ajax request and adds a guest to parties"""
-
-    form = AddGuestToPartiesForm(request.form)
-    if form.validate():
-        pass
-    else:
-        for field, error in form.errors.items():
-            flash(u"Error in %s -  %s" % (
-                  getattr(form, field).label.text,
-                  error[0]), 'danger')
-        return redirect(request.referrer)
-
-
 @profiles.route('/delete_friend.json', methods=['POST'])
 @login_required
 @email_confirmation_required
@@ -739,27 +714,14 @@ def delete_friend():
                                                   current_user.id,
                                                   Friend.friend_profile_id ==
                                                   form.friend_profile_id.data).first()
-    works_for1 = RecipeWorksFor.query.filter(RecipeWorksFor.user_id == current_user.id,
-                                             RecipeWorksFor.guest_profile_id == form.friend_profile_id.data).all()
     if request.method == 'POST' and form.validate():
         if friend_profile.owned_by_user_id == current_user.id:
-            if works_for1:
-                for record in works_for1:
-                    record.discard_works_for()
             friend_profile.remove_profile()
         else:
-            works_for2 = RecipeWorksFor.query.filter(RecipeWorksFor.user_id == friend_profile.owned_by_user_id,
-                                                     RecipeWorksFor.guest_profile_id == current_user.profile_id).all()
             friendship2 = db.session.query(Friend).filter(Friend.user_id ==
                                                           friend_profile.owned_by_user_id,
                                                           Friend.friend_profile_id ==
                                                           current_user.profile_id).first()
-            if works_for1:
-                for record in works_for1:
-                    record.discard_works_for()
-            if works_for2:
-                for record in works_for2:
-                    record.discard_works_for()
             friendship2.remove_friendship()
 
         friendship1.remove_friendship()

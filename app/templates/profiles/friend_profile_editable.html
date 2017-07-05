@@ -194,50 +194,6 @@
     </div>
 </div>
 
-<div class="modal fade" id="inviteModal" tabindex="-1" role="dialog" aria-labelledby="inviteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content" role="document">
-            <div class="modal-header">
-                <h4 class="modal-title" id="inviteModalLabel">Invite {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend_profile.email }}{%endif %} To A Party</h4>
-                <div id="flashedalert"></div>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class = "row round_hidden_div" style="padding-top: 2em">
-                    {% if parties_invited %}
-                        Parties already invited to:
-                        <ul>
-                            {% for party in parties_invited %}
-                                {% if party.datetime_of_party >= now %}
-                                <li>
-                                    {{ party.title}}
-                                </li>
-                                {% else %}
-                                    <p>Not invited to any parties</p>
-                                {% endif %}
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('profiles.add_to_party') }}" class="form form-horizontal" method="POST" role="form" id="inviteForm">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="profile_id" value="{{  profile_id  }}"/>
-                        <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(invite_form.parties) }}
-                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
-                    </form>
-                            <script src="{{ url_for('static', filename = 'js/inviteFriendToParties.js') }}" type="text/javascript"></script>
-                    {% if not parties %}
-                    <span class="text-danger">Whoops! You will need to add at least one new party first before adding guests.</span>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-    </div>
-</div>
 
 <div class="modal fade" id="removeFriend" tabindex="-1" role="dialog" aria-labelledby="removeFriendModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -457,8 +413,6 @@
 
         <div class="col-md-5 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
-                
-                <button type="button" class="btn btn-sm btn-info pull-right" href="#" data-toggle="modal" data-target="#inviteModal">Invite To More Parties</button>
 
                 <h3>Upcoming Parties Invited</h3>
                 <div class="upcomingParties">

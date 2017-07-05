@@ -5,11 +5,9 @@ from passlib.hash import bcrypt
 from . import db, login_manager
 from flask import flash
 from flask_login import UserMixin, current_user
-import pytz
-from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, BadData, SignatureExpired
+from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, SignatureExpired
 import os
 from sqlalchemy import and_, or_
-from flask import redirect, url_for
 
 ##############################################################################
 # Model definitions
@@ -122,7 +120,7 @@ class Profile(BaseMixin, db.Model):
     def remove_profile(self):
         '''Deletes an unofficial profile and all affected records'''
 
-        _intolerances = ProfileIntolerance.query.filter(ProfileIntolerance.profile_id == self.id).all()
+        _intolerances = ProfileIntolerance.query.filter(ProfileIntolerance.profile_id == self.profile_id).all()
         if _intolerances:
             for intolerance in _intolerances:
                 intolerance._delete_()
@@ -131,16 +129,15 @@ class Profile(BaseMixin, db.Model):
             for ingredient in self.avoidances:
                 ingredient._delete_()
 
-        this_user = current_user
-
-        friendship = Friend.query.filter(Friend.user_id == this_user.id,
-                                         Friend.friend_profile_id == self.profile_id).first()
-        if friendship:
-            friendship.remove_friendship()
-
         parties_invited = PartyGuest.query.filter(PartyGuest.friend_profile_id == self.profile_id).all()
-        for party in parties_invited:
-            party.discard_party()
+        if parties_invited:
+            for party in parties_invited:
+                party.discard_party()
+
+        friendship = Friend.query.filter(Friend.friend_profile_id == self.profile_id).all()
+        if friendship:
+            for friend in friendship:
+                friend.remove_friendship()
 
         if self.avoidances:
             for ingredient in self.avoidances:
@@ -262,13 +259,12 @@ class User(BaseMixin, UserMixin, db.Model):
             for party in self.parties:
                 party.discard_party()
 
-        user_id = self.id
+        private_profiles = Profile.query.filter(Profile.owned_by_user_id == self.id).all()
+        if private_profiles:
+            for profile in private_profiles:
+                profile.remove_profile()
 
         self._delete_()
-
-        private_profiles = Profile.query.filter(Profile.owned_by_user_id == user_id).all()
-        for profile in private_profiles:
-            profile.remove_profile
 
     def __repr__(self):
         '''Provide helpful representation when printed.'''

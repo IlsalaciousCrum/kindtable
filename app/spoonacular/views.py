@@ -1,4 +1,4 @@
-"""K(i)nd app views"""
+"""K(i)nd app views for the 'spoonacular' blueprint"""
 
 from flask import (render_template, request, flash, redirect, session, json, url_for, jsonify)
 

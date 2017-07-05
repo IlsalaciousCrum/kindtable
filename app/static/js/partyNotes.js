@@ -33,7 +33,7 @@ $(document).ready(function() {
     "use strict";
     $('#deletenote').on('click', (function(event) {
     
-        var url = "/profiles/clearpartynote.json";
+        var url = Flask.url_for("profiles.clearpartynotes");
         $.ajax({
             type: "POST",
             url: url,

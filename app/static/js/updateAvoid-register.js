@@ -54,7 +54,7 @@ $(document).ready(function() {
     "use strict";
     $('#deleteavoid').on('click', (function(event) {
     
-        var url = "/auth/delete_ingredient.json";
+        var url = Flask.url_for("auth.delete_stored_ingredient");
         $.ajax({
             type: "POST",
             url: url,
@@ -62,6 +62,9 @@ $(document).ready(function() {
             success: showCurrentAvoids
         });
     }));
+
+
+
 
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
@@ -84,7 +87,7 @@ $(document).ready(function() {
     "use strict";
     $('#deleteavoidreason').on('click', (function(event) {
     
-        var url = "/auth/delete_reason.json";
+        var url = Flask.url_for("auth.delete_stored_reason");
         $.ajax({
             type: "POST",
             url: url,
