@@ -14,7 +14,7 @@
     <div class="col-md-4 side_column">
         <div class="row display_guest">
             <div class="guest_name">
-                <h3>{{ responses.get('totalResults', None) }} Recipes <br>found<br>for<br> <a href="{{ url_for('profiles.show_party_profile',party_id=party.party_id) }}">{{ party.title }}</a></h3>  
+                <h3>{{ responses.get('totalResults', None) - offset }} Recipes <br>found<br>for<br> <a href="{{ url_for('profiles.show_party_profile',party_id=party.party_id) }}">{{ party.title }}</a></h3>  
             </div>
         </div>   
 
@@ -94,42 +94,42 @@
                                 </label><br>
                                 {% endfor %}
 
-                            </div>
-                        {% else %}
+                        </div>
+                    {% else %}
                         <span class="text-muted">No intolerances</span>
-                        {% endif %}
+                    
+                    {% endif %}
 
+                        <h4 class="form-control-static">Ingredients to omit:</h4> 
+                                {% if party_avoids %}
+                                    <div class="checkbox"> 
+                                    {% for avoid in party_avoids %}  
+                                            <label>
+                                                {% if avoid %}  
+                                                <input type="checkbox" name="avoids" class="alertme" value="{{  avoid }}" checked><strong>{{  avoid|capitalize  }}</strong><br>
 
-                        <h4 class="form-control-static">Ingredients to omit:</h4>
-                            <div class="checkbox">
-                                {% for avoid in party_avoids %}  
-                                    {% if not avoid %}
-                                        <span class="text-muted" style="padding-left: 1em">No ingredients to avoid</span>
-                                    {% endif %}
+                                                {% for guest in party.guests %}
+                                                {% for guestavoid in guest.profiles.avoidances %}
+                                                
+                                                {% if guestavoid.ingredient == avoid %}
+                                                
+                                                <a href="#" data-toggle="tooltip" data-placement="right" title='"Reason: {{  guestavoid.reason  }}"'>{% if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}</a>{% endif %}</a>
+                                                {% endif %}
+                                                {% endfor %}    
+                                                {% endfor %}
+                                                {% else %}
+                                                <input type="hidden" name="avoids" class="alertme" value="{{  avoid }}" checked><strong>{{  avoid|capitalize  }}</strong><br>
+                                                {% endif %}
+                                            </label><br>
+                                    {% endfor %}
+                                </div>
+                                {% else %}
+                                <span class="text-muted">No ingredients to avoid</span><br><br>
+                                {% endif %}
+                         
+                                    
 
-                                        <label>
-                                            {% if avoid %}  
-                                            <input type="checkbox" name="avoids" class="alertme" value="{{  avoid }}" checked><strong>{{  avoid|capitalize  }}</strong><br>
-
-                                            {% for guest in party.guests %}
-                                            {% for guestavoid in guest.profiles.avoidances %}
-                                            
-                                            {% if guestavoid.ingredient == avoid %}
-                                            
-                                            <a href="#" data-toggle="tooltip" data-placement="right" title='"Reason: {{  guestavoid.reason  }}"'>{% if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}</a>{% endif %}</a>
-                                            {% endif %}
-                                            {% endfor %}    
-                                            {% endfor %}
-
-                                            {% else %}
-                                            <input type="hidden" name="avoids" class="alertme" value="{{  avoid }}" checked><strong>{{  avoid|capitalize  }}</strong><br>
-                                            {% endif %}
-                                            
-                                        </label><br>
-
-                                {% endfor %}
-
-                            </div>
+                            
                         
                         
                         <input type="submit" id="recipe-form-submit"value="Click for more variety" class="btn btn-success btn-lg btn-block">                 
@@ -140,8 +140,9 @@
             </div> <!-- end of left column -->
 
 
-            <div class="col-md-8 recipe_results side_column" id="recipe_results">
+            <div class="col-md-8 side_column">
 
+            <div class="recipe_results" id="recipe_results">
                 {% for i in range(result_number) %}
                     <div class="col-md-6 recipe">
                         <h4><a href="#" data-toggle="tooltip" data-placement="right" title="{{  responses['response'][i].get('title')  }}" >{{  responses['response'][i].get('title')|truncate(39, end=" (...)") }}</a></h4>
@@ -152,6 +153,19 @@
                     </div>
                 {% endfor %}
             </div>
+
+            {% if responses.get('totalResults', None) > 100 %}
+                {% if (responses.get('totalResults', None) - offset) > 0 %}
+                    <div class="row text-center">
+                        <div class="col-md-6-offset-4">
+                        <br><br><br><br><br>
+                        <a href="{{  url_for('spoonacular.load_more_recipes')  }}" class="btn btn-lg btn-success" id="loadMoreRecipes">Load More Recipes</a>
+                    </div>
+                {% endif %}  
+            {% endif %}
+
+
+            </div>                                 
 
             </div>
 

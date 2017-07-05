@@ -65,7 +65,7 @@ def guest_intolerances(party_id):
     return list(i_set)
 
 
-def spoonacular_request(party_id, diet, intols, avoids, cuisine, course, offset):
+def spoonacular_request(diet, intols, avoids, cuisine, course, offset):
     """Assembles a new API request with new variables, to Spoonacular"""
 
     avoid_string = ', '.join(avoids)

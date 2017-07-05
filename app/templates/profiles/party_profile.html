@@ -183,9 +183,10 @@
                     <div id="guests">
 
                         <h3>Guests
+                        
                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#guestsModal">
                                 Manage guest list
-                            </button></h3>
+                        </button></h3>
                             
                             {% if party.guests %}
                                 {% for guest in party.guests %}
@@ -246,7 +247,9 @@
                     {% endif %}
 
                         <h3>Menu</h3>
+                        {% if party.guests %}
                         <a href="{{  url_for('spoonacular.show_search_spoonacular')  }}" class="btn btn-info" role="button">Search for Recipes</a><br><br>
+                        {% endif %}
 
                         {% if collated_recipes %}
                             {% for recipe in collated_recipes %}

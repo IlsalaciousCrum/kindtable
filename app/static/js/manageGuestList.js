@@ -2,6 +2,7 @@ function showCurrentGuests(results) {
     "use strict";
     console.dir(results); // for debugging
     $(".guests").load(location.href + " #guests");
+    $(".recipes").load(location.href + " #recipes");
     $(".modal.in").modal("hide");
 }
 

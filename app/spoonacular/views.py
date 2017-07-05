@@ -69,14 +69,9 @@ def show_search_spoonacular():
     intols = session["intols"]
     course = session["course"]
     cuisine = session["cuisine"]
+    offset = session["offset"]
 
-    try:
-        offset = session["offset"]
-    except:
-        session["offset"] = 0
-        offset = 0
-
-    responses = spoonacular_request(party_id=party_id, diet=diets,
+    responses = spoonacular_request(diet=diets,
                                     intols=intols, avoids=avoids,
                                     cuisine=cuisine, course=course,
                                     offset=offset)
@@ -120,6 +115,7 @@ def rerun_search():
     session['diets'] = newdiets
     session['intols'] = newintols
     session['avoids'] = newavoids
+    session['offset'] = 0
 
     return redirect(url_for("spoonacular.show_search_spoonacular"))
 

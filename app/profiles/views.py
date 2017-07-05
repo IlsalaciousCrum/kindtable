@@ -358,6 +358,7 @@ def show_party_profile(party_id):
         session['diets'] = party_diets
         session['intols'] = get_intolerance
         session['avoids'] = get_avoid
+        session['offset'] = 0
 
         friends = current_user.valid_friends()
         manage_guests_form.friends.choices = [(friend.profile_id, ("{0} {1} ({2})").format(friend.first_name, friend.last_name, friend.email)) for friend in friends]
