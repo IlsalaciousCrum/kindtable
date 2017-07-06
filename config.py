@@ -18,7 +18,7 @@ class Config:
     KIND_MAIL_SENDER = 'Kind Table Admin <mail@kindtable.net>'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     KIND_ADMIN = os.environ.get('KIND_ADMIN')
-    SSL_DISABLE = False
+    SSL_DISABLE = True
 
     @staticmethod
     def init_app(app):
@@ -78,6 +78,9 @@ class HerokuConfig(ProductionConfig):
         file_handler = StreamHandler()
         file_handler.setLevel(logging.WARNING)
         app.logger.addHandler(file_handler)
+
+        from wekzeug.contrib.fixers import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
 config = {

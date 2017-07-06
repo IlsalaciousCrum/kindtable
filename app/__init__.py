@@ -38,6 +38,10 @@ def create_app(config_name):
     login_manager.init_app(app)
     app.jinja_env.undefined = StrictUndefined
 
+    if not app.debug and not app.testing and not app.config['SSL_DISABLE']:
+        from flask.ext.sslify import SSLify
+        sslify = SSLify(app)
+
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
