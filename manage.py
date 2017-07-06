@@ -15,7 +15,7 @@ from app.email import approve_beta_access
 
 app = create_app(os.getenv('FLASK_CONFIG', 'default'))
 manager = Manager(app)
-from models import *
+from app.models import *
 migrate = Migrate(app, db)
 mail = Mail(app)
 
