@@ -167,6 +167,7 @@ class User(BaseMixin, UserMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    beta_approved = db.Column(db.Boolean, unique=False, default=False)
     session_token = db.Column(db.String(256))
     password_hash = db.Column(db.String(128))
     profile_id = db.Column(db.Integer, db.ForeignKey('profiles.profile_id'),

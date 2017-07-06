@@ -247,10 +247,11 @@
                     {% endif %}
 
                         <h3>Menu</h3>
+                
                         {% if party.guests %}
-                        <a href="{{  url_for('spoonacular.show_search_spoonacular')  }}" class="btn btn-info" role="button">Search for Recipes</a><br><br>
-                        {% endif %}
-
+                            <a href="{{  url_for('spoonacular.show_search_spoonacular')  }}" class="btn btn-info" role="button">Search for Recipes</a><br><br>
+                            {% endif %}
+                        
                         {% if collated_recipes %}
                             {% for recipe in collated_recipes %}
                                 <a href="{{ url_for('spoonacular.saved_recipe', record_id=recipe['record_id']) }}" target="_blank"><span style="font-size: 125%">{{  recipe['title']  }}</span></a><br>

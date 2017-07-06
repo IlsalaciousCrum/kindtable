@@ -8,7 +8,7 @@ from app.models import (User, Profile, Cuisine, Course, Party,
                         PartyRecipes, RecipeCard, PartyGuest)
 
 from flask_login import login_required, current_user
-from ..decorators import email_confirmation_required
+from ..decorators import email_confirmation_required, beta_approval_required
 
 from ..functions import (guest_avoidances, guest_intolerances,
                          spoonacular_recipe_information,
@@ -24,11 +24,11 @@ from ..email import send_email
 @spoonacular.route('/recipe/<int:record_id>')
 @login_required
 @email_confirmation_required
+@beta_approval_required
 def show_saved_recipe(record_id):
     """Show a recipe saved in the RecipeCard in it's own page, from the recipe preview, on the party page"""
 
-    session_token = session.get("session_token")
-    this_user = User.query.filter_by(session_token=session_token).first()
+    this_user = current_user
     this_recipe = PartyRecipes.query.get(record_id)
     ingredients = json.loads(this_recipe.recipes.ingredients)
     instructions = json.loads(this_recipe.recipes.instructions)
@@ -52,6 +52,7 @@ def show_saved_recipe(record_id):
 @spoonacular.route('/searchrecipes')
 @login_required
 @email_confirmation_required
+@beta_approval_required
 def show_search_spoonacular():
     """Collate party information, query spoonacular and show results."""
 
@@ -102,6 +103,7 @@ def show_search_spoonacular():
 @spoonacular.route('/rerun_search', methods=["POST"])
 @login_required
 @email_confirmation_required
+@beta_approval_required
 def rerun_search():
     """Reruns a recipe search from the recipe page."""
 
@@ -121,6 +123,7 @@ def rerun_search():
 
 
 @spoonacular.route('/load_more_recipes')
+@beta_approval_required
 @login_required
 @email_confirmation_required
 def load_more_recipes():
@@ -134,6 +137,7 @@ def load_more_recipes():
 
 @spoonacular.route('/saved_recipe/<int:record_id>')
 @login_required
+@beta_approval_required
 @email_confirmation_required
 def saved_recipe(record_id):
     """Show a recipe preview of recipes saved in the RecipeCard table, from the party page"""
@@ -193,6 +197,7 @@ def saved_recipe(record_id):
 
 @spoonacular.route('/see_recipe/<int:recipe_id>')
 @login_required
+@beta_approval_required
 @email_confirmation_required
 def see_recipe(recipe_id):
     """Preview a recipe not yet saved, from the recipe search page"""
@@ -251,6 +256,7 @@ def see_recipe(recipe_id):
 @spoonacular.route('/addtorecipebox', methods=['POST'])
 @login_required
 @email_confirmation_required
+@beta_approval_required
 def add_recipe_box():
     """Add a recipe to the recipe box"""
 
@@ -318,6 +324,7 @@ def add_recipe_box():
 @spoonacular.route('/discardrecipe.json', methods=['POST'])
 @login_required
 @email_confirmation_required
+@beta_approval_required
 def discardrecipe():
     """Takes an Ajax request and deletes a PartyRecipe"""
 
@@ -338,6 +345,7 @@ def discardrecipe():
 @spoonacular.route('/changerecipenotes.json', methods=['POST'])
 @login_required
 @email_confirmation_required
+@beta_approval_required
 def changerecipenotes():
     """Takes an Ajax request and changes a note on the PartyRecipes table"""
 
@@ -357,6 +365,7 @@ def changerecipenotes():
 @spoonacular.route('/clearrecipenote.json', methods=['POST'])
 @login_required
 @email_confirmation_required
+@beta_approval_required
 def clearrecipenotes():
     """Takes an Ajax request and clears a note on the PartyRecipes table"""
 
@@ -376,6 +385,7 @@ def clearrecipenotes():
 @spoonacular.route('/emailmenu.json', methods=['POST'])
 @login_required
 @email_confirmation_required
+@beta_approval_required
 def email_menu():
     """Takes an Ajax request and email's the menu to the user"""
 
