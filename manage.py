@@ -7,7 +7,7 @@ from app import create_app, db
 from app.models import (User, Profile, Friend, ProfileIntolerance, Intolerance,
                         Diet, Cuisine, Course, IngToAvoid, PartyGuest, Party,
                         RecipeCard, PartyRecipes)
-from Flask_script import Manager, Shell, Server
+from flask_script import Manager, Shell, Server
 from flask_migrate import Migrate, MigrateCommand
 from jinja2 import StrictUndefined
 from flask_mail import Mail
