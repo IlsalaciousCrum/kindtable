@@ -11,6 +11,7 @@ from Flask_script import Manager, Shell, Server
 from flask_migrate import Migrate, MigrateCommand
 from jinja2 import StrictUndefined
 from flask_mail import Mail
+from app.email import approve_beta_access
 
 app = create_app(os.getenv('FLASK_CONFIG', 'default'))
 manager = Manager(app)
@@ -30,7 +31,7 @@ def make_shell_context():
                 ProfileIntolerance=ProfileIntolerance, Intolerance=Intolerance,
                 Diet=Diet, Cuisine=Cuisine, Course=Course, IngToAvoid=IngToAvoid,
                 PartyGuest=PartyGuest, Party=Party, RecipeCard=RecipeCard,
-                PartyRecipes=PartyRecipes)
+                PartyRecipes=PartyRecipes, approve_beta_access_email=approve_beta_access)
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)
@@ -52,12 +53,13 @@ def deploy():
     """Run deployment tasks."""
 
     from flask.ext.migrate import upgrade
-    from app.seed import LoadSeedData
+    from app.seed import LoadSeedData, LoadTestPeople
 
     # migrate database to latest revision
     upgrade()
 
     LoadSeedData()
+    LoadTestPeople()
 
 
 if __name__ == '__main__':

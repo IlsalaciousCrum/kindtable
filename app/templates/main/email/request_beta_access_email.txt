@@ -1,0 +1,15 @@
+Dear Kind Table Admin,
+
+Request for beta access:
+
+User id:  {{  user_id}}
+Profile id:  {{  profile_id  }}
+Full name:  {{  full_name  }}
+Email:  {{  email  }}
+Reason  {{  reason  }}
+
+Sincerely,
+
+Ilsa Gordon
+
+Kind Table

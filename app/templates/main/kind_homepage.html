@@ -1,8 +1,8 @@
 
 {% if current_user.is_authenticated %}
-{% extends 'base.html' %}
+{% extends 'main/base.html' %}
 {% else %}
-{% extends 'anonymous.html' %}
+{% extends 'main/anonymous.html' %}
 {% endif %}
 
 
