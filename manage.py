@@ -15,6 +15,7 @@ from app.email import approve_beta_access
 
 app = create_app(os.getenv('FLASK_CONFIG', 'default'))
 manager = Manager(app)
+from models import *
 migrate = Migrate(app, db)
 mail = Mail(app)
 
@@ -53,13 +54,12 @@ def deploy():
     """Run deployment tasks."""
 
     from flask.ext.migrate import upgrade
-    from app.seed import LoadSeedData, LoadTestPeople
+    from app.seed import LoadSeedData
 
     # migrate database to latest revision
     upgrade()
 
     LoadSeedData()
-    LoadTestPeople()
 
 if __name__ == '__main__':
     manager.run()
