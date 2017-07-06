@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row well-spaced" style="padding-top: 10em">
+    <div class="col-md-6 col-md-offset-3">
+        <div class = "row round_hidden_div" style="padding-top: 2em">
+
+            <h1>Request beta testing access</h1>
+
+            <p>In order to use the recipe search and menu building features of this site you will need to 
+                request beta testing access.
+
+            <p>These requests are reviewed individually and we will respond as soon as possible. In the meantime,
+                you can continue to add your friends, create private profiles, create parties and assemble guest lists.</p>
+
+            <div class = "row round_hidden_div" style="padding-top: 2em">
+                {% from "_formhelpers.html" import render_field %}
+                    <form action="{{ url_for('main.request_beta_access') }}" class="form form-horizontal" method="post" role="form" id="betaAccessForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="profile_id"/>
+                    <input type="hidden" name="user_id"/>
+                        {{ render_field(beta_request_form.full_name,  style="width: 75%", rows="1") }}<br>
+                        {{ render_field(beta_request_form.email,  style="width: 75%", rows="1") }}<br>
+                        {{ render_field(beta_request_form.reason,  style="width: 100%", rows="5") }}<br>
+                        <input type="submit" class="btn btn-sm btn-info btn-default" value="Submit">
+                    </form>
+            </div>  
+        </div>
+    </div>
+</div>
+
+{% endblock %}
