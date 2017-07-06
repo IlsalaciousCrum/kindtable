@@ -18,6 +18,7 @@ class Config:
     KIND_MAIL_SENDER = 'Kind Table Admin <mail@kindtable.net>'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     KIND_ADMIN = os.environ.get('KIND_ADMIN')
+    SSL_DISABLE = False
 
     @staticmethod
     def init_app(app):
@@ -35,8 +36,7 @@ class TestingConfig(Config):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = 'postgres://ctufwrrmmozyit:2f60a317a9f8bbe24db52ea5efd32651ae6b8a55500e709f70386d87c30b25a0@ec2-54-225-119-223.compute-1.amazonaws.com:5432/d7scv1f00qis1d'
-    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'postgres:///kind'
 
     @classmethod
     def init_app(cls, app):
@@ -54,17 +54,36 @@ class ProductionConfig(Config):
                 mailhost=(cls.MAIL_SERVER, cls.MAIL_PORT),
                 fromaddr=cls.KIND_MAIL_SENDER,
                 toaddrs=cls.KIND_ADMIN,
-                subject=cls.FLASKY_MAIL_SUBJECT_PREFIX + ' Application Error',
+                subject=cls.KIND_MAIL_SUBJECT_PREFIX + ' Application Error',
                 credentials=credentials,
                 secure=secure)
             mail_handler.setLevel(logging.ERROR)
             app.logger.addHandler(mail_handler)
 
 
+class HerokuConfig(ProductionConfig):
+    SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
+
+    @classmethod
+    def init_app(cls, app):
+        ProductionConfig.init_app(app)
+
+        # handle proxy server headers
+        from werkzeug.contrib.fixers import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app)
+
+        # log to stderr
+        import logging
+        from logging import StreamHandler
+        file_handler = StreamHandler()
+        file_handler.setLevel(logging.WARNING)
+        app.logger.addHandler(file_handler)
+
+
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
-
+    'heroku': HerokuConfig,
     'default': DevelopmentConfig
 }

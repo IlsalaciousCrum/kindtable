@@ -61,6 +61,5 @@ def deploy():
     LoadSeedData()
     LoadTestPeople()
 
-
 if __name__ == '__main__':
     manager.run()

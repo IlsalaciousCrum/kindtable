@@ -6,6 +6,7 @@ secrets.sh
 create_friends_profile_form.html
 user_profile_junk_code.html
 thoughts.md
+*.env*
 
 #File for adding document git commit messages
 message.txt
