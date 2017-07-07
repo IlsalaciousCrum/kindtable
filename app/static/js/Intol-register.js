@@ -6,7 +6,6 @@ function showCurrentIntols(results) {
         $('#intol-success').css('display', 'none');
     }));
     $(".modal.in").modal("hide");
-
 }
 
 $(document).ready(function() {

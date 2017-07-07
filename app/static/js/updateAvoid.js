@@ -16,9 +16,6 @@ $(document).ready(function() {
     }));
 });
 
-
-
-
 function showCurrentAvoids(results) {
     "use strict";
     console.dir(results); // for debugging
@@ -58,7 +55,6 @@ function showCurrentAvoids(results) {
 $(document).ready(function() {
     "use strict";
     $('#deleteavoid').on('click', (function(event) {
-    
         var url = Flask.url_for("profiles.deleteavoid");
         $.ajax({
             type: "POST",
@@ -68,7 +64,6 @@ $(document).ready(function() {
         });
     }));
 
-
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -77,7 +72,6 @@ $(document).ready(function() {
         }
     });
 });
-
 
 function showCurrentAvoids(results) {
     "use strict";
@@ -89,7 +83,6 @@ function showCurrentAvoids(results) {
 $(document).ready(function() {
     "use strict";
     $('#deleteavoidreason').on('click', (function(event) {
-    
         var url = "/profiles/deleteavoidreason.json";
         $.ajax({
             type: "POST",

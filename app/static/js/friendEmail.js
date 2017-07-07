@@ -5,7 +5,6 @@ function showCurrentEmail(results) {
     $(".friendEmail").load(location.href + " #friendEmail");
 }
 
-
 $(document).ready(function() {
     "use strict";
     $('#emailForm').on('submit', (function(event) {

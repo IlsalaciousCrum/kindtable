@@ -5,7 +5,6 @@ function showCurrentNotes(results) {
     $(".party_notes").load(location.href + " #party_notes");
 }
 
-
 $(document).ready(function() {
     "use strict";
     $('#notesForm').on('submit', (function(event) {

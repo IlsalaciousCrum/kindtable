@@ -5,7 +5,6 @@ function showCurrentTitle(results) {
     $(".partytitle").load(location.href + " #partytitle");
 }
 
-
 $(document).ready(function() {
     "use strict";
     $('#changeTitle').on('submit', (function(event) {

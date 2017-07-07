@@ -1,8 +1,7 @@
-//  TODO: "[Deprecation] Synchronous XMLHttpRequest on the main thread is deprecated 
-//  because of its detrimental effects to the end user's experience."
-//  shows up in the console but without loading this script in with the recipe
-//  search modal, the form just submits instead of using the ajax route.
-
+/*  TODO: "[Deprecation] Synchronous XMLHttpRequest on the main thread is deprecated 
+  because of its detrimental effects to the end user's experience."
+  shows up in the console but without loading this script in with the recipe
+  search modal, the form just submits instead of using the ajax route. */
 
 function showSuccessMessage(results) {
     "use strict";
@@ -18,7 +17,6 @@ function showSuccessMessage(results) {
     $(".modal-backdrop fade in").remove();
 }));
 }
-
 
 $(document).ready(function() {
     "use strict";
@@ -41,6 +39,3 @@ $(document).ready(function() {
         }
     });
 });
-
-
-

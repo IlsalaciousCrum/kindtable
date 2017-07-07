@@ -14,14 +14,9 @@ $(document).ready(function() {
     }));
 });
 
-
 $(document).ready(function() {
     "use strict";
     $('.printButton').click(function(){
          $("#recipePrintWindow").print();
     });
 });
-
-
-
-

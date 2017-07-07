@@ -5,7 +5,6 @@ function showCurrentLastName(results) {
     $(".last").load(location.href + " #last");
 }
 
-
 $(document).ready(function() {
     "use strict";
     $('#changeLastName').on('submit', (function(event) {

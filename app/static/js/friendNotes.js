@@ -5,7 +5,6 @@ function showCurrentNotes(results) {
     $(".friend_notes").load(location.href + " #friend_notes");
 }
 
-
 $(document).ready(function() {
     "use strict";
     $('#notesForm').on('submit', (function(event) {
@@ -28,11 +27,9 @@ $(document).ready(function() {
     });
 });
 
-
 $(document).ready(function() {
     "use strict";
     $('#deletenote').on('click', (function(event) {
-    
         var url = Flask.url_for("profiles.clearfriendnotes");
         $.ajax({
             type: "POST",

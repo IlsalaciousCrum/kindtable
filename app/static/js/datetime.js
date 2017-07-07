@@ -6,7 +6,6 @@ function showCurrentDate(results) {
     $(".dtm-dtm").html(answer);
 }
 
-
 $(document).ready(function() {
     "use strict";
     $('#party_datetime').on('submit', (function(event) {

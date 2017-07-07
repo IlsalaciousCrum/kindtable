@@ -5,7 +5,6 @@ function showCurrentNotes(results) {
     $(".recipe_notes").load(location.href + " #recipe_notes");
 }
 
-
 $(document).ready(function() {
     "use strict";
     $('#notesForm').on('submit', (function(event) {
@@ -28,11 +27,9 @@ $(document).ready(function() {
     });
 });
 
-
 $(document).ready(function() {
     "use strict";
     $('#deletenote').on('click', (function(event) {
-    
         var url = Flask.url_for("profiles.clearrecipenotes");
         $.ajax({
             type: "POST",
@@ -41,7 +38,7 @@ $(document).ready(function() {
             success: showCurrentNotes
         });
     }));
-
+    
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {

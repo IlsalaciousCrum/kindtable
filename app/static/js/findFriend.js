@@ -1,5 +1,3 @@
-
-
 $(document).ready(function() {
     "use strict";
     $('#findFriendLink').on('click', (function (event) {
@@ -11,5 +9,3 @@ $(document).ready(function() {
         });
     }));
 });
-
-

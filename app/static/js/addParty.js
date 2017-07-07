@@ -1,4 +1,3 @@
-
 $(document).ready(function() {
     "use strict";
     $('#addPartyLink').on('click', (function (event) {

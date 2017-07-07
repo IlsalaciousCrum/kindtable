@@ -1,5 +1,3 @@
-
-
 $(document).ready(function() {
     "use strict";
     $('#addFriendProfileLink').on('click', (function (event) {

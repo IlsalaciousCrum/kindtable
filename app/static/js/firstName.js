@@ -5,7 +5,6 @@ function showCurrentFirstName(results) {
     $(".first").load(location.href + " #first");
 }
 
-
 $(document).ready(function() {
     "use strict";
     $('#changeFirstName').on('submit', (function(event) {

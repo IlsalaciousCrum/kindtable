@@ -1,4 +1,3 @@
-
 function showCurrentAvoid(results) {
     "use strict";
     console.dir(results); // for debugging

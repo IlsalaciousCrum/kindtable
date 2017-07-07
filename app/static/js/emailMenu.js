@@ -1,4 +1,3 @@
-
 function showSuccess(results) {
     "use strict";
     console.dir(results); // for debugging

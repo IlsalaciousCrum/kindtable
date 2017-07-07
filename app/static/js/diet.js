@@ -5,7 +5,6 @@ function showCurrentDiet(results) {
     $(".dietType").load(location.href + " #dietType");
 }
 
-
 $(document).ready(function() {
     "use strict";
     $('#changeDiet').on('submit', (function(event) {
