@@ -52,13 +52,14 @@ def test():
 def deploy():
     """Run deployment tasks."""
 
-    # from flask.ext.migrate import upgrade
-    from app.seed import LoadSeedData
+    from flask.ext.migrate import upgrade
+    from app.seed import LoadSeedData, LoadTestPeople
 
     # migrate database to latest revision
-    # upgrade()
+    upgrade()
 
     LoadSeedData()
+    LoadTestPeople()
 
 if __name__ == '__main__':
     manager.run()

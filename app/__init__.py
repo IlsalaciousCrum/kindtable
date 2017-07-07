@@ -9,6 +9,7 @@ from jinja2 import StrictUndefined
 from flask_wtf.csrf import CSRFProtect
 from flask_jsglue import JSGlue
 
+
 jsglue = JSGlue()
 db = SQLAlchemy()
 bootstrap = Bootstrap()
