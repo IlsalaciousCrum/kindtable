@@ -360,7 +360,8 @@
                                         {% else %}
                                         {{ friend.first_name }} {{friend.last_name  }}
                                     <span class="text-muted">({{  friend.email  }})</span>
-                                        </a> {% endif %}
+                                        {% endif %}
+                                    </a> 
                                 </li>
                             {% endfor %}
                         </ul>
