@@ -260,11 +260,12 @@
                             {% for recipe in collated_recipes %}
                                 <a href="{{ url_for('spoonacular.saved_recipe', record_id=recipe['record_id']) }}" target="_blank"><span style="font-size: 125%">{{  recipe['title']  }}</span></a><br>
                                     <ul>
-                                        <li>
+                                        
                                             <span class="text-muted">
                                                 {% if recipe['works_for_guests'] %}
-                                            <strong>Works for {{  recipe['works_for_guests']|length  }} out of {{  party.guests|length  }} guests</strong>:<br> {% for person in recipe['works_for_guests'] %}{{  person  }}{% if not loop.last %}, {% endif %}{% endfor %}{% endif %}<br>
-                                        </li>
+                                            <li>
+                                            <strong>Works for {{  recipe['works_for_guests']|length  }} out of {{  party.guests|length  }} guests</strong>:<br> {% for person in recipe['works_for_guests'] %}{{  person  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>{% endif %}<br>
+                                        
                                             {% if recipe['notes'] %}
                                                 <li>
                                                     <span class="text-muted"><strong>Recipe Notes:</strong> {{  recipe['notes']  }}</span>
