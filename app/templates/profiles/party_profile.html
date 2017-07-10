@@ -264,7 +264,8 @@
                                             <span class="text-muted">
                                                 {% if recipe['works_for_guests'] %}
                                             <li>
-                                            <strong>Works for {{  recipe['works_for_guests']|length  }} out of {{  party.guests|length  }} guests</strong>:<br> {% for person in recipe['works_for_guests'] %}{{  person  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>{% endif %}<br>
+                                            <strong>Works for {{  recipe['works_for_guests']|length  }} out of {{  party.guests|length  }} guests</strong>:<br> {% for person in recipe['works_for_guests'] %}{{  person  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>{% else %}
+                                            <span class="text-muted"><li>This recipe won't techinically work for anyone you have invited but I bet you knew that.</span></li>{% endif %}<br>
                                         
                                             {% if recipe['notes'] %}
                                                 <li>
