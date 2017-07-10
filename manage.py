@@ -35,7 +35,9 @@ def make_shell_context():
 
 manager.add_command("shell", Shell(make_context=make_shell_context))
 manager.add_command('db', MigrateCommand)
-server = Server(host="0.0.0.0", port=5000, use_debugger=True, use_reloader=True)
+PORT = int(os.environ.get("PORT", 5000))
+server = Server(host="0.0.0.0", port=PORT, use_debugger=False, use_reloader=True)
+
 manager.add_command("runserver", server)
 manager.add_command('db', MigrateCommand)
 
