@@ -1,6 +1,5 @@
 function showCurrentTitle(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".modal.in").modal("hide");
     $(".name").load(location.href + " #name");
     $(".headerName").load(location.href + " #headerName");

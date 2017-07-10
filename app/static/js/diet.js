@@ -1,6 +1,5 @@
 function showCurrentDiet(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".modal.in").modal("hide");
     $(".dietType").load(location.href + " #dietType");
 }

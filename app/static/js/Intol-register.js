@@ -1,6 +1,5 @@
 function showCurrentIntols(results) {
     "use strict";
-    console.dir(results); // for debugging
     $("#intol-success").css('display', 'inline');
     $("#intol-success").fadeOut(2500, (function(){
         $('#intol-success').css('display', 'none');

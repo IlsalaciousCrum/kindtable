@@ -253,32 +253,22 @@ def add_friend_profile():
     """Loads the add_friend_profile modal contents and processes a request to
     make a private profile"""
 
-    print 1
     private_profile_title_form = PrivateProfileTitleForm(request.form)
-    print 2
     this_user = current_user
-    print 3
     if request.method == 'POST' and private_profile_title_form.validate():
-        print 4
         existing_profile = Profile.query.filter(Profile.private_profile_title == private_profile_title_form.title.data, Profile.owned_by_user_id == this_user.id).first()
-        print 5
         if existing_profile:
-            print 6
             flash("Looks like you already have a private profile for this person. Would you like to edit this one?")
             return redirect('profiles/friendprofile/%s' % existing_profile.profile_id)
         else:
-            print 7
             new_friend_profile = Profile.create_record(private_profile_title=private_profile_title_form.title.data,
                                                        owned_by_user_id=this_user.id)
-            print 8
             Friend.create_record(user_id=current_user.id,
                                  friend_profile_id=new_friend_profile.profile_id,
                                  private_profile=True)
-            print 9
             flash("Success! You can start editing information about your friend here. You don't have to add their first and last name but it will make the site easier to navigate")
             return redirect('profiles/friendprofile/%s' % new_friend_profile.profile_id)
     else:
-        print "GET template"
         return render_template("profiles/add_friend_profile.html",
                                private_profile_title_form=private_profile_title_form)
 
@@ -302,7 +292,6 @@ def confirm_friendship_with_existing_user(token):
     elif not friendship:
         abort(404)
     else:
-        print friendship
         friend = User.query.get(friendship.user_id)
 
         Friend.create_record(user_id=current_user_id,
@@ -383,19 +372,16 @@ def show_party_profile(party_id):
                     add = True
                     if guest.profiles.avoidances:
                         for avoid in guest.profiles.avoidances:
-                            print 3
                             if avoid.ingredient in works_for['avoids']:
                                 pass
                             else:
                                 add = False
-                                print 4
                     if guest.profiles.diet.diet_type in works_for['diets']:
                         pass
                     else:
                         add = False
                     if guest.profiles.intolerances:
                         for intol in guest.profiles.intolerances:
-                            print 6
                             if intol.intol_name in works_for['intols']:
                                 pass
                             else:
@@ -441,10 +427,6 @@ def add_new_party():
     """Serves the template and processes the form to add a new party"""
 
     add_party_form = AddNewPartyForm(request.form)
-    print add_party_form.party_name.data
-    print add_party_form.date.data
-    print add_party_form.hour.data
-    print add_party_form.notes.data
 
     # format for date setter  %Y-%m-%d %H:%M:%S"
 
@@ -459,7 +441,6 @@ def add_new_party():
                                         party_notes=add_party_form.notes.data)
         new_guest = PartyGuest.create_record(party_id=new_party.party_id,
                                              friend_profile_id=current_user.profile_id)
-        print new_guest
         flash("Success! Who would you like to invite to your party?", "success")
         return redirect("profiles/party_profile/%s" % new_party.party_id)
     elif request.method == 'POST' and not add_party_form.validate():
@@ -637,34 +618,23 @@ def intol():
 @email_confirmation_required
 def addavoid():
     """Takes an Ajax request and adds an ingredient to avoid"""
-    print 1
     form = AddAvoidForm(request.form)
-    print 2
     profile = Profile.query.get(form.profile_id.data)
-    print 3
     if form.validate() and profile.owned_by_user_id == current_user.id:
-        print 4
         already_added = db.session.query(IngToAvoid
                                          ).filter(IngToAvoid.profile_id == profile.profile_id, IngToAvoid.ingredient ==
                                                   form.add_avoid_ingredient.data).all()
-        print 5
         if already_added:
-            print 6
             flash("We already know about that ingredient to avoid.\
                   Would you like to add a different one?", "warning")
-            print 7
             return redirect(request.referrer)
         else:
-            print 8
             IngToAvoid.create_record(ingredient=form.add_avoid_ingredient.data,
                                      reason=form.add_avoid_reason.data,
                                      profile_id=profile.profile_id)
-            print 9
             profile.update({"last_updated": datetime.utcnow()})
-            print 10
             return jsonify(data={'message': 'Avoid added'})
     else:
-        print 11
         for field, error in form.errors.items():
             flash(u"Error in %s -  %s" % (
                   getattr(form, field).label.text,
@@ -949,8 +919,6 @@ def party_datetime():
     """Takes an Ajax request and changes a party's title"""
 
     form = PartyDatetimeForm(request.form)
-    print form.date.data
-    print form.hour.data
 
     if request.method == 'POST' and form.validate():
         session_timezone = session['timezone']
@@ -979,10 +947,7 @@ def changepartynotes():
     """Takes an Ajax request and changes a note on the Party table"""
 
     form = PartyNotesForm(request.form)
-    print form.notes.data
-    print form.party_id.data
     party = Party.query.get(form.party_id.data)
-    print party
     if request.method == 'POST' and form.validate():
         party.update({"party_notes": form.notes.data,
                       "last_updated": datetime.utcnow()})
@@ -1046,40 +1011,24 @@ def invitetoparties():
                                                                                   datetime.utcnow(),
                                                                                   PartyGuest.friend_profile_id == inviteform.profileid.data).order_by(Party.datetime_of_party).all()
 
-    print "upcoming_parties_invited_to is below"
-    print upcoming_parties_invited_to
-
     upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id,
                                                       Party.datetime_of_party >= datetime.utcnow()).all()
     inviteform.parties.choices = [(party.party_id, party.title) for party in upcoming_parties]
 
     form_data = inviteform.parties.data
 
-    print form_data
-
     profile_id = inviteform.profileid.data
 
-    print profile_id
-
     if request.method == 'POST' and inviteform.validate():
-        print 1
         if form_data is not None:
             for choice in form_data:
-                print 2
                 PartyGuest.create_record(party_id=choice,
                                          friend_profile_id=profile_id)
-            print 3
-        print "upcoming_parties below"
-        print upcoming_parties
         for party in upcoming_parties_invited_to:
-            print 4
             if party.party.party_id not in form_data:
-                print 5
                 party._delete_()
-        print 6
         return jsonify(data={'message': 'PartyGuest updated'})
     else:
-        print 7
         for field, error in inviteform.errors.items():
             flash(u"Error in %s -  %s" % (
                   getattr(inviteform, field).label.text,

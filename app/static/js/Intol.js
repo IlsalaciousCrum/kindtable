@@ -1,6 +1,5 @@
 function showCurrentIntols(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".intols").load(location.href + " #intols");
     $(".modal.in").modal("hide");
 }

@@ -1,6 +1,5 @@
 function showCurrentAvoid(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".avoids").load(location.href + " #avoids");
     $(".avoids").show();
     $(".modal.in").find('form')[0].reset();

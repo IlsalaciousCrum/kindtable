@@ -1,6 +1,5 @@
 function showUpcomingParties(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".upcomingParties").load(location.href + " #upcomingParties");
     $(".modal.in").modal("hide");
 }

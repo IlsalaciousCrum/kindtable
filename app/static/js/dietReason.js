@@ -1,6 +1,5 @@
 function showCurrentDietReason(results) {
     "use strict";
-    console.dir(results);
     $(".modal.in").modal("hide");
     $(".dietReason").load(location.href + "#dietReason");
 }
@@ -29,7 +28,6 @@ $(document).ready(function() {
 
 function refreshDietReason(results) {
     "use strict";
-    console.dir(results);
     $(".modal.in").modal("hide");
     $(".dietReason").load(location.href + "#dietReason");
 }

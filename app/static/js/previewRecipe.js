@@ -5,7 +5,6 @@
 
 function showSuccessMessage(results) {
     "use strict";
-    console.dir(results); // for debugging
     $('#seeRecipeModal').modal('hide');
     var party_title = $("#party_title").html();
     $("#alert-recipe-party-title").html(party_title);

@@ -1,12 +1,9 @@
 *kind_env*
-*Old*
 *.pyc
 secrets.sh
 .DS_Store
-create_friends_profile_form.html
-user_profile_junk_code.html
-thoughts.md
 *.env*
+migrations/*
 
 #File for adding document git commit messages
 message.txt

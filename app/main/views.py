@@ -26,9 +26,7 @@ def request_beta_access():
     """Load the beta access request view and process a request"""
 
     this_user = current_user
-    print this_user
     this_profile = this_user.profile
-    print this_profile
     beta_request_form = BetaAccessForm(request.form)
     if request.method == 'POST' and beta_request_form.validate():
         if this_user.beta_approved:

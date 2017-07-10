@@ -1,6 +1,5 @@
 function showCurrentDate(results) {
     "use strict";
-    console.dir(results); // for debugging
     var answer = results;
     $(".modal.in").modal("hide");
     $(".dtm-dtm").html(answer);

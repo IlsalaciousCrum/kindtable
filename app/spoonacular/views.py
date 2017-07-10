@@ -77,11 +77,6 @@ def show_search_spoonacular():
                                     cuisine=cuisine, course=course,
                                     offset=offset)
 
-    print "This is number"
-    print responses.get('number', None)
-    print "this is totalResults"
-    print responses.get('totalResults', None)
-
     result_number = int(min(responses.get('number', None), responses.get('totalResults', None)))
 
     return render_template("spoonacular/recipe_search.html",
@@ -223,17 +218,14 @@ def see_recipe(recipe_id):
 
     existing_recipe = RecipeCard.query.filter(RecipeCard.recipe_id == str(recipe_id)).first()
     if existing_recipe:
-        print "This is loading from an existing recipe"
         info = {'title': existing_recipe.title, 'image_url': existing_recipe.recipe_image_url, 'source_url': existing_recipe.source_recipe_url,
                 'spoonacular_url': existing_recipe.spoonacular_recipe_url, 'recipe_id': recipe_id}
         ingredients = json.loads(existing_recipe.ingredients)
         instructions = json.loads(existing_recipe.instructions)
 
     else:
-        print "this is making the spoonacular call again"
         info = spoonacular_recipe_information(recipe_id)
         ingredients = json.loads(info['ingredients_list'])
-        print ingredients
         instructions = json.loads(info['instructions_list'])
 
     session['info'] = info
@@ -279,7 +271,6 @@ def add_recipe_box():
         works_for_dump = json.dumps({'avoids': tuple(avoids), 'diets': tuple(diets), 'intols': tuple(intols)})
 
         recipe_exists = RecipeCard.query.filter(RecipeCard.recipe_id == recipe_id).first()
-        print recipe_exists
         if recipe_exists:
             saved_recipe_card_id = recipe_exists.recipe_record_id
             title = recipe_exists.title

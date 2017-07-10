@@ -1,6 +1,5 @@
 function showSuccess(results) {
     "use strict";
-    console.dir(results); // for debugging
     $("#emailSuccess").css('display', 'inline');
     $("#emailSuccess").fadeOut(6000, (function(){
     $('#emailSuccess').css('display', 'none');

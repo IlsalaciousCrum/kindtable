@@ -13,7 +13,6 @@ $(document).ready(function() {
 
 function showCurrentAvoids(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".avoids").load(location.href + " #avoids");
     $(".modal.in").modal("hide");
 }
@@ -42,7 +41,6 @@ $(document).ready(function() {
 
 function showCurrentAvoids(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".avoids").load(location.href + " #avoids");
     $(".modal.in").modal("hide");
 }
@@ -70,7 +68,6 @@ $(document).ready(function() {
 
 function showCurrentAvoids(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".avoids").load(location.href + " #avoids");
     $(".modal.in").modal("hide");
 }

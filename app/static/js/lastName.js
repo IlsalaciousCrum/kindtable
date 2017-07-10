@@ -1,6 +1,5 @@
 function showCurrentLastName(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".modal.in").modal("hide");
     $(".last").load(location.href + " #last");
 }

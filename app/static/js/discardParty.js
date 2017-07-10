@@ -1,6 +1,5 @@
 function showCurrentNotes(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".modal.in").modal("hide");
     $(".party_notes").load(location.href + " #party_notes");
 }

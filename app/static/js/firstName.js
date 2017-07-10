@@ -1,6 +1,5 @@
 function showCurrentFirstName(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".modal.in").modal("hide");
     $(".first").load(location.href + " #first");
 }

@@ -86,17 +86,12 @@ def spoonacular_request(diet, intols, avoids, cuisine, course, offset):
                'limitLicense': 'false', 'number': 100, 'offset': offset, 'query': 'recipe',
                'type': course}
 
-    print "This is the payload"
-    print payload
 
     response = requests.get(url, headers=headers, params=payload)
 
     responses = {}
 
     spoon = response.json()
-
-    print "the response is below this one"
-    print spoon
 
     responses["number"] = spoon['number']
     responses["totalResults"] = spoon['totalResults']
@@ -116,7 +111,6 @@ def spoonacular_request(diet, intols, avoids, cuisine, course, offset):
             image_url = url_for('static', filename='knife_fork.png')
         title = spoon['results'][i].get('title')
         recipe_url = recipe_base + image_url[:-4]
-        print recipe_url
         response = {"title": title, "recipe_url": recipe_url, "image_url": image_url, "recipe_id": recipe_id}
         responses['response'].append(response)
 
@@ -136,7 +130,6 @@ def spoonacular_recipe_information(recipe_id):
     response = requests.get(url, headers=headers, params=payload)
 
     spoon = response.json()
-    print spoon
 
     title = spoon["title"]
     image = spoon["image"]
@@ -145,7 +138,6 @@ def spoonacular_recipe_information(recipe_id):
     _id = spoon["id"]
 
     ingredients_list = json.dumps(((each["originalString"]) for each in spoon['extendedIngredients']), iterable_as_array=True)
-    print ingredients_list
 
     if len(spoon['analyzedInstructions']) == 0:
         instructions = json.dumps("Instructions located at the 'Original Recipe Source' link below")

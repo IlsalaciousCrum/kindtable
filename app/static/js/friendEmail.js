@@ -1,6 +1,5 @@
 function showCurrentEmail(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".modal.in").modal("hide");
     $(".friendEmail").load(location.href + " #friendEmail");
 }

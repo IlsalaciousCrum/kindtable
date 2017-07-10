@@ -1,6 +1,5 @@
 function showCurrentNotes(results) {
     "use strict";
-    console.dir(results); // for debugging
     $(".modal.in").modal("hide");
     $(".friend_notes").load(location.href + " #friend_notes");
 }
