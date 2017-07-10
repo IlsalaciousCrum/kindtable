@@ -41,8 +41,7 @@ def login():
                                                            User.profile_id ==
                                                            Profile.profile_id).first()
         if user is not None and user.verify_password(login_form.password.data):
-            session['remember_me'] = login_form.remember_me.data
-            login_user(user, remember=login_form.remember_me.data)
+            login_user(user, login_form.remember_me.data)
             session['timezone'] = str(login_form.timezone.data)
             session['session_token'] = user.session_token
             flash('You are now logged in', 'success')
