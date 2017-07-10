@@ -364,6 +364,7 @@ def show_party_profile(party_id):
         manage_guests_form.friends.data = [guest.friend_profile_id for guest in party_guests]
 
         collated_recipes = []
+        recipe_dict = {}
         if party.party_recipes:
             for recipe in party.party_recipes:
                 works_for = json.loads(recipe.works_for)
@@ -439,8 +440,8 @@ def add_new_party():
                                         datetime_of_party=party_date,
                                         user_id=current_user.id,
                                         party_notes=add_party_form.notes.data)
-        new_guest = PartyGuest.create_record(party_id=new_party.party_id,
-                                             friend_profile_id=current_user.profile_id)
+        PartyGuest.create_record(party_id=new_party.party_id,
+                                 friend_profile_id=current_user.profile_id)
         flash("Success! Who would you like to invite to your party?", "success")
         return redirect("profiles/party_profile/%s" % new_party.party_id)
     elif request.method == 'POST' and not add_party_form.validate():
