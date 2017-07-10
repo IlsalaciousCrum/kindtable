@@ -193,12 +193,16 @@
                                     {% if guest.profiles.profile_id != current_user.profile_id %}
                                         <a href="{{ url_for('profiles.show_friend_profile', friend_id=guest.profiles.profile_id) }}">
                                         <span style="font-size: 135%">
+                                            {% if guest.profiles.private_profile_title %}
+                                            {{  guest.profiles.private_profile_title  }}
+                                            {% else %}
                                             {%if guest.profiles.first_name and guest.profiles.last_name %}
                                                 {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}
                                             {% elif guest.profiles.first_name and not guest.profiles.last_name %}
                                                 {{  guest.profiles.first_name}}
                                             {% else %}
                                                 {{  guest.profiles.email  }}
+                                            {% endif %}
                                             {% endif %}
                                         </span>
                                         </a>

@@ -3,11 +3,11 @@
 
 <!-- Modals -->
 
-<div class="modal fade" id="firstNameModal" tabindex="-1" role="dialog" aria-labelledby="changeFirstNameModalLabel" aria-hidden="true">
+<div class="modal fade" id="privateProfileTitleModal" tabindex="-1" role="dialog" aria-labelledby="privateProfileTitleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="changeFirstNameModalLabel">Change First Name</h5>
+                <h5 class="modal-title" id="privateProfileTitleModalLabel">Change private profile title</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -15,43 +15,19 @@
             <div class="modal-body">
                 <div class = "row round_hidden_div" style="padding-top: 2em">
                 {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('profiles.changefirstname') }}" class="form form-horizontal" method="post" role="form" id="changeFirstName">
+                    <form action="{{ url_for('profiles.changeprivateprofiletitle') }}" class="form form-horizontal" method="post" role="form" id="changeTitle">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(first_name_form.first_name,  style="width: 75%", rows="1") }}<br>
+                        {{ render_field(title_form.title,  style="width: 75%", rows="1") }}<br>
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
         </div>
-        <script src="{{ url_for('static', filename = 'js/firstName.js') }}" type="text/javascript"></script>
+        <script src="{{ url_for('static', filename = 'js/changeTitle.js') }}" type="text/javascript"></script>
     </div>
 </div>
 
-<div class="modal fade" id="lastNameModal" tabindex="-1" role="dialog" aria-labelledby="changeLastNameModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="changeLastNameModalLabel">Change Last Name</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class = "row round_hidden_div" style="padding-top: 2em">
-                {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('profiles.changelastname') }}" class="form form-horizontal" method="post" role="form" id="changeLastName">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                    <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(last_name_form.last_name, style="width: 75%", rows="1") }}<br>
-                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
-                    </form>
-                </div>  
-            </div>
-        </div>
-    </div>
-    <script src="{{ url_for('static', filename = 'js/lastName.js') }}" type="text/javascript"></script>
-</div>
 
 <div class="modal fade" id="dietModal" tabindex="-1" role="dialog" aria-labelledby="changeDietModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -324,10 +300,8 @@
 
 <!-- Begin content -->
 
-<h1 class="text-left" style="padding-left: 3em">Your Profile for {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }} {{  friend_profile.last_name  }}
-{% else %}
-    {{ friend_profile.email }}
-{%endif %}</h3>
+<h1 class="text-left headerName" style="padding-left: 3em"><span id="headerName">Your Profile for {{  friend_profile.private_profile_title  }}
+</span></h1>
 
     <div class="row well-spaced dashboard" style="padding-top: 3em">
         <div class="col-md-4 col-md-offset-1">      
@@ -338,28 +312,14 @@
                         Last updated {{ moment(friend_profile.last_updated).format('LLLL') }}
                     </div>
                 </div>
-                <div class="first">
-                    <div id="first">
-                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#firstNameModal">
-                            <span class="glyphicon glyphicon-pencil text-info" title="Change the first name" aria-hidden="true"></span>
-                        </button>&emsp; <strong>First Name:</strong>&emsp;{{  friend_profile.first_name  }}
-                    </div>
-                </div>
-                <div class="last">
-                    <div id="last">
-                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change the last name" data-target="#lastNameModal">
-                            <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
-                        </button>&emsp; <strong>Last Name:</strong>&emsp;{{  friend_profile.last_name  }}
+                <div class="name">
+                    <div id="name">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#privateProfileTitleModal">
+                            <span class="glyphicon glyphicon-pencil text-info" title="Change the title for this profile" aria-hidden="true"></span>
+                        </button>&emsp; <strong>Name:</strong>&emsp;{{  friend_profile.private_profile_title  }}
                     </div>
                 </div>
 
-                <div class="friendEmail">
-                    <div id="friendEmail">
-                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#friendEmailModal">
-                                <span class="glyphicon glyphicon-pencil text-info" title="Change the first name" aria-hidden="true"></span>
-                            </button>&emsp; <strong>Email address:</strong>&emsp;{{  friend_profile.email  }}
-                    </div>
-                </div>
 
                 <div class="dietType">
                     <div id="dietType">

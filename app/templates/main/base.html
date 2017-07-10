@@ -94,8 +94,12 @@ display:none;
                             {% for friend in current_user.valid_friends()|sort(attribute='first_name')  %}
                                 <li class="myFriends">
                                     <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.profile_id) }}">
+                                        {% if friend.private_profile_title %}
+                                        {{ friend.private_profile_title }}
+                                        {% else %}
                                         {% if friend.first_name is not none %}{{ friend.first_name }}{% else %}{%endif %} {% if friend.last_name is not none %}{{ friend.last_name }}{% else %}{%endif %}
                                         ({{ friend.email }})
+                                        {% endif %}
                                     </a>
                                 </li>
                             {% endfor %}

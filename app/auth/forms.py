@@ -1,7 +1,7 @@
 '''WTForms forms for user management'''
 
 from wtforms import Form, widgets
-from wtforms import (StringField, PasswordField, BooleanField, SubmitField,
+from wtforms import (StringField, PasswordField, SubmitField,
                      RadioField, TextField, SelectMultipleField, HiddenField)
 from wtforms.validators import (InputRequired, Length, Email, EqualTo, Optional,
                                 DataRequired, ValidationError)
@@ -23,7 +23,6 @@ class LoginForm(Form):
                                     Email('A valid email address is required.')])
     password = PasswordField('Password',
                              validators=[InputRequired('Please enter a valid password or reset password')])
-    remember_me = BooleanField('Keep me logged in')
     submit1 = SubmitField('Log in')
 
 

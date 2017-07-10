@@ -14,6 +14,21 @@ from datetime import date
 from wtforms.fields.html5 import DateField
 
 
+class PrivateProfileTitleForm(Form):
+    title = StringField("Your friend's name",
+                        validators=[InputRequired(message="Please tell us how to refer to your friend."),
+                                    Length(1, 100, message="Limit 100 characters")])
+    submit = SubmitField('Update')
+
+
+class ChangePrivateProfileTitleForm(Form):
+    profile_id = HiddenField(validators=[InputRequired()])
+    title = StringField("Your friend's name",
+                        validators=[InputRequired(message="Please tell us how to refer to your friend."),
+                                    Length(1, 100, message="Limit 100 characters")])
+    submit = SubmitField('Update')
+
+
 class FirstNameForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     first_name = StringField('First name',

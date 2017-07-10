@@ -74,6 +74,7 @@ class Profile(BaseMixin, db.Model):
     profile_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     owned_by_user_id = db.Column(db.Integer)
     email = db.Column(db.String(200), unique=False)
+    private_profile_title = db.Column(db.String(100), unique=False)
     email_verified = db.Column(db.Boolean, unique=False, default=False)
     first_name = db.Column(db.String(64), nullable=True)
     last_name = db.Column(db.String(64), nullable=True)

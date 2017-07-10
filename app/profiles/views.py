@@ -18,7 +18,8 @@ from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
                     AddNewPartyForm, DeleteFriendForm, ChangeFriendEmailForm,
                     FriendNotesForm, FindaFriendForm,
                     ManageGuestListForm, PartyTitleForm, PartyDatetimeForm,
-                    PartyNotesForm, DeletePartyForm, InviteForm)
+                    PartyNotesForm, DeletePartyForm, InviteForm,
+                    ChangePrivateProfileTitleForm, PrivateProfileTitleForm)
 
 from datetime import datetime
 
@@ -124,16 +125,14 @@ def show_friend_profile(friend_id):
         notes_form.notes.data = is_friend.friend_notes
 
         if friend_profile.owned_by_user_id == current_user.id:
-            first_name_form = FirstNameForm(request.form)
-            first_name_form.first_name.data = friend_profile.first_name
-            last_name_form = LastNameForm(request.form)
-            last_name_form.last_name.data = friend_profile.last_name
             diet_form = DietForm(request.form)
             diet_reason_form = DietReasonForm(request.form)
             diet_reason_form.diet_reason.data = friend_profile.diet_reason
             add_avoid_form = AddAvoidForm(request.form)
             update_avoid_form = UpdateAvoidForm(request.form)
             intol_form = IntoleranceForm(request.form)
+            title_form = ChangePrivateProfileTitleForm(request.form)
+            title_form.title.data = friend_profile.private_profile_title
             profile_intolerances = db.session.query(ProfileIntolerance
                                                     ).filter(Intolerance.intol_id ==
                                                              ProfileIntolerance.intol_id,
@@ -150,8 +149,6 @@ def show_friend_profile(friend_id):
                                    profile=current_user.profile,
                                    delete_form=delete_form,
                                    intol_form=intol_form,
-                                   first_name_form=first_name_form,
-                                   last_name_form=last_name_form,
                                    diet_form=diet_form,
                                    diet_reason_form=diet_reason_form,
                                    add_avoid_form=add_avoid_form,
@@ -162,7 +159,8 @@ def show_friend_profile(friend_id):
                                    now=now,
                                    parties=parties,
                                    inviteform=inviteform,
-                                   upcoming_parties=upcoming_parties)
+                                   upcoming_parties=upcoming_parties,
+                                   title_form=title_form)
         elif is_friend and is_friend.friendship_verified_by_email:
             now = datetime.now(pytz.utc)
             return render_template("/profiles/friend_profile_fixed.html",
@@ -255,24 +253,34 @@ def add_friend_profile():
     """Loads the add_friend_profile modal contents and processes a request to
     make a private profile"""
 
-    add_friend_form = FindaFriendForm(request.form)
+    print 1
+    private_profile_title_form = PrivateProfileTitleForm(request.form)
+    print 2
     this_user = current_user
-    if request.method == 'POST' and add_friend_form.validate():
-        existing_profile = Profile.query.filter(Profile.email == add_friend_form.friend_email.data, Profile.owned_by_user_id == this_user.id).first()
+    print 3
+    if request.method == 'POST' and private_profile_title_form.validate():
+        print 4
+        existing_profile = Profile.query.filter(Profile.private_profile_title == private_profile_title_form.title.data, Profile.owned_by_user_id == this_user.id).first()
+        print 5
         if existing_profile:
+            print 6
             flash("Looks like you already have a private profile for this person. Would you like to edit this one?")
             return redirect('profiles/friendprofile/%s' % existing_profile.profile_id)
         else:
-            new_friend_profile = Profile.create_record(email=add_friend_form.friend_email.data,
+            print 7
+            new_friend_profile = Profile.create_record(private_profile_title=private_profile_title_form.title.data,
                                                        owned_by_user_id=this_user.id)
+            print 8
             Friend.create_record(user_id=current_user.id,
                                  friend_profile_id=new_friend_profile.profile_id,
                                  private_profile=True)
+            print 9
             flash("Success! You can start editing information about your friend here. You don't have to add their first and last name but it will make the site easier to navigate")
             return redirect('profiles/friendprofile/%s' % new_friend_profile.profile_id)
     else:
+        print "GET template"
         return render_template("profiles/add_friend_profile.html",
-                               add_friend_form=add_friend_form)
+                               private_profile_title_form=private_profile_title_form)
 
 
 @profiles.route('/confirm_friendship_existing_user/<token>', methods=['GET'])
@@ -361,7 +369,7 @@ def show_party_profile(party_id):
         session['offset'] = 0
 
         friends = current_user.valid_friends()
-        manage_guests_form.friends.choices = [(friend.profile_id, ("{0} {1} ({2})").format(friend.first_name, friend.last_name, friend.email)) for friend in friends]
+        manage_guests_form.friends.choices = [(friend.profile_id, ("{0} {1} ({2})").format(friend.first_name, friend.last_name, friend.email)) if friend.private_profile_title is None else (friend.profile_id, friend.private_profile_title) for friend in friends]
         titleform.title.data = party.title
         party_guests = party.guests
         manage_guests_form.friends.data = [guest.friend_profile_id for guest in party_guests]
@@ -393,7 +401,9 @@ def show_party_profile(party_id):
                             else:
                                 add = False
                     if add is True:
-                        if guest.profiles.first_name and guest.profiles.last_name:
+                        if guest.profiles.private_profile_title:
+                            name = guest.profiles.private_profile_title
+                        elif guest.profiles.first_name and guest.profiles.last_name:
                             name = guest.profiles.first_name + " " + guest.profiles.last_name
                         elif guest.profiles.first_name:
                             name = guest.profiles.first_name + " (" + guest.profiles.email + ")"
@@ -461,6 +471,27 @@ def add_new_party():
 
 
 # Only JSON routes below for AJAX calls
+
+@profiles.route('/changeprivateprofiletitle.json', methods=['POST'])
+@login_required
+@email_confirmation_required
+def changeprivateprofiletitle():
+    """Takes an Ajax request and changes a private profiles title"""
+
+    form = ChangePrivateProfileTitleForm(request.form)
+    profile = Profile.query.get(form.profile_id.data)
+    if form.validate() and profile.owned_by_user_id == current_user.id:
+        profile = Profile.query.get(form.profile_id.data)
+        profile.update({"private_profile_title": form.title.data,
+                        "last_updated": datetime.utcnow()})
+        return jsonify(data={'message': 'Title updated'})
+    else:
+        for field, error in form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+
 
 @profiles.route('/changefirstname.json', methods=['POST'])
 @login_required

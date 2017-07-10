@@ -53,13 +53,16 @@
                         {% for guest in party.guests %}
                             {% if guest.profiles.diet.diet_type == diet %}
                                 <a href="#" data-toggle="tooltip" data-placement="right" title='Reason: "{{  guest.profiles.diet_reason}}"'>
+                                    {% if guest.profiles.private_profile_title %}
+                                    {{ guest.profiles.private_profile_title }}
+                                    {% else %}
                                     {% if guest.profiles.first_name and guest.profiles.last_name %}
                                         {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}
                                     {% elif guest.profiles.first_name and not guest.profiles.last_name %}
                                         {{  guest.profiles.first_name}}
                                     {% else %}
                                         {{  guest.profiles.email  }}
-                                    {% endif %}</a><br>
+                                    {% endif %}{% endif %}</a><br>
                             {% endif %}
                         {% endfor %}
                     </label>
@@ -83,8 +86,11 @@
                                 {% for intolerance in guest.profiles.intolerances %}
                                 {% if intolerance.intol_name == intol %}
                                 <a href="#" data-toggle="tooltip" data-placement="right" title="No reasons are collected for Intolerances/Allergies because the reason is always the same, these things will make your guest very sick. Tread carefully. It may be enough to have seperate dishes and it may not.">
+                                    {% if guest.profiles.private_profile_title %}
+                                    {{ guest.profiles.private_profile_title  }}
+                                    {% else %}
                                     {% if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}</a>{% endif %}</a><br>
-                                    {% endif %}
+                                    {% endif %}{% endif %}
                                     {% endfor %}    
                                     {% endfor %}
 
@@ -113,8 +119,12 @@
                                                 
                                                 {% if guestavoid.ingredient == avoid %}
                                                 
-                                                <a href="#" data-toggle="tooltip" data-placement="right" title='"Reason: {{  guestavoid.reason  }}"'>{% if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}</a>{% endif %}</a>
-                                                {% endif %}
+                                                <a href="#" data-toggle="tooltip" data-placement="right" title='"Reason: {{  guestavoid.reason  }}"'>
+                                                {% if guest.profiles.private_profile_title %}
+                                                {{ guest.profiles.private_profile_title  }}
+                                                {% else %}
+                                                {% if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}</a>{% endif %}</a>
+                                                {% endif %}{% endif %}
                                                 {% endfor %}    
                                                 {% endfor %}
                                                 {% else %}

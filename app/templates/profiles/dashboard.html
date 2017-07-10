@@ -352,11 +352,15 @@
                     
                     {% if current_user.valid_friends() %}
                         <ul>
-                            {% for friend in current_user.valid_friends() %}
+                            {% for friend in current_user.valid_friends()|sort(attribute="first_name") %}
                                 <li>
                                     <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.profile_id) }}">
+                                        {% if friend.private_profile_title %}
+                                        {{  friend.private_profile_title }}
+                                        {% else %}
                                         {{ friend.first_name }} {{friend.last_name  }}
                                     </a> <span class="text-muted">({{  friend.email  }})</span>
+                                        {% endif %}
                                 </li>
                             {% endfor %}
                         </ul>

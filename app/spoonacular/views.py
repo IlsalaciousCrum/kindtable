@@ -173,7 +173,9 @@ def saved_recipe(record_id):
                 else:
                     add = False
         if add is True:
-            if guest.profiles.first_name and guest.profiles.last_name:
+            if guest.profiles.private_profile_title:
+                name = guest.profiles.private_profile_title
+            elif guest.profiles.first_name and guest.profiles.last_name:
                 name = guest.profiles.first_name + " " + guest.profiles.last_name
             elif guest.profiles.first_name:
                 name = guest.profiles.first_name + " (" + guest.profiles.email + ")"
