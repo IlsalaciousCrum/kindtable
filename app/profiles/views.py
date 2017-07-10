@@ -266,7 +266,7 @@ def add_friend_profile():
             Friend.create_record(user_id=current_user.id,
                                  friend_profile_id=new_friend_profile.profile_id,
                                  private_profile=True)
-            flash("Success! You can start editing information about your friend here. You don't have to add their first and last name but it will make the site easier to navigate")
+            flash("Success! You can start editing information about your friend here.")
             return redirect('profiles/friendprofile/%s' % new_friend_profile.profile_id)
     else:
         return render_template("profiles/add_friend_profile.html",
