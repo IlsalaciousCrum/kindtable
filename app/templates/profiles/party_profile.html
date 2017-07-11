@@ -259,19 +259,21 @@
                         {% if collated_recipes %}
                             {% for recipe in collated_recipes %}
                                 <a href="{{ url_for('spoonacular.saved_recipe', record_id=recipe['record_id']) }}" target="_blank"><span style="font-size: 125%">{{  recipe['title']  }}</span></a><br>
-                                    <ul>
-                                        
+                                    <ul>  
+                                        {% if recipe['works_for_guests'] %}
                                             <span class="text-muted">
-                                                {% if recipe['works_for_guests'] %}
-                                            <li>
-                                            <strong>Works for {{  recipe['works_for_guests']|length  }} out of {{  party.guests|length  }} guests</strong>:<br> {% for person in recipe['works_for_guests'] %}{{  person  }}{% if not loop.last %}, {% endif %}{% endfor %}</li>{% else %}
-                                            <span class="text-muted"><li>This recipe won't techinically work for anyone you have invited (but I bet it will taste great.</span></li>{% endif %}
-                                        
-                                            {% if recipe['notes'] %}
                                                 <li>
-                                                    <span class="text-muted"><strong>Recipe Notes:</strong> {{  recipe['notes']  }}</span>
+                                                    <strong>Works for {{  recipe['works_for_guests']|length  }} out of {{  party.guests|length  }} guests</strong>:<br> {% for person in recipe['works_for_guests'] %}{{  person  }}{% if not loop.last %}, {% endif %}{% endfor %}
                                                 </li>
-                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted"><li>This recipe won't techinically work for anyone you have invited (but I bet it will taste great.</li></span>
+                                        {% endif %}
+                                
+                                        {% if recipe['notes'] %}
+                                            <li>
+                                                <span class="text-muted"><strong>Recipe Notes:</strong> {{  recipe['notes']  }}</span>
+                                            </li>
+                                        {% endif %}
                                             <li><span class="text-muted"><strong>Course:</strong> {{  recipe['course']  }}</span></li>
                                             <li><span class="text-muted"><strong>Cuisine:</strong> {{  recipe['cuisine']  }}</span></li>
                                     </ul>

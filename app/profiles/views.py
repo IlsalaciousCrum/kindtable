@@ -399,15 +399,15 @@ def show_party_profile(party_id):
                         works.append(name)
                     else:
                         continue
-            recipe_dict = {'title': recipe.recipes.title,
-                           'record_id': recipe.record_id,
-                           'image_url': recipe.recipes.recipe_image_url,
-                           'works_for': json.loads(recipe.works_for),
-                           'notes': recipe.recipe_notes,
-                           'works_for_guests': works,
-                           'course': recipe.course.course_name,
-                           'cuisine': recipe.cuisine.cuisine_name}
-            collated_recipes.append(recipe_dict)
+                    recipe_dict = {'title': recipe.recipes.title,
+                                   'record_id': recipe.record_id,
+                                   'image_url': recipe.recipes.recipe_image_url,
+                                   'works_for': json.loads(recipe.works_for),
+                                   'notes': recipe.recipe_notes,
+                                   'works_for_guests': works,
+                                   'course': recipe.course.course_name,
+                                   'cuisine': recipe.cuisine.cuisine_name}
+                    collated_recipes.append(recipe_dict)
         else:
             collated_recipes = ""
         return render_template("profiles/party_profile.html", party=party,
