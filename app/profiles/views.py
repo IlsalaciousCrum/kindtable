@@ -311,7 +311,12 @@ def confirm_friendship_with_new_user(token):
 
     user_id = current_user.id
     friendship = Friend.process_email_token(token, current_user_id=user_id)
-    if not friendship:
+    if friendship == "logout":
+        flash("Oops! Looks likes another user was still logged in on this computer. We have logged them out. Please follow the link from your email again.")
+        return redirect(url_for('auth.logout'))
+    elif friendship == "false":
+        flash("There seems to be an error. Please email kindtableapp@gmail.com with what you were doing when the error happened. Thank you.")
+    elif not friendship:
         abort(404)
     else:
         new_friend = friendship.user.profile
