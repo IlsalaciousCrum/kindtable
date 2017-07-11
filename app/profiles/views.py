@@ -211,17 +211,17 @@ def connect_friends():
                 flash("Looks like you have already sent this person a friend request. Maybe check with them personally or create a friend profile for them yourself?")
                 return redirect(request.referrer)
             else:
-                friendship = Friend.create_record(user_id=current_user.id,
+                friendship = Friend.create_record(user_id=this_user.id,
                                                   friend_profile_id=existing_user.profile_id)
                 token = friendship.generate_email_token()
                 send_email(to=existing_user.profile.email,
                            subject=' {0} {1}({2}) wants to connect\
-                           on KindTable'.format(current_user.profile.first_name,
-                                                current_user.profile.last_name,
-                                                current_user.profile.email),
+                           on KindTable'.format(this_user.profile.first_name,
+                                                this_user.profile.last_name,
+                                                this_user.profile.email),
                            template='profiles/email/friend_existing_user',
                            profile=existing_user.profile,
-                           friend=current_user.profile,
+                           friend=this_user.profile,
                            token=token)
                 friendship.update({"friend_request_sent": True})
                 flash('A connection request email has been sent to %s.' % existing_user.profile.email, "success")
@@ -232,9 +232,11 @@ def connect_friends():
                                               friend_profile_id=new_friend_profile.profile_id)
             token = friendship.generate_email_token()
             send_email(to=new_friend_profile.email,
-                       subject=' %s %s wants to connect on KindTable',
+                       subject='{0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
+                                                                              this_user.profile.last_name,
+                                                                              this_user.profile.email),
                        template='profiles/email/friend_new_user',
-                       friend=current_user.profile, token=token)
+                       friend=this_user.profile, token=token)
             flash('A connection request email has been sent to %s.'
                   % new_friend_profile.email, "success")
             return redirect(url_for('profiles.show_dashboard'))
