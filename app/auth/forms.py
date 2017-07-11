@@ -108,7 +108,7 @@ class PasswordChangeForm(Form):
 
 
 class PasswordResetRequestForm(Form):
-    email = StringField('Send password reset instructions to the email address you used to register: ',
+    email = StringField('Send password reset instructions to the email address you used to register',
                         validators=[InputRequired(), Length(1, 64),
                                     Email()])
     submit2 = SubmitField('Reset Password')

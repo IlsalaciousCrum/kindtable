@@ -109,7 +109,8 @@ def password_reset(token):
         else:
             flash("Something weird has happened", "danger")
             return redirect(url_for('main.index'))
-    return render_template('auth/reset_password.html', form=form)
+    else:
+        return render_template('auth/reset_password_from_email.html', form=form)
 
 
 @auth.route('/logout')
