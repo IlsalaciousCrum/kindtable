@@ -309,7 +309,8 @@ def confirm_friendship_with_existing_user(token):
 def confirm_friendship_with_new_user(token):
     """Validates an email token and registers a new user"""
 
-    friendship = Friend.process_email_token(token)
+    user_id = current_user.id
+    friendship = Friend.process_email_token(token, current_user_id=user_id)
     if not friendship:
         abort(404)
     else:

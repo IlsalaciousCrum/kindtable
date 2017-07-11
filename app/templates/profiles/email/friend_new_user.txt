@@ -11,7 +11,7 @@ Step One:
 Register at Kind Table. Complete a quick registration process to provide your dietary information. Don't have
 any dietary preferences? The process will be even quicker. :) 
 
-{{  url_for('auth.register')}}">{{  url_for('auth.register')}}
+{{  url_for('auth.register')}}
 
 
 Step Two:
