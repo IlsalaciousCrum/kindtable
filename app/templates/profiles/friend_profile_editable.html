@@ -191,10 +191,9 @@
                     </div>
 
                     {% from "_formhelpers.html" import render_field %}
-                    <form action="{{ url_for('profiles.delete_friend') }}" class="form form-horizontal" method="POST" role="form" id="deleteForm">
+                    <form action="{{ url_for('profiles.deleteprivateprofile') }}" class="form form-horizontal" method="POST" role="form" id="deleteForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="profile_id" value="{{  profile_id  }}"/>
-                        <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
+                        <input type="hidden" name="private_profile_id" value="{{  friend_profile.profile_id  }}"/>
                         <input type="submit" class="btn btn-lg btn-danger" value="Delete Friend"><br><br>
                         
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
@@ -329,8 +328,8 @@
                     </div>
                 </div>
 
-                <div class="dietReason">
-                    <div id="dietReason">
+                <div class="dreason">
+                    <div id="dreason">
                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#dietReasonModal">
                             <span class="glyphicon glyphicon-pencil text-info" title="Change the reason they follow this diet." aria-hidden="true"></span>
                         </button>&emsp; <strong>Diet reason:</strong>&emsp;{{  friend_profile.diet_reason  }}

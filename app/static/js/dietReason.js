@@ -1,7 +1,7 @@
 function showCurrentDietReason(results) {
     "use strict";
     $(".modal.in").modal("hide");
-    $(".dietReason").load(location.href + "#dietReason");
+    $(".dreason").load(location.href + " #dreason");
 }
 
 $(document).ready(function() {
@@ -26,22 +26,15 @@ $(document).ready(function() {
     });
 });
 
-function refreshDietReason(results) {
-    "use strict";
-    $(".modal.in").modal("hide");
-    $(".dietReason").load(location.href + "#dietReason");
-}
-
 $(document).ready(function() {
     "use strict";
-    $('#clearDietReason').on('submit', (function(event) {
-        event.preventDefault();
+    $('#clearDietReason').on('click', (function(event) {
         var url = Flask.url_for("profiles.cleardietreason");
         $.ajax({
             type: "POST",
             url:url,
             data: $('#changeDietReason').serialize(),
-            success: refreshDietReason
+            success: showCurrentDietReason
             });
     }));
 

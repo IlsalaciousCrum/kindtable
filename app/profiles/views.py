@@ -19,7 +19,8 @@ from .forms import (FirstNameForm, LastNameForm, DietForm, DietReasonForm,
                     FriendNotesForm, FindaFriendForm,
                     ManageGuestListForm, PartyTitleForm, PartyDatetimeForm,
                     PartyNotesForm, DeletePartyForm, InviteForm,
-                    ChangePrivateProfileTitleForm, PrivateProfileTitleForm)
+                    ChangePrivateProfileTitleForm, PrivateProfileTitleForm,
+                    DeletePrivateProfileForm)
 
 from datetime import datetime
 
@@ -119,13 +120,13 @@ def show_friend_profile(friend_id):
     if is_friend:
         parties_invited = db.session.query(Party).join(PartyGuest).filter(Party.user_id == current_user.id,
                                                                           PartyGuest.friend_profile_id == friend_id).all()
-        delete_form = DeleteFriendForm(request.form)
         email_form = ChangeFriendEmailForm(request.form)
         notes_form = FriendNotesForm(request.form)
         notes_form.notes.data = is_friend.friend_notes
 
         if friend_profile.owned_by_user_id == current_user.id:
             diet_form = DietForm(request.form)
+            deleteppform = DeletePrivateProfileForm(request.form)
             diet_reason_form = DietReasonForm(request.form)
             diet_reason_form.diet_reason.data = friend_profile.diet_reason
             add_avoid_form = AddAvoidForm(request.form)
@@ -147,7 +148,7 @@ def show_friend_profile(friend_id):
                                    friend_profile=friend_profile,
                                    parties_invited=parties_invited,
                                    profile=current_user.profile,
-                                   delete_form=delete_form,
+                                   deleteppform=deleteppform,
                                    intol_form=intol_form,
                                    diet_form=diet_form,
                                    diet_reason_form=diet_reason_form,
@@ -163,6 +164,7 @@ def show_friend_profile(friend_id):
                                    title_form=title_form)
         elif is_friend and is_friend.friendship_verified_by_email:
             now = datetime.now(pytz.utc)
+            delete_form = DeleteFriendForm(request.form)
             return render_template("/profiles/friend_profile_fixed.html",
                                    profile_id=current_user.profile.profile_id,
                                    friend_profile=friend_profile,
@@ -346,6 +348,8 @@ def show_party_profile(party_id):
 
         naive = party_date.replace(tzinfo=None)
 
+        deletepartyform = DeletePartyForm(request.form)
+
         party_date_date = naive
         party_date_time = naive.time()
 
@@ -423,7 +427,8 @@ def show_party_profile(party_id):
                                titleform=titleform,
                                datetimeform=datetimeform,
                                partynotesform=partynotesform,
-                               collated_recipes=collated_recipes)
+                               collated_recipes=collated_recipes,
+                               deletepartyform=deletepartyform)
     else:
         flash("At this time, you may only view your own parties. What a neat feature to add, though!")
         return redirect(request.referrer)
@@ -436,8 +441,6 @@ def add_new_party():
     """Serves the template and processes the form to add a new party"""
 
     add_party_form = AddNewPartyForm(request.form)
-
-    # format for date setter  %Y-%m-%d %H:%M:%S"
 
     if request.method == 'POST' and add_party_form.validate():
         session_timezone = session['timezone']
@@ -458,6 +461,23 @@ def add_new_party():
     else:
         return render_template("profiles/add_a_party.html",
                                add_party_form=add_party_form)
+
+
+@profiles.route('/delete_private_profile', methods=['GET', 'POST'])
+@login_required
+@email_confirmation_required
+def deleteprivateprofile():
+    """Deletes a private profile"""
+
+    deleteppform = DeletePrivateProfileForm(request.form)
+
+    if request.method == 'POST' and deleteppform.validate():
+        friend = Profile.query.get(deleteppform.private_profile_id.data)
+        friend.remove_profile()
+        flash("Private profile removed.")
+        return redirect(url_for('profiles.show_dashboard'))
+    else:
+        return redirect(request.referrer)
 
 
 # Only JSON routes below for AJAX calls
@@ -989,7 +1009,7 @@ def clearpartynotes():
         return redirect(request.referrer)
 
 
-@profiles.route('/discardparty.json', methods=['POST'])
+@profiles.route('/discardparty', methods=['POST'])
 @login_required
 @email_confirmation_required
 def discardparty():

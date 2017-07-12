@@ -47,63 +47,65 @@
                 <h4 class="form-control-static">Diets:</h4>
                 
                 {% for diet in party_diets %}  
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" class="alertme" name="diets" value="{{  diet }}" checked><strong>{{  diet|capitalize  }}</strong><br>
-                        {% for guest in party.guests %}
-                            {% if guest.profiles.diet.diet_type == diet %}
-                                <a href="#" data-toggle="tooltip" data-placement="right" title='Reason: "{{  guest.profiles.diet_reason}}"'>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="alertme" name="diets" value="{{  diet }}" checked><strong>{{  diet|capitalize  }}</strong></label><br>
+                            
+                            {% for guest in party.guests %}
+                                <a title='Diet Reason: "{{  guest.profiles.diet_reason if guest.profiles.diet_reason != None else 'None'  }}"' class="ooltip">
+                                {% if guest.profiles.diet.diet_type == diet %}
                                     {% if guest.profiles.private_profile_title %}
-                                    {{ guest.profiles.private_profile_title }}
-                                    {% else %}
-                                    {% if guest.profiles.first_name and guest.profiles.last_name %}
-                                        {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}
+                                        {{ guest.profiles.private_profile_title }}<br>
+                                    {% elif guest.profiles.first_name and guest.profiles.last_name %}
+                                        {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}<br>
                                     {% elif guest.profiles.first_name and not guest.profiles.last_name %}
-                                        {{  guest.profiles.first_name}}
+                                        {{  guest.profiles.first_name}}<br>
                                     {% else %}
-                                        {{  guest.profiles.email  }}
-                                    {% endif %}{% endif %}</a><br>
-                            {% endif %}
-                        {% endfor %}
-                    </label>
-                        
-                </div>
+                                        {{  guest.profiles.email  }}<br>
+                                    {% endif %}
+                                {% endif %}
+                                </a>
+                            {% endfor %}
+                    </div>
                 {% endfor %}
-
                     <h4 class="form-control-static">Intolerances/Allergies:</h4>
                     
                     {% if party_intols %}
                         <div class="checkbox">
                             {% for intol in party_intols %}
-                            {% if not intol %}
-                                <span class="text-muted" style="padding-left: 1em">No allergies/intolerances</span>
-                            {% endif %}                 
+                                {% if not intol %}
+                                    <span class="text-muted" style="padding-left: 1em">No allergies/intolerances</span>
+                                {% endif %}                 
                             <label>
                                 {% if intol %}
-                                <input type="checkbox" class="alertme" name="intols" value="{{  intol }}" checked><strong>{{  intol|capitalize  }}</strong><br>
-                                
-                               {% for guest in party.guests %}
-                                {% for intolerance in guest.profiles.intolerances %}
-                                {% if intolerance.intol_name == intol %}
-                                <a href="#" data-toggle="tooltip" data-placement="right" title="No reasons are collected for Intolerances/Allergies because the reason is always the same, these things will make your guest very sick. Tread carefully. It may be enough to have seperate dishes and it may not.">
-                                    {% if guest.profiles.private_profile_title %}
-                                    {{ guest.profiles.private_profile_title  }}
-                                    {% else %}
-                                    {% if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}</a>{% endif %}</a><br>
-                                    {% endif %}{% endif %}
-                                    {% endfor %}    
+                                    <input type="checkbox" class="alertme" name="intols" value="{{  intol }}" checked><strong>{{  intol|capitalize  }}</strong><br>
+                                    
+                                   {% for guest in party.guests %}
+                                        {% for intolerance in guest.profiles.intolerances %}
+                                            {% if intolerance.intol_name == intol %}
+                                                <a title="No reasons are collected for Intolerances/Allergies because the reason is always the same, these things will make your guest very sick. Tread carefully. It may be enough to have seperate dishes and it may not." class="ooltip">
+                                                {% if guest.profiles.private_profile_title %}
+                                                    {{ guest.profiles.private_profile_title  }}
+                                                {% else %}
+                                                    {% if guest.profiles.first_name and guest.profiles.last_name %}
+                                                        {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}
+                                                    {% elif guest.profiles.first_name and not guest.profiles.last_name %}
+                                                        {{  guest.profiles.first_name}}
+                                                    {% else %}
+                                                        {{  guest.profiles.email  }}
+                                                    {% endif %}
+                                                {% endif %}</a><br>
+                                            {% endif %}
+                                        {% endfor %}    
                                     {% endfor %}
-
                                 {% else %}
-                                <input type="hidden" class="alertme" name="intols" value="{{  intol }}" checked><strong>{{  intol|capitalize  }}</strong><br>
+                                    <input type="hidden" class="alertme" name="intols" value="{{  intol }}" checked><strong>{{  intol|capitalize  }}</strong><br>
                                 {% endif %}    
                                 </label><br>
-                                {% endfor %}
-
+                            {% endfor %}
                         </div>
                     {% else %}
                         <span class="text-muted">No intolerances</span>
-                    
                     {% endif %}
 
                         <h4 class="form-control-static">Ingredients to omit:</h4> 
@@ -112,23 +114,27 @@
                                     {% for avoid in party_avoids %}  
                                             <label>
                                                 {% if avoid %}  
-                                                <input type="checkbox" name="avoids" class="alertme" value="{{  avoid }}" checked><strong>{{  avoid|capitalize  }}</strong><br>
+                                                    <input type="checkbox" name="avoids" class="alertme" value="{{  avoid }}" checked><strong>{{  avoid|capitalize  }}</strong><br>
 
-                                                {% for guest in party.guests %}
-                                                {% for guestavoid in guest.profiles.avoidances %}
-                                                
-                                                {% if guestavoid.ingredient == avoid %}
-                                                
-                                                <a href="#" data-toggle="tooltip" data-placement="right" title='"Reason: {{  guestavoid.reason  }}"'>
-                                                {% if guest.profiles.private_profile_title %}
-                                                {{ guest.profiles.private_profile_title  }}
+                                                    {% for guest in party.guests %}
+                                                        {% for guestavoid in guest.profiles.avoidances %}
+                                                            {% if guestavoid.ingredient == avoid %}
+                                                                <a title='Avoid Reason: "{{  guestavoid.reason  }}"' class="ooltip">
+                                                                    {% if guest.profiles.private_profile_title %}
+                                                                        {{ guest.profiles.private_profile_title  }}
+                                                                    {% elif guest.profiles.first_name and guest.profiles.last_name %}
+                                                                        {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}
+                                                                    {% elif guest.profiles.first_name and not guest.profiles.last_name %}
+                                                                        {{  guest.profiles.first_name}}
+                                                                    {% else %}
+                                                                        {{  guest.profiles.email  }}
+                                                                    {% endif %}
+                                                                </a>
+                                                            {% endif %}
+                                                        {% endfor %}    
+                                                    {% endfor %}
                                                 {% else %}
-                                                {% if guest.profiles.first_name and guest.profiles.last_name %}{{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}{% elif guest.profiles.first_name and not guest.profiles.last_name %}{{  guest.profiles.first_name}} {% else %}{{  guest.profiles.email  }}</a>{% endif %}</a>
-                                                {% endif %}{% endif %}
-                                                {% endfor %}    
-                                                {% endfor %}
-                                                {% else %}
-                                                <input type="hidden" name="avoids" class="alertme" value="{{  avoid }}" checked><strong>{{  avoid|capitalize  }}</strong><br>
+                                                    <input type="hidden" name="avoids" class="alertme" value="{{  avoid }}" checked><strong>{{  avoid|capitalize  }}</strong><br>
                                                 {% endif %}
                                             </label><br>
                                     {% endfor %}
@@ -136,12 +142,6 @@
                                 {% else %}
                                 <span class="text-muted">No ingredients to avoid</span><br><br>
                                 {% endif %}
-                         
-                                    
-
-                            
-                        
-                        
                         <input type="submit" id="recipe-form-submit"value="Click for more variety" class="btn btn-success btn-lg btn-block">                 
                         
                     </form>

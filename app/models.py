@@ -133,16 +133,12 @@ class Profile(BaseMixin, db.Model):
         parties_invited = PartyGuest.query.filter(PartyGuest.friend_profile_id == self.profile_id).all()
         if parties_invited:
             for party in parties_invited:
-                party.discard_party()
+                party.disinvite_guest()
 
         friendship = Friend.query.filter(Friend.friend_profile_id == self.profile_id).all()
         if friendship:
             for friend in friendship:
                 friend.remove_friendship()
-
-        if self.avoidances:
-            for ingredient in self.avoidances:
-                ingredient._delete_()
 
         self._delete_()
 

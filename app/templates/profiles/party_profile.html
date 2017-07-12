@@ -128,7 +128,13 @@
                     <div class="alert alert-warning" role="alert">    
                         <span class="text-danger">Caution: Are you sure this is what you want to do? All information you have saved about this party and will
                             be permanently deleted. You can still build it later with a fresh start, but you might want to save/print recipes now.
-                        </span>
+                        </span><br><br>
+                         {% from "_formhelpers.html" import render_field %}
+                        <form action="{{ url_for('profiles.discardparty') }}" class="form form-horizontal" method="post" role="form" id="discardPartyForm">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
+                            <input type="submit" class="btn btn-sm btn-danger" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                         </form>
                     </div>
                 </div>
             </div>
@@ -252,7 +258,7 @@
 
                         <h3>Menu</h3>
                 
-                        {% if party.guests %}
+                        {% if party.guests|length > 1 %}
                             <a href="{{  url_for('spoonacular.show_search_spoonacular')  }}" class="btn btn-info" role="button">Search for Recipes</a><br><br>
                             {% endif %}
                         
@@ -266,7 +272,7 @@
                                                     <strong>Works for {{  recipe['works_for_guests']|length  }} out of {{  party.guests|length  }} guests</strong>:<br> {% for person in recipe['works_for_guests'] %}{{  person  }}{% if not loop.last %}, {% endif %}{% endfor %}
                                                 </li>
                                         {% else %}
-                                            <span class="text-muted"><li>This recipe won't techinically work for anyone you have invited (but I bet it will taste great.</li></span>
+                                            <span class="text-muted"><li>(This recipe won't techinically work for anyone you have invited)<br></li></span>
                                         {% endif %}
                                 
                                         {% if recipe['notes'] %}

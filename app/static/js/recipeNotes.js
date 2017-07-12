@@ -29,7 +29,7 @@ $(document).ready(function() {
 $(document).ready(function() {
     "use strict";
     $('#deletenote').on('click', (function(event) {
-        var url = Flask.url_for("profiles.clearrecipenotes");
+        var url = Flask.url_for("spoonacular.clearrecipenotes");
         $.ajax({
             type: "POST",
             url: url,

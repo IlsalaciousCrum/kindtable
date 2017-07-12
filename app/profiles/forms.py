@@ -57,6 +57,7 @@ class DietForm(Form):
 class DietReasonForm(Form):
     profile_id = HiddenField(validators=[InputRequired()])
     diet_reason = TextField('Reason diet is followed',
+                            widget=TextArea(),
                             validators=[Length(1, 128, message="Limit 64 characters"), DataRequired(message='Please enter a reason or exit the window')])
     submit = SubmitField('Update')
 
@@ -174,10 +175,15 @@ class DeleteFriendForm(Form):
     submit = SubmitField('Update')
 
 
+class DeletePrivateProfileForm(Form):
+    private_profile_id = HiddenField(validators=[InputRequired()])
+    submit = SubmitField('Update')
+
+
 class ChangeFriendEmailForm(Form):
     friend_profile_id = HiddenField(validators=[InputRequired()])
     email = StringField('New Email',
-                        validators=[InputRequired(),
+                        validators=[InputRequired('Please enter a reason.'),
                                     Length(1, 64),
                                     Email(),
                                     EqualTo('email2',

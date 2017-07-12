@@ -16,4 +16,5 @@ class BetaAccessForm(Form):
                                     Email('A valid email address is required.')])
     reason = StringField('Reason for access',
                          widget=TextArea(),
-                         validators=[Length(1, 300, message="Limit 300 characters")])
+                         validators=[InputRequired(message="Please provide a reason."),
+                                     Length(1, 300, message="Limit 300 characters")])
