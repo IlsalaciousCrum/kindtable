@@ -40,7 +40,10 @@ def login():
                                                            email.lower(),
                                                            User.profile_id ==
                                                            Profile.profile_id).first()
-        if user is not None and user.verify_password(login_form.password.data):
+        if user is None:
+            flash('You are not registered under that email address. Try again or register as a new user.')
+            return redirect(request.referrer)
+        elif user is not None and user.verify_password(login_form.password.data):
             login_user(user)
             session['timezone'] = str(login_form.timezone.data)
             session['session_token'] = user.session_token
