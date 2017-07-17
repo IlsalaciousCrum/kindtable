@@ -246,12 +246,25 @@ def register():
 @login_required
 def confirm(token):
 
+    confirm = current_user.profile.confirm(token)
+    print confirm
+    type(confirm)
+    raise Exception
+
     if current_user.profile.email_verified:
         return redirect(url_for('main.index'))
-    elif current_user.profile.confirm(token):
+    elif confirm is True:
         flash('You have confirmed your account. Thanks!', 'success')
+    elif confirm == "Expired":
+        token = profile.generate_confirmation_token()
+        send_email(to=profile.email, subject=' Confirm Your Account',
+                   template='auth/email/confirm', profile=profile, token=token)
+        flash('Please check your email for instructions on completing\
+              registration.', "success")
     else:
         flash('The confirmation link is invalid.', 'danger')
+
+        {'profile_id': self.profile_id, 'email': self.email}
 
     return redirect(url_for('main.index'))
 

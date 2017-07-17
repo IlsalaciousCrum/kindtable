@@ -4,8 +4,8 @@ from datetime import datetime
 from passlib.hash import bcrypt
 from . import db, login_manager
 from flask import flash
-from flask_login import UserMixin, current_user
-from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, SignatureExpired
+from flask_login import UserMixin
+from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, SignatureExpired, BadData
 import os
 from sqlalchemy import and_, or_
 
@@ -102,9 +102,17 @@ class Profile(BaseMixin, db.Model):
         registration_serializer = URLSafeTimedSerializer(os.environ['APP_SECRET_KEY'])
         try:
             data = registration_serializer.loads(token, max_age=86400)
-        except SignatureExpired:
-            # TODO: add functionality to send another confirmation link automatically here.
-            flash("It's been more than 24 hours since we sent the confirmation link. Please email kindtableapp@gmail.com for assistance. Please email kindtableapp@gmail.com for assistance.", 'danger')
+        except SignatureExpired, e:
+            encoded_payload = e.payload
+            if encoded_payload is not None:
+                try:
+                    decoded_payload = registration_serializer.load_payload(encoded_payload)
+                    return decoded_payload
+                except:
+                    flash("There seems to be something wrong with your confirmation email. Please email kindtableapp@gmail.com for assistance.", 'danger')
+                    return False
+        except BadData:
+            flash("There seems to be something wrong with your confirmation email. Please email kindtableapp@gmail.com for assistance.", 'danger')
             return False
         except BadSignature:
             # TODO: add functionality to email me an error log when this happens with all possible information
