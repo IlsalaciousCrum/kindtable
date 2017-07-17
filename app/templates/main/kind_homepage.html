@@ -15,7 +15,7 @@
             <img src="/static/knife_fork.png" alt="cutlery" class="center">
 
             {% if current_user.is_authenticated %}
-                {% if profile.email_verified is False %}
+                {% if profile.email_verified == false %}
                     <p class="bg-primary text-white">Hi {{  profile.first_name  }},<br><br>
                         Please check the email account you used to register for an email with 
                         a link in it for confirming your email account. Once I know your email account
