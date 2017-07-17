@@ -23,7 +23,6 @@
                     amazing meals.
                 {% endif %}
                 </p>
-            {% else %}
                 <b>Hello,
                 {% if current_user.profile.first_name is not none %}
                     {{  current_user.profile.first_name  }}.
@@ -32,10 +31,10 @@
                 {% endif %}
                 Welcome back!</b>
                 <p>What would you like to work on today?</p>
-                {% else %}
+            {% else %}
                 <b>Kind Table takes the work out of choosing recipes for a dinner party or holiday event by managing your friends dietary needs and preferences and presenting recipes that would work for all.</b>
                 {% endif %}
-              
+            {% endif %}
         </div>
     </div>
 
