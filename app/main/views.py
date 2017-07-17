@@ -30,14 +30,22 @@ def request_beta_access():
     """Load the beta access request view and process a request"""
 
     this_user = current_user
+    print this_user
     this_profile = this_user.profile
+    print this_profile
     beta_request_form = BetaAccessForm(request.form)
     if request.method == 'POST' and beta_request_form.validate():
+        print 1
         if this_user.beta_approved:
+            print 2
             return redirect(url_for('profiles.show_dashboard'))
         else:
+            print 3
             beta_access_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
+            print 4
             token = beta_access_serializer.dumps({'user_id': this_user.id, 'email': this_profile.email})
+            print token
+            print 5
             send_email(to='kindtableapp@gmail.com',
                        subject=' Beta Access Request',
                        template='main/email/request_beta_access_email',
@@ -47,9 +55,11 @@ def request_beta_access():
                        email=beta_request_form.email.data,
                        reason=beta_request_form.reason.data,
                        token=token)
+            print 6
             flash("Thank you! You will receive an email when your beta access is granted.")
             return redirect(url_for("profiles.show_dashboard"))
     else:
+        print 7
         beta_request_form.full_name.data = this_profile.first_name + " " + this_profile.last_name
         beta_request_form.email.data = this_profile.email
         return render_template("main/beta_access_request.html",
