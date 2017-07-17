@@ -16,11 +16,11 @@
 
             {% if current_user.is_authenticated %}
                 {% if profile.email_verified == false %}
-                    <p class="alert alert-danger" role="alert">Hi {{  profile.first_name  }},<br><br>
+                    <h2 class="alert alert-danger" role="alert">Hi {{  profile.first_name  }},<br><br>
                         Please check the email account you used to register for an email with 
                         a link in it for confirming your email account. Once I know your email account
                         is real, I would love for you to start using Kind Table to plan some 
-                        amazing meals.</p>
+                        amazing meals.</h2>
                 {% elif profile.email_verified == true %}
                     <b>Hello,
                     {% if current_user.profile.first_name is not none %}
