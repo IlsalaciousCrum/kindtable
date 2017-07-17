@@ -59,7 +59,7 @@ def request_beta_access():
 @main.route('/confirm/<token>')
 @login_required
 @email_confirmation_required
-def confirm(token):
+def owner_approved_beta_access(token):
 
     beta_access_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
     try:
