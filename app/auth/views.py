@@ -10,7 +10,7 @@ from .. import db
 
 from ..email import send_email
 
-from ..models import Profile, User, Diet, ProfileIntolerance, IngToAvoid, PartyGuest, Friend
+from ..models import Profile, User, Diet, ProfileIntolerance, IngToAvoid, Friend
 
 from ..decorators import flash_errors
 
@@ -24,6 +24,8 @@ from .forms import (LoginForm,
                     IntoleranceForm)
 
 from datetime import datetime
+
+import sys
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -247,24 +249,22 @@ def register():
 def confirm(token):
 
     confirm = current_user.profile.confirm(token)
-    print confirm
-    type(confirm)
-    raise Exception
 
     if current_user.profile.email_verified:
         return redirect(url_for('main.index'))
     elif confirm is True:
         flash('You have confirmed your account. Thanks!', 'success')
-    elif confirm == "Expired":
-        token = profile.generate_confirmation_token()
-        send_email(to=profile.email, subject=' Confirm Your Account',
-                   template='auth/email/confirm', profile=profile, token=token)
-        flash('Please check your email for instructions on completing\
-              registration.', "success")
+    elif type(confirm) is dict:
+        profile = Profile.query.get(confirm['profile_id'])
+        if profile.email == confirm['email']:
+            token = profile.generate_confirmation_token()
+            send_email(to=profile.email, subject=' Confirm Your Account',
+                       template='auth/email/confirm', profile=profile, token=token)
+            flash('That confirmation email is more than 24 hours old. I just \
+                sent you a new one. Please check your email account again and \
+                follow the instructions in the email')
     else:
-        flash('The confirmation link is invalid.', 'danger')
-
-        {'profile_id': self.profile_id, 'email': self.email}
+        flash('The confirmation link is invalid.')
 
     return redirect(url_for('main.index'))
 
