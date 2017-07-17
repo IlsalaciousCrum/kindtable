@@ -21,14 +21,3 @@ def send_email(to, subject, template, **kwargs):
     thr = Thread(target=send_async_email, args=[app, msg])
     thr.start()
     return thr
-
-
-def approve_beta_access(to, **kwargs):
-    app = current_app._get_current_object()
-    msg = Message(app.config['KIND_MAIL_SUBJECT_PREFIX'] + " " + "Beta Testing Access Approved",
-                  sender=app.config['KIND_MAIL_SENDER'], recipients=[to])
-    msg.body = render_template("main/email/approved_beta_access" + '.txt', **kwargs)
-    msg.html = render_template("main/email/approved_beta_access" + '.html', **kwargs)
-    thr = Thread(target=send_async_email, args=[app, msg])
-    thr.start()
-    return thr

@@ -8,6 +8,9 @@ Full name:  {{  full_name  }}
 Email:  {{  email  }}
 Reason  {{  reason  }}
 
+Aprove link: {{ url_for('main.owner_approved_beta_access', token=token, _external=True) }}
+
+
 Sincerely,
 
 Ilsa Gordon
