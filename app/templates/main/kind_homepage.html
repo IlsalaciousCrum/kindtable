@@ -15,6 +15,14 @@
             <img src="/static/knife_fork.png" alt="cutlery" class="center">
 
             {% if current_user.is_authenticated %}
+                {% if profile.email_verified is False %}
+                <p class="bg-primary text-white">Hi {{  profile.first_name  }},<br><br>
+                    Please check the email account you used to register for an email with 
+                    a link in it for confirming your email account. Once I know your email account
+                    is real, I would love for you to start using Kind Table to plan some 
+                    amazing meals.
+                </p>
+            {% else %}
                 <b>Hello,
                 {% if current_user.profile.first_name is not none %}
                     {{  current_user.profile.first_name  }}.
@@ -23,8 +31,9 @@
                 {% endif %}
                 Welcome back!</b>
                 <p>What would you like to work on today?</p>
-            {% else %}
+                {% else %}
                 <b>Kind Table takes the work out of choosing recipes for a dinner party or holiday event by managing your friends dietary needs and preferences and presenting recipes that would work for all.</b>
+                {% endif %}
             {% endif %}  
         </div>
     </div>
