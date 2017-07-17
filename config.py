@@ -19,6 +19,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     KIND_ADMIN = os.environ.get('KIND_ADMIN')
     SSL_DISABLE = True
+    ADMIN_USER_ID = os.environ['ADMIN_USER_ID']
 
     @staticmethod
     def init_app(app):

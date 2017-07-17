@@ -74,8 +74,8 @@ def owner_approved_beta_access(token):
 
     user = User.query.get(data['user_id'])
 
-    if not user or user.profile.email != data['email']:
-        flash("Something fishy. No user or their email doesn't match")
+    if not user or user.profile.email != data['email'] or current_user.id != os.environ['ADMIN_USER_ID']:
+        flash("Something fishy. No user or their email doesn't match or this is not the admin logged in.")
     else:
         user.beta_approved = True
         db.session.commit()
