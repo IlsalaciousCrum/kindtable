@@ -72,29 +72,22 @@ def request_beta_access():
 def owner_approved_beta_access(token):
 
     beta_access_serializer = JSONWebSignatureSerializer(os.environ['APP_SECRET_KEY'])
-    print 1
+    this_user = current_user
     try:
-        print 2
         data = beta_access_serializer.loads(token)
-        print data
     except BadData:
-        print 3
         flash("Bad Data. There seems to be something wrong with this beta access email.", 'danger')
         return False
     except BadSignature:
-        print 4
         # TODO: add functionality to email me an error log when this happens with all possible information
         flash("Bad Signature. There seems to be something wrong this beta access email.")
         return False
 
     user = User.query.get(data['user_id'])
-
-    if not user or user.profile.email != data['email'] or current_user.id != os.environ['ADMIN_USER_ID']:
-        print 6
+    if not user or user.profile.email != data['email'] or int(this_user.id) != int(os.environ['ADMIN_USER_ID']):
         flash("Something fishy. No user or their email doesn't match or this is not the admin logged in.")
         return redirect(url_for('main.index'))
     else:
-        print 7
         user.beta_approved = True
         db.session.commit()
         send_email(to=user.profile.email,
