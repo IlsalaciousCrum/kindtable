@@ -21,34 +21,6 @@ from .forms import (SaveRecipe, RecipeNotesForm, DeleteRecipeForm, EmailMenuForm
 from ..email import send_email
 
 
-@spoonacular.route('/recipe/<int:record_id>')
-@login_required
-@email_confirmation_required
-@beta_approval_required
-def show_saved_recipe(record_id):
-    """Show a recipe saved in the RecipeCard in it's own page, from the recipe preview, on the party page"""
-
-    this_user = current_user
-    this_recipe = PartyRecipes.query.get(record_id)
-    ingredients = json.loads(this_recipe.recipes.ingredients)
-    instructions = json.loads(this_recipe.recipes.instructions)
-    party = Party.query.get(this_recipe.party_id)
-    works_for = json.loads(this_recipe.works_for)
-
-    avoid = guest_avoidances(party.party_id)
-    intolerances = guest_intolerances(party.party_id)
-
-    return render_template("profiles/saved_recipe_profile.html",
-                           this_user=this_user,
-                           this_recipe=this_recipe,
-                           party=party,
-                           avoid=avoid,
-                           intolerances=intolerances,
-                           ingredients=ingredients,
-                           instructions=instructions,
-                           works_for=works_for)
-
-
 @spoonacular.route('/searchrecipes')
 @login_required
 @email_confirmation_required
@@ -140,56 +112,61 @@ def saved_recipe(record_id):
     notesForm = RecipeNotesForm(request.form)
     discardRecipeForm = DeleteRecipeForm(request.form)
     party_recipe = PartyRecipes.query.get(record_id)
-    notesForm.notes.data = party_recipe.recipe_notes
-    party = Party.query.get(party_recipe.party_id)
-    card = RecipeCard.query.get(party_recipe.recipe_record_id)
+    if party_recipe:
 
-    ingredients = json.loads(card.ingredients)
-    instructions = json.loads(card.instructions)
+        notesForm.notes.data = party_recipe.recipe_notes
+        party = Party.query.get(party_recipe.party_id)
+        card = RecipeCard.query.get(party_recipe.recipe_record_id)
 
-    works_for = json.loads(party_recipe.works_for)
-    works_for_name = []
-    for guest in party.guests:
-        add = True
-        if guest.profiles.avoidances:
-            for avoid in guest.profiles.avoidances:
-                if avoid.ingredient in works_for['avoids']:
-                    pass
-                else:
-                    add = False
-        if guest.profiles.diet.diet_type in works_for['diets']:
-            pass
-        else:
-            add = False
-        if guest.profiles.intolerances:
-            for intol in guest.profiles.intolerances:
-                if intol.intol_name in works_for['intols']:
-                    pass
-                else:
-                    add = False
-        if add is True:
-            if guest.profiles.private_profile_title:
-                name = guest.profiles.private_profile_title
-            elif guest.profiles.first_name and guest.profiles.last_name:
-                name = guest.profiles.first_name + " " + guest.profiles.last_name
-            elif guest.profiles.first_name:
-                name = guest.profiles.first_name + " (" + guest.profiles.email + ")"
+        ingredients = json.loads(card.ingredients)
+        instructions = json.loads(card.instructions)
+
+        works_for = json.loads(party_recipe.works_for)
+        works_for_name = []
+        for guest in party.guests:
+            add = True
+            if guest.profiles.avoidances:
+                for avoid in guest.profiles.avoidances:
+                    if avoid.ingredient in works_for['avoids']:
+                        pass
+                    else:
+                        add = False
+            if guest.profiles.diet.diet_type in works_for['diets']:
+                pass
             else:
-                name = guest.profiles.email
-            works_for_name.append(name)
-        else:
-            continue
+                add = False
+            if guest.profiles.intolerances:
+                for intol in guest.profiles.intolerances:
+                    if intol.intol_name in works_for['intols']:
+                        pass
+                    else:
+                        add = False
+            if add is True:
+                if guest.profiles.private_profile_title:
+                    name = guest.profiles.private_profile_title
+                elif guest.profiles.first_name and guest.profiles.last_name:
+                    name = guest.profiles.first_name + " " + guest.profiles.last_name
+                elif guest.profiles.first_name:
+                    name = guest.profiles.first_name + " (" + guest.profiles.email + ")"
+                else:
+                    name = guest.profiles.email
+                works_for_name.append(name)
+            else:
+                continue
 
-    return render_template("spoonacular/saved_recipe.html",
-                           party_recipe=party_recipe,
-                           party=party,
-                           card=card,
-                           works_for=works_for,
-                           works_for_name=works_for_name,
-                           notesForm=notesForm,
-                           discardRecipeForm=discardRecipeForm,
-                           ingredients=ingredients,
-                           instructions=instructions)
+        return render_template("spoonacular/saved_recipe.html",
+                               party_recipe=party_recipe,
+                               party=party,
+                               card=card,
+                               works_for=works_for,
+                               works_for_name=works_for_name,
+                               notesForm=notesForm,
+                               discardRecipeForm=discardRecipeForm,
+                               ingredients=ingredients,
+                               instructions=instructions)
+    else:
+        flash("Hm...I don't know that one. Looks like you bookmarked a link that wasn't meant to be saved.")
+        return redirect(url_for("main.index"))
 
 
 @spoonacular.route('/see_recipe/<int:recipe_id>')

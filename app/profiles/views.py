@@ -178,8 +178,7 @@ def show_friend_profile(friend_id):
                                    inviteform=inviteform,
                                    upcoming_parties=upcoming_parties)
     else:
-        flash("Looks like you are trying to view the profile of someone you are not\
-              friends with. Do you want to create your own profile for a friend?", "danger")
+        flash("Hmm...I don't know that one. Your friends can be accessed from the dropdown menu above or from your Dashboard.")
         return redirect(request.referrer)
 
 
