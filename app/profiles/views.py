@@ -333,7 +333,7 @@ def show_party_profile(party_id):
     """Show the party profile"""
 
     is_your_party = Party.query.filter(Party.user_id ==
-                                       current_user.id).first()
+                                       current_user.id, Party.party_id == party_id).first()
     if is_your_party:
         session['party_id'] = party_id
         party = Party.query.get(party_id)
@@ -430,8 +430,8 @@ def show_party_profile(party_id):
                                collated_recipes=collated_recipes,
                                deletepartyform=deletepartyform)
     else:
-        flash("At this time, you may only view your own parties. What a neat feature to add, though!")
-        return redirect(request.referrer)
+        flash("Hmm...I don't know that one. Your parties can be accessed from the dropdown menu above or from your Dashboard.")
+        return redirect(url_for('main.index'))
 
 
 @profiles.route('/add_new_party', methods=['GET', 'POST'])
