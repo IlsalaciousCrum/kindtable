@@ -49,16 +49,14 @@
             </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-left">
-                    <li>
-                        <a class="btn navbar-btn btn-sm btn-default" href={{ url_for('auth.register') }}>New User? Register here.</a>
-                    </li>
-                </ul>    
+                <div class="btn-group nav navbar-nav nav-bar-right">
+                    <a class="btn btn-sm btn-primary navbar-btn" href={{ url_for('auth.register') }}>New User? Register here.</a>
+                </div>    
    
-                <ul class="nav navbar-nav navbar-right">
+                <div class="nav navbar-nav navbar-right">
                     <a class="btn navbar-btn btn-sm btn-default" href={{ url_for('auth.login', variable='#resetpassword')  }} >Reset Password</a>
                     <a class="btn btn-info btn-sm navbar-btn" href={{ url_for('auth.login') }}>Log in</a>
-                </ul>
+                </div>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
