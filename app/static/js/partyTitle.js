@@ -1,4 +1,4 @@
-function showCurrentTitle(results) {
+function showCurrentPartyTitle(results) {
     "use strict";
     $(".modal.in").modal("hide");
     $(".partytitle").load(location.href + " #partytitle");
@@ -13,7 +13,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#changeTitle').serialize(),
-            success: showCurrentTitle
+            success: showCurrentPartyTitle
         });
     }));
 

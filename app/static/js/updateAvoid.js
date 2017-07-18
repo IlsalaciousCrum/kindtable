@@ -44,12 +44,6 @@ $(document).ready(function() {
     });
 });
 
-function showCurrentAvoids(results) {
-    "use strict";
-    $(".avoids").load(location.href + " #avoids");
-    $(".modal.in").modal("hide");
-}
-
 $(document).ready(function() {
     "use strict";
     $('#deleteavoid').on('click', (function(event) {
@@ -70,12 +64,6 @@ $(document).ready(function() {
         }
     });
 });
-
-function showCurrentAvoids(results) {
-    "use strict";
-    $(".avoids").load(location.href + " #avoids");
-    $(".modal.in").modal("hide");
-}
 
 $(document).ready(function() {
     "use strict";

@@ -1,4 +1,4 @@
-function showCurrentIntols(results) {
+function showCurrentIntolsRegister(results) {
     "use strict";
     $("#intol-success").css('display', 'inline');
     $("#intol-success").fadeOut(2500, (function(){
@@ -16,7 +16,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#intolsForm').serialize(),
-            success: showCurrentIntols
+            success: showCurrentIntolsRegister
         });
     }));
 

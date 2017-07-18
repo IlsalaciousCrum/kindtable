@@ -1,4 +1,4 @@
-function showCurrentAvoid(results) {
+function showCurrentAvoidRegister(results) {
     "use strict";
     $(".avoids").load(location.href + " #avoids");
     $(".avoids").show();
@@ -19,7 +19,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#addAvoidForm').serialize(),
-            success: showCurrentAvoid
+            success: showCurrentAvoidRegister
         });
     }));
 

@@ -1,4 +1,4 @@
-function showSuccess(results) {
+function showEmailMenuSuccess(results) {
     "use strict";
     $("#emailSuccess").css('display', 'inline');
     $("#emailSuccess").fadeOut(6000, (function(){
@@ -15,7 +15,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#emailMenuForm').serialize(),
-            success: showSuccess
+            success: showEmailMenuSuccess
         });
     }));
 

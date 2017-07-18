@@ -1,4 +1,4 @@
-function showCurrentNotes(results) {
+function showCurrentRecipeNotes(results) {
     "use strict";
     $(".modal.in").modal("hide");
     $(".recipe_notes").load(location.href + " #recipe_notes");
@@ -13,7 +13,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#notesForm').serialize(),
-            success: showCurrentNotes
+            success: showCurrentRecipeNotes
         });
     }));
 
@@ -34,7 +34,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#notesForm').serialize(),
-            success: showCurrentNotes
+            success: showCurrentRecipeNotes
         });
     }));
     

@@ -74,7 +74,9 @@ def owner_approved_beta_access(token):
         return False
 
     user = User.query.get(data['user_id'])
-    if not user or user.profile.email != data['email'] or int(this_user.id) != int(os.environ['ADMIN_USER_ID']):
+    if int(this_user.id) != int(os.environ['ADMIN_USER_ID']):
+        return redirect(url_for('auth.logout'))
+    elif not user or user.profile.email != data['email'] or int(this_user.id) != int(os.environ['ADMIN_USER_ID']):
         flash("Something fishy. No user or their email doesn't match or this is not the admin logged in.")
         return redirect(url_for('main.index'))
     else:

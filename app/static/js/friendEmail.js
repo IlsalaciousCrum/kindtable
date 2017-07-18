@@ -1,4 +1,4 @@
-function showCurrentEmail(results) {
+function showCurrentFriendEmail(results) {
     "use strict";
     $(".modal.in").modal("hide");
     $(".friendEmail").load(location.href + " #friendEmail");
@@ -13,7 +13,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#emailForm').serialize(),
-            success: showCurrentEmail
+            success: showCurrentFriendEmail
         });
     }));
 

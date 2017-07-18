@@ -1,4 +1,4 @@
-function showCurrentNotes(results) {
+function showCurrentPartyNotes(results) {
     "use strict";
     $(".modal.in").modal("hide");
     $(".party_notes").load(location.href + " #party_notes");
@@ -13,7 +13,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#notesForm').serialize(),
-            success: showCurrentNotes
+            success: showCurrentPartyNotes
         });
     }));
 
@@ -34,7 +34,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#notesForm').serialize(),
-            success: showCurrentNotes
+            success: showCurrentPartyNotes
         });
     }));
 

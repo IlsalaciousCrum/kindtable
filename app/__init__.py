@@ -8,6 +8,7 @@ from config import config
 from jinja2 import StrictUndefined
 from flask_wtf.csrf import CSRFProtect
 from flask_jsglue import JSGlue
+from flask_assets import Environment, Bundle
 
 jsglue = JSGlue()
 db = SQLAlchemy()
@@ -27,7 +28,21 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    # bootstrap.init_app(app)
+    # Flask Assets
+
+    assets = Environment(app)
+
+    js = Bundle('js/addAvoid-Register.js', 'js/addAvoid.js', 'js/addFriendProfile.js',
+                'js/addParty.js', 'js/base.js', 'js/changeTitle.js', 'js/datetime.js',
+                'js/diet.js', 'js/dietReason.js', 'js/emailMenu.js', 'js/findFriend.js',
+                'js/firstName.js', 'js/friendEmail.js', 'js/friendNotes.js',
+                'js/Intol-register.js', 'js/Intol.js', 'js/inviteFriendToParties.js',
+                'js/lastName.js', 'js/login_timezone.js',
+                'js/manageGuestList.js', 'js/partyNotes.js', 'js/partyTitle.js',
+                'js/previewRecipe.js', 'js/recipeNotes.js', 'js/recipeSearch.js',
+                'js/updateAvoid-register.js', 'js/updateAvoid.js',
+                filters='jsmin', output='gen/packed.js')
+    assets.register('js_all', js)
     Bootstrap(app)
     CSRFProtect(app)
     mail.init_app(app)

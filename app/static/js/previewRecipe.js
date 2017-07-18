@@ -3,7 +3,7 @@
   shows up in the console but without loading this script in with the recipe
   search modal, the form just submits instead of using the ajax route. */
 
-function showSuccessMessage(results) {
+function showSuccessPreviewRecipe(results) {
     "use strict";
     $('#seeRecipeModal').modal('hide');
     var party_title = $("#party_title").html();
@@ -26,7 +26,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#saveform').serialize(),
-            success: showSuccessMessage
+            success: showSuccessPreviewRecipe
         });
     }));
 

@@ -1,4 +1,4 @@
-function showCurrentNotes(results) {
+function showCurrentFriendNotes(results) {
     "use strict";
     $(".modal.in").modal("hide");
     $(".friend_notes").load(location.href + " #friend_notes");
@@ -13,7 +13,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#notesForm').serialize(),
-            success: showCurrentNotes
+            success: showCurrentFriendNotes
         });
     }));
 
@@ -34,7 +34,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#notesForm').serialize(),
-            success: showCurrentNotes
+            success: showCurrentFriendNotes
         });
     }));
 

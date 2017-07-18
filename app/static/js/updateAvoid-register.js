@@ -11,7 +11,7 @@ $(document).ready(function() {
     }));
 });
 
-function showCurrentAvoids(results) {
+function showCurrentAvoidsRegister(results) {
     "use strict";
     $(".avoids").load(location.href + " #avoids");
     $(".modal.in").modal("hide");
@@ -26,7 +26,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#updateAvoidForm').serialize(),
-            success: showCurrentAvoids
+            success: showCurrentAvoidsRegister
         });
     }));
 
@@ -38,12 +38,6 @@ $(document).ready(function() {
         }
     });
 });
-
-function showCurrentAvoids(results) {
-    "use strict";
-    $(".avoids").load(location.href + " #avoids");
-    $(".modal.in").modal("hide");
-}
 
 $(document).ready(function() {
     "use strict";
@@ -53,7 +47,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#updateAvoidForm').serialize(),
-            success: showCurrentAvoids
+            success: showCurrentAvoidsRegister
         });
     }));
 
@@ -66,11 +60,6 @@ $(document).ready(function() {
     });
 });
 
-function showCurrentAvoids(results) {
-    "use strict";
-    $(".avoids").load(location.href + " #avoids");
-    $(".modal.in").modal("hide");
-}
 
 $(document).ready(function() {
     "use strict";
@@ -80,7 +69,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#updateAvoidForm').serialize(),
-            success: showCurrentAvoids
+            success: showCurrentAvoidsRegister
         });
     }));
 

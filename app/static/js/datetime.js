@@ -1,4 +1,4 @@
-function showCurrentDate(results) {
+function showCurrentDateTime(results) {
     "use strict";
     var answer = results;
     $(".modal.in").modal("hide");
@@ -14,7 +14,7 @@ $(document).ready(function() {
             type: "POST",
             url: url,
             data: $('#party_datetime').serialize(),
-            success: showCurrentDate
+            success: showCurrentDateTime
         });
     }));
 

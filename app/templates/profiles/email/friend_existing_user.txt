@@ -1,6 +1,6 @@
 Dear {{ profile.first_name }},
 
-{{ friend.first_name}} {{ friend.last_name  }}({{  friend.email  }}) would like to 
+{{ friend.first_name}} {{ friend.last_name  }} - ({{  friend.email  }}) would like to 
 connect with you on KindTable. 
 
 If you agree, they will be able to see your profile information and to invite you

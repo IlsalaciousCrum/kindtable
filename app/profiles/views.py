@@ -234,7 +234,7 @@ def connect_friends():
                                               friend_profile_id=new_friend_profile.profile_id)
             token = friendship.generate_email_token()
             send_email(to=new_friend_profile.email,
-                       subject='{0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
+                       subject=' {0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
                                                                               this_user.profile.last_name,
                                                                               this_user.profile.email),
                        template='profiles/email/friend_new_user',

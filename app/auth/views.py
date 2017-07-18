@@ -284,7 +284,7 @@ def change_email():
                             'email_verified': False,
                             'last_updated': datetime.utcnow()})
             token = profile.generate_confirmation_token()
-            send_email(to=profile.email, subject='Confirm your new email address',
+            send_email(to=profile.email, subject=' Confirm your new email address',
                        template='auth/email/confirm', profile=profile, token=token)
             session.clear()
             logout_user()
