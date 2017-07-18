@@ -58,10 +58,8 @@ class RegistrationForm(Form):
     submit = SubmitField('Register')
 
     def validate_email(self, field):
-        print "checking valid email"
 
         if db.session.query(User).join(Profile).filter(Profile.email == field.data, User.profile_id == Profile.profile_id).first():
-            print "triggering the email validation but somehow not flashing"
             raise ValidationError('Email address already registered.')
 
 
@@ -75,34 +73,34 @@ class IntoleranceForm(Form):
 
 class UpdateAvoidForm(Form):
     original_key = HiddenField()
-    update_avoid_key = StringField('Change ingredient to avoid:',
+    update_avoid_key = StringField('Change ingredient to avoid',
                                    validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
                                                Length(1, 64, message="Limit 64 characters")])
-    update_avoid_value = TextField('Change the reason you avoid this ingredient:',
+    update_avoid_value = TextField('Change the reason you avoid this ingredient',
                                    widget=TextArea(),
                                    validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
 
 
 class AddAvoidForm(Form):
-    add_avoid_ingredient = StringField('Ingredient to avoid:',
+    add_avoid_ingredient = StringField('Ingredient to avoid',
                                        validators=[InputRequired(message="Please enter an ingredient to avoid."),
                                                    Length(1, 64, message="Limit 64 characters")])
-    add_avoid_reason = TextField('Reason you would like to avoid this ingredient:',
+    add_avoid_reason = TextField('Reason you would like to avoid this ingredient',
                                  widget=TextArea(),
                                  validators=[Length(1, 128, message="Limit 128 characters"), Optional()])
     submit = SubmitField('Update')
 
 
 class PasswordChangeForm(Form):
-    old_password = PasswordField('Old password:',
+    old_password = PasswordField('Old password',
                                  validators=[InputRequired('Please enter your current password'),
                                              Length(1, 64)])
-    password = PasswordField('Password:',
+    password = PasswordField('Password',
                              validators=[InputRequired(message='Please provide a strong password'),
                                          Length(1, 64, message="Limit 64 characters"),
                                          EqualTo('password2', message='Passwords must match.')])
-    password2 = PasswordField('Confirm password:',
+    password2 = PasswordField('Confirm password',
                               validators=[InputRequired()])
     submit = SubmitField('Change Password')
 
@@ -128,7 +126,6 @@ class PasswordResetForm(Form):
     submit = SubmitField('Reset Password')
 
     def validate_email(self, field):
-        print "checking valid email/user/profile"
         if db.session.query(User).join(Profile).filter(Profile.email == field.data, User.profile_id == Profile.profile_id).first() is None:
             raise ValidationError('Unknown email address.')
 

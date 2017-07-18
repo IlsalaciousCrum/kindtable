@@ -20,7 +20,7 @@
                                     <form action="{{ url_for('spoonacular.add_recipe_box') }}" class="form form-horizontal" method="post" role="form" id="saveform">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <input type="hidden" name="recipe_id" value="{{  recipe_id  }}"/>
-                                            {{ render_field(saveform.notes,  placeholder="  Type your notes here", id="note_input", style="width: 100%", rows="3",  maxlength=300) }}
+                                            {{ render_field(saveform.notes,  placeholder="Optional", id="note_input", style="width: 100%", rows="3",  maxlength=300) }}
                                         <input type="submit" class="btn btn-lg btn-success" id="saveRecipeButton" value="Save Recipe">
                                     </form>
                             {% endif %}

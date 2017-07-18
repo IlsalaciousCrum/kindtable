@@ -40,7 +40,7 @@ def create_app(config_name):
                 'js/lastName.js', 'js/login_timezone.js',
                 'js/manageGuestList.js', 'js/partyNotes.js', 'js/partyTitle.js',
                 'js/previewRecipe.js', 'js/recipeNotes.js', 'js/recipeSearch.js',
-                'js/updateAvoid-register.js', 'js/updateAvoid.js',
+                'js/resetPassword.js', 'js/updateAvoid-register.js', 'js/updateAvoid.js',
                 filters='jsmin', output='gen/packed.js')
     assets.register('js_all', js)
     Bootstrap(app)

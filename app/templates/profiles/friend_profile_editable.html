@@ -68,7 +68,7 @@
                     <form action="{{ url_for('profiles.changedietreason') }}" class="form form-horizontal" method="post" role="form" id="changeDietReason">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(diet_reason_form.diet_reason, style="width: 100%", rows="4", maxlength=128) }}<br>
+                        {{ render_field(diet_reason_form.diet_reason, style="width: 100%", rows="4", maxlength=128, placeholder="Optional") }}<br>
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>&ensp;<button type="button" class="btn btn-sm btn-danger" id="clearDietReason">Delete reason</button>
                     </form>
                 </div>             
@@ -95,7 +95,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(add_avoid_form.add_avoid_ingredient, style="width: 75%", rows="1") }}
-                        {{ render_field(add_avoid_form.add_avoid_reason, style="width: 100%", rows="4", maxlength=128) }}
+                        {{ render_field(add_avoid_form.add_avoid_reason, style="width: 100%", rows="4", maxlength=128, placeholder="Optional") }}
                         <p class = "text-muted">The information about why they avoid this ingredient will show up on the recipe search page to help you make your guest more comfortable.</p>
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
@@ -123,7 +123,7 @@
                         <input type="hidden" name="profile_id" value="{{  friend_profile.profile_id  }}"/>
                         <input type="hidden" id="updateAvoidFormAvoidId" name="avoid_id"/>
                         {{ render_field(update_avoid_form.update_avoid_ingredient, style="width: 75%", rows="1") }}
-                        {{ render_field(update_avoid_form.update_avoid_reason, style="width: 100%", rows="4", maxlength=128) }}
+                        {{ render_field(update_avoid_form.update_avoid_reason, style="width: 100%", rows="4", maxlength=128, placeholder="Optional") }}
                         <p class = "text-muted">The information about why they avoid this ingredient will show up on the recipe search page to help you make your guest more comfortable.</p>
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">&emsp;
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
@@ -245,7 +245,7 @@
                     <form action="{{ url_for('profiles.changefriendnotes') }}" class="form form-horizontal" method="post" role="form" id="notesForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
-                        {{ render_field(notes_form.notes, style="width: 100%", rows="5", maxlength=300) }}
+                        {{ render_field(notes_form.notes, style="width: 100%", rows="5", maxlength=300, placeholder="Optional") }}
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-sm btn-danger" id="deletenote">Delete note</button>
                      </form>

@@ -24,6 +24,9 @@ body {
     display: inline-block;
 }
 
+.navbar-default .navbar-brand {
+    font-size: 300%;
+}
 
 inline-dl {
   width: 100%;

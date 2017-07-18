@@ -17,7 +17,7 @@
                     {{ render_no_label_field(login_form.timezone, id="timezone") }}
                     {{ render_field(login_form.email, style="width: 75%") }}<br>
                     {{ render_field(login_form.password, style="width: 75%") }}<br>
-                    <input name='submit1' type=submit class="btn btn-info" value='submit'>  <button type="button" class="btn btn-info" data-toggle="modal" data-target="#resetpassword">Reset Password</button>
+                    <input name='submit1' type=submit class="btn btn-info" value='Submit'>
                 </dl>
 
             </form>
@@ -41,6 +41,9 @@
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             {{ render_field(reset_password_request_form.email, style="width: 75%") }}<br>
                             <input type="submit" class="btn btn-sm btn-info btn-default" value="Submit">
+                            <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Cancel">
+                            Cancel
+                        </button>
                         </form>
                     </div>
                 </div>     

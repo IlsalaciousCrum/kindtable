@@ -19,7 +19,7 @@
                     <form action="{{ url_for('spoonacular.changerecipenotes') }}" class="form form-horizontal" method="post" role="form" id="notesForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="recipe_id" value="{{  party_recipe.record_id  }}"/>
-                        {{ render_field(notesForm.notes, style="width: 100%", rows="5", maxlength=300) }}
+                        {{ render_field(notesForm.notes, style="width: 100%", rows="5", maxlength=300, placeholder="Optional") }}
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-sm btn-danger" id="deletenote">Delete note</button>
                      </form>

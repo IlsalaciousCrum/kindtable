@@ -91,7 +91,7 @@
                     <form action="{{ url_for('profiles.changedietreason') }}" class="form form-horizontal" method="post" role="form" id="changeDietReason">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
-                        {{ render_field(diet_reason_form.diet_reason, style="width: 100%", rows="4", maxlength=128) }}
+                        {{ render_field(diet_reason_form.diet_reason, style="width: 100%", rows="4", maxlength=128, placeholder="Optional") }}
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">&emsp;
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
                             Cancel
@@ -122,7 +122,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
                         {{ render_field(add_avoid_form.add_avoid_ingredient, style="width: 75%", rows="1") }}
-                        {{ render_field(add_avoid_form.add_avoid_reason, style="width: 100%", rows="4", maxlength=128) }}
+                        {{ render_field(add_avoid_form.add_avoid_reason, style="width: 100%", rows="4", maxlength=128, placeholder="Optional") }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
@@ -154,7 +154,7 @@
                         <input type="hidden" name="profile_id" value="{{  profile.profile_id  }}"/>
                         <input type="hidden" id="updateAvoidFormAvoidId" name="avoid_id"/>
                         {{ render_field(update_avoid_form.update_avoid_ingredient, style="width: 75%", rows="1") }}
-                        {{ render_field(update_avoid_form.update_avoid_reason, style="width: 100%", rows="4", maxlength=128) }}
+                        {{ render_field(update_avoid_form.update_avoid_reason, style="width: 100%", rows="4", maxlength=128, placeholder="Optional") }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
                         <input type="submit" class="btn btn-sm btn-info" value="Submit">&emsp;
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
