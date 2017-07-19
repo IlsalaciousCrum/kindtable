@@ -42,7 +42,7 @@ def login():
                                                            Profile.profile_id).first()
         if user is None:
             flash('You are not registered under that email address. Try again or register as a new user.')
-            return redirect(request.referrer)
+            return redirect(request.args.get('next') or url_for('main.index'))
         elif user is not None and user.verify_password(login_form.password.data):
             login_user(user)
             session['timezone'] = str(login_form.timezone.data)
@@ -51,7 +51,7 @@ def login():
             return redirect(request.args.get('next') or url_for('main.index'))
         else:
             flash('Invalid username or password.', 'danger')
-            return redirect(url_for('auth.login'))
+            return redirect(request.args.get('next') or url_for('main.index'))
     return render_template('auth/login.html',
                            login_form=login_form,
                            reset_password_request_form=reset_password_request_form)
