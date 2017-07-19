@@ -1,13 +1,14 @@
 $(document).ready(function() {
     "use strict";
-    $('#updateAvoidModal').on('show.bs.modal', (function(event) {
+    $('#updateAvoidRegisterModal').on('show.bs.modal', (function(event) {
         var button = $(event.relatedTarget); // Button that triggered the modal
         var avoid_key = button.data('key'); // Extract info from data-* attributes
+        console.log(avoid_key);
         var avoid_value = button.data('value'); // Extract info from data-* attributes
-        $('textarea[name="update_avoid_key"]').val(avoid_key);
+        $('input[name="update_avoid_key"]').val(avoid_key);
         $('textarea[name="update_avoid_value"]').val(avoid_value);
         $('input[name="original_key"]').val(avoid_key);
-        $(".updateAvoidModal").modal("show");
+        $(".updateAvoidRegisterModal").modal("show");
     }));
 });
 
@@ -41,8 +42,9 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     "use strict";
-    $('#deleteavoid').on('click', (function(event) {
+    $('#deleteavoidreg').on('click', (function(event) {
         var url = Flask.url_for("auth.delete_stored_ingredient");
+        console.log(url);
         $.ajax({
             type: "POST",
             url: url,
@@ -63,8 +65,9 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     "use strict";
-    $('#deleteavoidreason').on('click', (function(event) {
+    $('#deleteavoidreasonreg').on('click', (function(event) {
         var url = Flask.url_for("auth.delete_stored_reason");
+        console.log(url);
         $.ajax({
             type: "POST",
             url: url,

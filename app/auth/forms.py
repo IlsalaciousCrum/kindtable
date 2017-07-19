@@ -71,7 +71,7 @@ class IntoleranceForm(Form):
     submit = SubmitField('Update')
 
 
-class UpdateAvoidForm(Form):
+class RegUpdateAvoidForm(Form):
     original_key = HiddenField()
     update_avoid_key = StringField('Change ingredient to avoid',
                                    validators=[InputRequired(message="Please click on 'delete ingredient' to remove this ingredient"),
@@ -82,7 +82,7 @@ class UpdateAvoidForm(Form):
     submit = SubmitField('Update')
 
 
-class AddAvoidForm(Form):
+class RegAddAvoidForm(Form):
     add_avoid_ingredient = StringField('Ingredient to avoid',
                                        validators=[InputRequired(message="Please enter an ingredient to avoid."),
                                                    Length(1, 64, message="Limit 64 characters")])

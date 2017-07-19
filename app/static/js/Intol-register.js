@@ -4,6 +4,7 @@ function showCurrentIntolsRegister(results) {
     $("#intol-success").fadeOut(2500, (function(){
         $('#intol-success').css('display', 'none');
     }));
+    $(".intols").load(location.href + " #intols");
     $(".modal.in").modal("hide");
 }
 

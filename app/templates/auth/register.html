@@ -7,7 +7,7 @@
     <h1>Register</h1>
 
 
-<div class="modal fade" id="addAvoidModal" tabindex="-1" role="dialog" aria-labelledby="addAvoidModalLabel" aria-hidden="true">
+<div class="modal fade" id="addAvoidRegisterModal" tabindex="-1" role="dialog" aria-labelledby="addAvoidModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -38,7 +38,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="updateAvoidModal" tabindex="-1" role="dialog" aria-labelledby="updateAvoidModalLabel" aria-hidden="true">
+<div class="modal fade" id="updateAvoidRegisterModal" tabindex="-1" role="dialog" aria-labelledby="updateAvoidModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content" role="document">
             <div class="modal-header">
@@ -62,8 +62,8 @@
                         <button type="button" class="btn btn-sm btn-info" data-dismiss="modal" aria-label="Close">
                             Cancel
                         </button>&emsp;
-                        <button type="button" class="btn btn-sm btn-warning" id="deleteavoidreason">Delete the reason</button>
-                        <button type="button" class="btn btn-sm btn-danger" id="deleteavoid">Delete ingredient</button>
+                        <button type="button" class="btn btn-sm btn-warning" id="deleteavoidreasonreg">Delete the reason</button>
+                        <button type="button" class="btn btn-sm btn-danger" id="deleteavoidreg">Delete ingredient</button>
                     </form>
                 </div>
             </div>
@@ -76,7 +76,6 @@
         <div class="modal-content" role="document">
             <div class="modal-header">
                 <h5 class="modal-title" id="addIntolModalLabel">Change Allergy/Intolerance Groups</h5>
-                <div id="flashedalert"></div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -134,16 +133,18 @@
         <div class = "row round_hidden_div" style="padding-top: 2em">
           
                 <h4>Allergies and Intolerances&ensp;<a role="button" tabindex="0" data-container="body" data-toggle="popover" data-html='true' data-trigger="focus" data-placement="left" title="Allergies/Intolerances" data-content="For example, gluten can be found in many <a href=https://celiac.org/live-gluten-free/glutenfreediet/sources-of-gluten/' title='The Celiac Disease Foundation's list of sources of gluten' target='_blank'>non-wheat ingredients</a> and if you select gluten, we will be sure that recipes will not include those ingredients. But if you are sensitive only to wheat itself and not ingredients such as soy sauce, selecting 'wheat' instead of 'gluten' gives you and your hosts more options."><span class="glyphicon glyphicon-info-sign text-info"></span></a></h4>
+
+                {% if not session.intol_dict %}<div class="intols"><p class = "text-muted">Telling us about any allergy/intolerance groups that apply to you can help make sure that KindTable recipes will be safe for you. Do any of these apply to you? Dairy, egg, gluten, peanut, sesame, seafood, shellfish, soy, sulfites, tree nut, wheat.</p></div>{% else %}<div class="intols"><div id="intols">{% for intol in session['intol_dict'] %}{% for each in session['intol_dict'][intol] %}<a role="button" type="button" href="#" data-toggle="modal" data-target="#intolRegisterModal"><span class="glyphicon glyphicon-pencil text-info" title="Change your allergies/intolerances." aria-hidden="true"></span></a>&emsp;{{  each  }} - {{  session['intol_dict'][intol][each]  }}<br>{% endfor %}{% endfor %}</div></div><br>{% endif %}
                 
-                <p class = "text-muted">Telling us about any allergy/intolerance groups that apply to you can help make sure that KindTable recipes will be safe for you. Do any of these apply to you? Dairy, egg, gluten, peanut, sesame, seafood, shellfish, soy, sulfites, tree nut, wheat.</p>
-                <p><button type="button" class="btn btn-primary" href="#" data-toggle="modal" data-target="#intolModal">Select Allergy/Intolerance groups</button>&ensp;<span style="display: none" class="alert alert-success glyphicon glyphicon-ok" id="intol-success"></span></p>
+                
+                <p><button type="button" class="btn btn-primary" href="#" data-toggle="modal" data-target="#intolRegisterModal">Select Allergy/Intolerance groups</button>&ensp;<span style="display: none" class="alert alert-success glyphicon glyphicon-ok" id="intol-success"></span></p>
 
              <h4 style="padding-top: 1em">Ingredients to Avoid</h4>
 
-             {% if not session.avoid_dict %}<div hidden class="avoids"></div>{% else %}<div class="avoids"><div id="avoids">{% for key, value in session.avoid_dict.iteritems() %}<a role="button" type="button" data-toggle="modal" data-target="#updateAvoidModal" class="deleteAvoid" data-key="{{ key }}" data-value="{{ value }}"><span class="glyphicon glyphicon-pencil text-info" title="Edit this ingredient to avoid." aria-hidden="true"></span></a>&emsp;{{  key  }} - {{  value  }}<br>{% endfor %}</div></div>{% endif %}
+             {% if not session.avoid_dict %}<div class="avoids"><p class = "text-muted">Are there any ingredients you would like to avoid eating?</p></div>{% else %}<div class="avoids"><div id="avoids">{% for key, value in session.avoid_dict.iteritems() %}<a role="button" type="button" data-toggle="modal" data-target="#updateAvoidRegisterModal" class="deleteAvoid" data-key="{{ key }}" data-value="{{ value }}"><span class="glyphicon glyphicon-pencil text-info" title="Edit this ingredient to avoid." aria-hidden="true"></span></a>&emsp;{{  key  }} - {{  value  }}<br>{% endfor %}</div></div><br>{% endif %}
 
-             <p class = "text-muted" style="padding-top: 1em">Are there any ingredients you would like to avoid eating?</p>
-             <p><button type="button" class="btn btn-primary" href="#" data-toggle="modal" data-target="#addAvoidModal">Add Ingredients to Avoid</button>&ensp;<span style="display: none" class="alert alert-success glyphicon glyphicon-ok" id="avoid-success"></span></p>
+             
+             <p><button type="button" class="btn btn-primary" href="#" data-toggle="modal" data-target="#addAvoidRegisterModal">Add Ingredients to Avoid</button>&ensp;<span style="display: none" class="alert alert-success glyphicon glyphicon-ok" id="avoid-success"></span></p>
             <input type="submit" class="btn btn-success btn-lg pull" value="Register" />
   
             </div>

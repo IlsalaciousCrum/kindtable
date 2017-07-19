@@ -10,7 +10,7 @@ from .. import db
 
 from ..email import send_email
 
-from ..models import Profile, User, Diet, ProfileIntolerance, IngToAvoid, Friend
+from ..models import Profile, User, Diet, ProfileIntolerance, IngToAvoid, Friend, Intolerance
 
 from ..decorators import flash_errors
 
@@ -19,13 +19,11 @@ from .forms import (LoginForm,
                     PasswordResetRequestForm,
                     PasswordResetForm,
                     ChangeEmailForm,
-                    UpdateAvoidForm,
-                    AddAvoidForm,
+                    RegUpdateAvoidForm,
+                    RegAddAvoidForm,
                     IntoleranceForm)
 
 from datetime import datetime
-
-import sys
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -132,8 +130,17 @@ def store_intols():
     '''Store allergies/intolerances for registration'''
 
     intol_form = IntoleranceForm(request.form)
+
+    session['intol_dict'] = {}
+    print intol_form.intolerances.data
+    intol_dict = session['intol_dict']
+    print intol_dict
     if intol_form.validate():
-        session['intolerances'] = {'intols': intol_form.intolerances.data}
+        for intol in intol_form.intolerances.data:
+            desc = Intolerance.query.get(intol)
+            print desc
+            intol_dict[intol] = {desc.intol_name: desc.intol_description}
+            print intol_dict
     return jsonify(data={'message': 'Intols saved'})
 
 
@@ -141,7 +148,7 @@ def store_intols():
 def store_avoid():
     '''Store ingredients to avoid and the reason, for registration'''
 
-    add_avoid_form = AddAvoidForm(request.form)
+    add_avoid_form = RegAddAvoidForm(request.form)
     if add_avoid_form.validate():
         avoid_dict = session['avoid_dict']
         avoid_dict[add_avoid_form.add_avoid_ingredient.data
@@ -154,7 +161,7 @@ def store_avoid():
 def update_stored_avoid():
     '''Store ingredients to avoid and the reason, for registration'''
 
-    update_avoid_form = UpdateAvoidForm(request.form)
+    update_avoid_form = RegUpdateAvoidForm(request.form)
     if update_avoid_form.validate():
         avoid_dict = session['avoid_dict']
         del avoid_dict[update_avoid_form.update_avoid_key.data]
@@ -168,7 +175,7 @@ def update_stored_avoid():
 def delete_stored_ingredient():
     '''Delete ingredient to avoid, for registration'''
 
-    update_avoid_form = UpdateAvoidForm(request.form)
+    update_avoid_form = RegUpdateAvoidForm(request.form)
     if update_avoid_form.validate():
         avoid_dict = session['avoid_dict']
         del avoid_dict[update_avoid_form.original_key.data]
@@ -180,7 +187,7 @@ def delete_stored_ingredient():
 def delete_stored_reason():
     '''Delete reason for avoiding ingredient, for registration'''
 
-    update_avoid_form = UpdateAvoidForm(request.form)
+    update_avoid_form = RegUpdateAvoidForm(request.form)
     if update_avoid_form.validate():
         avoid_dict = session['avoid_dict']
         avoid_dict[update_avoid_form.original_key.data] = ""
@@ -201,10 +208,12 @@ def register():
                                         diet_reason=form.diet_reason.data)
         user = User.create_record(profile_id=profile.profile_id,
                                   password=form.password.data)
-        if session['intolerances']['intols']:
-            for intolerance in session['intolerances']['intols']:
-                ProfileIntolerance.create_record(profile_id=profile.profile_id,
-                                                 intol_id=intolerance)
+        intolerances = session['intol_dict']
+        if intolerances:
+            for intol in intolerances:
+                intol = ProfileIntolerance.create_record(profile_id=profile.profile_id,
+                                                         intol_id=intol)
+                print intol
         avoidances = session['avoid_dict']
         if avoidances:
             for key, value in session['avoid_dict'].iteritems():
@@ -228,14 +237,15 @@ def register():
     except:
         session['avoid_dict'] = {}
     try:
-        session['intolerances']
+        session['intol_dict']
     except:
-        session['intolerances'] = {}
+        session['intol_dict'] = {}
 
     diets = Diet.query.order_by(Diet.diet_type).all()
-    add_avoid_form = AddAvoidForm(request.form)
-    update_avoid_form = UpdateAvoidForm(request.form)
+    add_avoid_form = RegAddAvoidForm(request.form)
+    update_avoid_form = RegUpdateAvoidForm(request.form)
     intol_form = IntoleranceForm(request.form)
+
     return render_template('auth/register.html',
                            form=form,
                            diets=diets,
