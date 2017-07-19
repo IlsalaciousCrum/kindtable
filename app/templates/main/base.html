@@ -93,7 +93,12 @@ display:none;
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
                         <ul class="dropdown-menu" id="friendsDropDown">
+                            <li><a data-toggle="modal" id="findFriendLink" data-target="#findFriendModal"><b>Connect a new friend</b></a></li>
+                            <li><a data-toggle="modal" id="addFriendProfileLink" data-target="#addFriendProfileModal"><b>Create Your Own Profile for a Friend</b></a></li>
+                            <li role="separator" class="divider"></li>
                             {% if current_user.valid_friends() is defined %}
+                                <li class="text-center bg-info small text-muted">Your Friends</li>
+                                <li role="separator" class="divider"></li>
                             {% for friend in current_user.valid_friends()|sort(attribute='first_name')  %}
                                 <li class="myFriends">
                                     <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.profile_id) }}">
@@ -108,22 +113,25 @@ display:none;
                             {% endfor %}
                             {% else %}
                             {% endif %}
-                            <li role="separator" class="divider"></li>
-                            <li><a data-toggle="modal" id="findFriendLink" data-target="#findFriendModal">Connect a new friend</a></li>
-                            <li><a data-toggle="modal" id="addFriendProfileLink" data-target="#addFriendProfileModal">Create Your Own Profile for a Friend</a></li>
+
+
                         </ul>    
                     </li>
                     <li class="dropdown" id="partiesDropDown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Parties<span class="caret"></span></a>
                         <ul class="dropdown-menu">
+                            <li><a data-toggle="modal" id="addPartyLink" data-target="#addPartyModal"><b>Create a new party</b></a></li>
+                            <li role="separator" class="divider"></li>
                             {% if current_user.parties %}
+                            <li class="text-center bg-info small text-muted">Your parties:</li>
+                            <li role="separator" class="divider"></li>
                             {% for party in current_user.parties|sort(attribute='datetime_of_party') %}
                             <li class="myParties"><a href="{{ url_for('profiles.show_party_profile', party_id = party.party_id) }}">{{  party.title  }}</a></li>
                             {% endfor %}
                             {% else %}
                             {% endif %}
-                            <li role="separator" class="divider"></li>
-                            <li><a data-toggle="modal" id="addPartyLink" data-target="#addPartyModal">Create a party</a></li>
+                           
+
                         </ul>
                     </li>
                 </ul>    

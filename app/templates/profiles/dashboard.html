@@ -245,7 +245,7 @@
             <div class = "row round_div" style="padding-top: 2em">
                 
 
-                <h3>Profile</h3>
+                <h3>Your Profile</h3>
                 <div class='lastUpdated'>
                     <div id='lastUpdated' class="text-muted small" style='padding-bottom: 1em'>
                         Last updated {{ moment(profile.last_updated).format('LLLL') }}
@@ -341,20 +341,20 @@
         <div class="col-md-5 col-md-offset-1">      
             <div class = "row round_div" style="padding-top: 2em">
                 <div id="friends">
-                    <h3>Friends</h3>
+                    <h3>Your Friends</h3>
                     
                     {% if current_user.valid_friends() %}
                         <ul>
                             {% for friend in current_user.valid_friends()|sort(attribute="first_name") %}
                                 <li>
-                                    <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.profile_id) }}">
+                                    <a href="{{ url_for('profiles.show_friend_profile', friend_id=friend.profile_id) }}"><h4>
                                         {% if friend.private_profile_title %}
                                         {{  friend.private_profile_title }}
                                         {% else %}
                                         {{ friend.first_name }} {{friend.last_name  }}
                                     <span class="text-muted">({{  friend.email  }})</span>
                                         {% endif %}
-                                    </a> 
+                                    </h4></a> 
                                 </li>
                             {% endfor %}
                         </ul>
@@ -363,7 +363,7 @@
                     {% endif %}
                 </div>
 
-                <h3>Upcoming Parties</h3>
+                <h3>Your Upcoming Parties</h3>
                 <div id="upcomingparties">
                     {% if upcoming_parties %}
                         <ul>
@@ -379,7 +379,7 @@
                         <span class="text-muted strong">No upcoming parties. Time to plan some!</span>
                     {% endif %}
                 </div>
-                <h3>Past Parties</h3>
+                <h3>Your Past Parties</h3>
                 <div id="pastparties">
                     {% if past_parties %}
                         <ul>
