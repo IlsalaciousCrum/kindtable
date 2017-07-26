@@ -198,6 +198,7 @@ def delete_stored_reason():
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     '''Register a new user'''
+
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         email = form.email.data
@@ -245,6 +246,8 @@ def register():
     add_avoid_form = RegAddAvoidForm(request.form)
     update_avoid_form = RegUpdateAvoidForm(request.form)
     intol_form = IntoleranceForm(request.form)
+    intol_dict = session['intol_dict']
+    intol_form.intolerances.data = [(int(item)) for item in intol_dict]
 
     return render_template('auth/register.html',
                            form=form,
@@ -319,38 +322,27 @@ def delete_account():
     # TODO - this code sequence could potentially be shortened by using cascade="all,delete"
     # on the model but perfect is the enemy of done.
 
-    print 1
     this_user = current_user
-    print 2
     if this_user.friends:
         for friend in this_user.friends:
-            print "friend id" + str(friend.record_id)
             friend.remove_friendship()
 
-    print 3
     friendship = Friend.query.filter(Friend.friend_profile_id == this_user.profile.profile_id).all()
     if friendship:
         for friend in friendship:
-            print "friend id" + str(friend.record_id)
             friend.remove_friendship()
 
-    print 5
     if this_user.parties:
         for party in this_user.parties:
-            print "party id" + str(party.party_id)
             party.discard_party()
 
     user_id = this_user.id
 
     this_user._delete_()
 
-    print "this user:"
-    print this_user
-
     private_profiles = Profile.query.filter(Profile.owned_by_user_id == user_id).all()
     if private_profiles:
         for profile in private_profiles:
-            print "profile id: " + str(profile.profile_id)
             profile.remove_profile()
 
     logout_user()
