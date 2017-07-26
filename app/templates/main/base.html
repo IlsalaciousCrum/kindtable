@@ -96,7 +96,7 @@ display:none;
                             <li><a data-toggle="modal" id="findFriendLink" data-target="#findFriendModal"><b>Connect a new friend</b></a></li>
                             <li><a data-toggle="modal" id="addFriendProfileLink" data-target="#addFriendProfileModal"><b>Create Your Own Profile for a Friend</b></a></li>
                             <li role="separator" class="divider"></li>
-                            {% if current_user.valid_friends() is defined %}
+                            {% if current_user.valid_friends() %}
                                 <li class="text-center bg-info small text-muted">Your Friends</li>
                                 <li role="separator" class="divider"></li>
                             {% for friend in current_user.valid_friends()|sort(attribute='first_name')  %}
