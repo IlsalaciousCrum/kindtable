@@ -244,6 +244,7 @@ class User(BaseMixin, UserMixin, db.Model):
     def get_id(self):
         return unicode(self.session_token)
 
+    @property
     def valid_friends(self):
         '''Returns a list with the profile objects of friends that have been confirmed'''
 
