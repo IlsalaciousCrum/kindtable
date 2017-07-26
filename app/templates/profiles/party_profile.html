@@ -31,7 +31,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="changeTitleModalLabel">Change Party Title</h5>
+                <h5 class="modal-title" id="changeTitleModalLabel">Change Event Title</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -56,7 +56,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="datetimeModalLabel">Change Party Date and/or Time</h5>
+                <h4 class="modal-title" id="datetimeModalLabel">Change Event Date and/or Time</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -85,7 +85,7 @@
     <div class="modal-dialog">
         <div class="modal-content" role="document">
             <div class="modal-header">
-                <h4 class="modal-title" id="notesModalLabel">Party notes</h4>
+                <h4 class="modal-title" id="notesModalLabel">Event notes</h4>
                 <div id="flashedalert"></div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -122,7 +122,7 @@
                 <div class = "row round_hidden_div" style="padding-top: 2em">
                         
                     <div class="alert alert-warning" role="alert">    
-                        <span class="text-danger">Caution: Are you sure this is what you want to do? All information you have saved about this party and will
+                        <span class="text-danger">Caution: Are you sure this is what you want to do? All information you have saved about this event and will
                             be permanently deleted. You can still build it later with a fresh start, but you might want to save/print recipes now.
                         </span><br><br>
                          {% from "_formhelpers.html" import render_field %}
@@ -162,7 +162,7 @@
                 <div class="partytitle">
                     <div id="partytitle">
                         <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#titleModal">
-                            <span class="glyphicon glyphicon-pencil text-info" title="Change the party title" aria-hidden="true"></span>
+                            <span class="glyphicon glyphicon-pencil text-info" title="Change the event title" aria-hidden="true"></span>
                         </button>&emsp; <strong>Title:</strong>&emsp;{{  party.title  }}
                     </div>
                 </div>
@@ -175,7 +175,7 @@
                 </div>
                 <div class="party_notes">
                     <div id="party_notes">
-                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change the notes for the party" data-target="#notesModal">
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change the notes for the event" data-target="#notesModal">
                             <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
                         </button>&emsp; <strong>Notes:</strong>&emsp;{{ party.party_notes }}
                     </div>
@@ -190,21 +190,21 @@
                                 Manage guest list
                         </button></h3>
                             
-                            {% if party.guests %}
+                            {% if party.guests|length > 1 %}
                                 {% for guest in party.guests %}
                                     {% if guest.profiles.profile_id != current_user.profile_id %}
                                         <a href="{{ url_for('profiles.show_friend_profile', friend_id=guest.profiles.profile_id) }}">
                                         <span style="font-size: 135%">
                                             {% if guest.profiles.private_profile_title %}
-                                            {{  guest.profiles.private_profile_title  }}
+                                                {{  guest.profiles.private_profile_title  }}
                                             {% else %}
-                                            {%if guest.profiles.first_name and guest.profiles.last_name %}
-                                                {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}
-                                            {% elif guest.profiles.first_name and not guest.profiles.last_name %}
-                                                {{  guest.profiles.first_name}}
-                                            {% else %}
-                                                {{  guest.profiles.email  }}
-                                            {% endif %}
+                                                {%if guest.profiles.first_name and guest.profiles.last_name %}
+                                                    {{  guest.profiles.first_name  }} {{  guest.profiles.last_name}}
+                                                {% elif guest.profiles.first_name and not guest.profiles.last_name %}
+                                                    {{  guest.profiles.first_name}}
+                                                {% else %}
+                                                    {{  guest.profiles.email  }}
+                                                {% endif %}
                                             {% endif %}
                                         </span>
                                         </a>
@@ -226,9 +226,9 @@
                 </div>
 
                 <div id="discardParty" style="padding-top: 3em">
-                    <small>Want to discard this party?</small>
+                    <small>Want to discard this event?</small>
                     <button type="button" class="btn btn-sm btn-default" href="#" data-toggle="modal" data-target="#discardParty">
-                        <span class="text-danger">Delete Party Permanently</span>                                                                                                                                                                                                                                                                                                                                                      
+                        <span class="text-danger">Delete Event Permanently</span>                                                                                                                                                                                                                                                                                                                                                      
                     </button>
                 </div>
             </div>
@@ -278,7 +278,7 @@
                                     </ul>
                             {% endfor %}
                         {% else %}
-                            No recipes added yet for this party.
+                            No recipes added yet for this event.
                         {% endif %}
                     </span>
                     </div>

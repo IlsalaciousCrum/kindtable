@@ -268,7 +268,7 @@
                 </div>
                 <div class = "row round_hidden_div" style="padding-top: 2em">
 
-                <span class="text-muted">Select all parties you want to add this friend to.<br><br>Deselecting a checkbox removes this friend from that party.<br><br></span>
+                <span class="text-muted">Select all parties you want to add this friend to.<br><br>Deselecting a checkbox removes this friend from that event.<br><br></span>
 
                 {% if upcoming_parties %}
                     {% from "_formhelpers.html" import render_field, render_no_label_field %}
@@ -403,7 +403,7 @@
 
                 {% endif %}
 
-                <h3>Upcoming Parties Invited</h3>
+                <h3>Upcoming Events Attending</h3>
                 <div class="upcomingParties">
                     <div id="upcomingParties">
                         {% if parties_invited %}
@@ -424,7 +424,7 @@
                     </div>
                 </div>
 
-                <h3>Past Parties Invited</h3>
+                <h3>Past Events Attended</h3>
                 <div id="pastParties">
                     {% if parties_invited %}
                         <ul>

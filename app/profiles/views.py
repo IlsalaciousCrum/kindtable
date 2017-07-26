@@ -429,7 +429,7 @@ def show_party_profile(party_id):
                                collated_recipes=collated_recipes,
                                deletepartyform=deletepartyform)
     else:
-        flash("Hmm...I don't know that one. Your parties can be accessed from the dropdown menu above or from your Dashboard.")
+        flash("Hmm...I don't know that one. Your events can be accessed from the dropdown menu above or from your Dashboard.")
         return redirect(url_for('main.index'))
 
 
@@ -452,7 +452,7 @@ def add_new_party():
                                         party_notes=add_party_form.notes.data)
         PartyGuest.create_record(party_id=new_party.party_id,
                                  friend_profile_id=current_user.profile_id)
-        flash("Success! Who would you like to invite to your party?", "success")
+        flash("Success! Who would you like to invite to your event?", "success")
         return redirect("profiles/party_profile/%s" % new_party.party_id)
     elif request.method == 'POST' and not add_party_form.validate():
         flash_errors(add_party_form)

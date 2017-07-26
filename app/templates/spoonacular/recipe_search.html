@@ -154,9 +154,9 @@
             <div class="recipe_results" id="recipe_results">
                 {% for i in range(result_number) %}
                     <div class="col-md-6 recipe">
-                        <h4><a href="#" data-toggle="tooltip" data-placement="right" title="{{  responses['response'][i].get('title')  }}" >{{  responses['response'][i].get('title')|truncate(39, end=" (...)") }}</a></h4>
+                        <h4>{{  responses['response'][i].get('title')|truncate(39, end=" (...)") }}</h4>
                     
-                        <button type="button" class="btn btn-sm btn-info recipe-button" data-toggle="modal" data-recipeid="{{ responses['response'][i].get('recipe_id') }}" data-target="#seeRecipeModal">View Recipe</button>
+                        <button type="button" class="btn btn-info recipe-button" data-toggle="modal" data-recipeid="{{ responses['response'][i].get('recipe_id') }}" data-target="#seeRecipeModal">View Recipe</button>
 
                             <img src="{{ responses['response'][i].get('image_url') }}" class="img-circle displayed" width="250" height="250">
                     </div>
