@@ -20,6 +20,7 @@
                     {{ render_field(form.email2, style="width: 75%", rows="1", maxlength=200) }}
                     {{ render_field(form.password, style="width: 75%", rows="1") }}<br>
                 <input type="submit" class="btn btn-sm btn-info btn-default" value="Submit">
+                <a href="{{  url_for('profiles.dashboard')  }}" class="btn btn-sm btn-default">>Back to Dashboard</button>
             </form>
         </div>   
     </div>
