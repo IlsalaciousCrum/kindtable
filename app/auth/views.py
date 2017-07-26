@@ -51,7 +51,7 @@ def login():
             return redirect(request.args.get('next') or url_for('main.index'))
         else:
             flash('Invalid username or password.', 'danger')
-            return redirect(request.args.get('next') or url_for('main.index'))
+            return redirect(request.args.get('next') or url_for('auth.login'))
     return render_template('auth/login.html',
                            login_form=login_form,
                            reset_password_request_form=reset_password_request_form)
