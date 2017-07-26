@@ -32,7 +32,7 @@
                         <input type="submit" class="btn btn-lg btn-danger" value="Delete Friend"><br><br>
                         
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
-                            Close
+                            Cancel
                         </button>
                     </form>
                 </div>
@@ -60,7 +60,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="friend_profile_id" value="{{  friend_profile.profile_id  }}"/>
                         {{ render_field(notes_form.notes, cols="65", rows="5", maxlength=300, placeholder="Optional") }}
-                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>&ensp;
+                        <input type="submit" class="btn btn-sm btn-info" value="Update">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>&ensp;
                         <button type="button" class="btn btn-sm btn-danger" id="deletenote">Delete note</button>
                      </form>
                 </div>

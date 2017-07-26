@@ -11,8 +11,9 @@
             <p style="padding-top: 1em;"><b>In order to use the recipe search and menu building features of this site you will need to 
                 request beta testing access.</b>
 
-            <p>These requests are reviewed individually and we will respond as soon as possible. In the meantime,
-                you can continue to add your friends, create private profiles, create parties and assemble guest lists.</p>
+            <p>These requests are reviewed individually and we will respond as soon as possible.</p>
+
+            <p>In the meantime, you can continue to add your friends, create private profiles, create parties and assemble guest lists.</p>
 
             <div class = "row round_hidden_div" style="padding-top: 2em">
                 {% from "_formhelpers.html" import render_field %}
@@ -23,7 +24,7 @@
                         {{ render_field(beta_request_form.full_name,  style="width: 75%", rows="1") }}<br>
                         {{ render_field(beta_request_form.email,  style="width: 75%", rows="1") }}<br>
                         {{ render_field(beta_request_form.reason,  style="width: 100%", rows="5") }}<br>
-                        <input type="submit" class="btn btn-sm btn-info btn-default" value="Submit">
+                        <input type="submit" class="btn btn-sm btn-info btn-default" value="Request">
                     </form>
             </div>  
         </div>

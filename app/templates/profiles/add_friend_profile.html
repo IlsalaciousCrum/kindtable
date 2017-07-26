@@ -13,7 +13,7 @@
         <form action="{{ url_for('profiles.add_friend_profile') }}" class="form form-horizontal" method="post" role="form" id="changeTitle">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             {{ render_field(private_profile_title_form.title, style="width: 75%", rows="1") }}<br>
-            <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+            <input type="submit" class="btn btn-sm btn-info" value="Add">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
         </form>
     </div>
 </div>

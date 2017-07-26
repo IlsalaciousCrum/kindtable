@@ -19,7 +19,7 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
                         {{ render_field(manage_guests_form.friends) }}<br>
-                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-info" value="Update">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
@@ -43,7 +43,7 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
                         {{ render_field(titleform.title,  style="width: 75%", rows="1") }}<br>
-                        <input type="submit" class="btn btn-sm btn-info btn-default" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-info btn-default" value="Update">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>  
             </div>
@@ -73,7 +73,7 @@
                     <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
                         {{ render_field(datetimeform.date) }}<br>
                         {{ render_field(datetimeform.hour) }}<br>
-                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-info" value="Update">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                     </form>
                 </div>
             </div>
@@ -98,7 +98,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <input type="hidden" name="party_id" value="{{  party.party_id  }}"/>
                         {{ render_field(partynotesform.notes, style="width: 100%", rows="5", maxlength=300, placeholder="Optional") }}
-                        <input type="submit" class="btn btn-sm btn-info" value="Submit">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
+                        <input type="submit" class="btn btn-sm btn-info" value="Update">&ensp;<button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-sm btn-danger" id="deletenote">Delete note</button>
                      </form>
                 </div>
