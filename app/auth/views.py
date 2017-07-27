@@ -204,7 +204,7 @@ def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         email = form.email.data
-        profile = Profile.query.filter(Profile.owned_by_user_id == None, Profile.email == form.email.data).one()
+        profile = Profile.query.filter(Profile.owned_by_user_id == None, Profile.email == form.email.data).first()
         if profile:
             profile.first_name = form.first_name.data
             profile.last_name = form.last_name.data

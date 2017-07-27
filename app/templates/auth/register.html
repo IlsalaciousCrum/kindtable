@@ -27,7 +27,7 @@
                         {{ render_field(add_avoid_form.add_avoid_ingredient, style="width: 75%") }}
                         {{ render_field(add_avoid_form.add_avoid_reason, style="width: 100%", rows="4", maxlength=128, placeholder="Optional") }}
                         <p class = "text-muted">The information about why you avoid this ingredient is provided to your hosts to help them make decisions about what they will serve other guests.</p>
-                        <input type="submit" class="btn btn-sm btn-default" value="Add">
+                        <input type="submit" class="btn btn-sm btn-info" value="Add">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Done">
                             Done
                         </button>
@@ -87,7 +87,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         {{ render_field(intol_form.intolerances) }}
                         <p class = "text-muted">Selecting the allergy/intolerance groups that apply to you can help make sure that KindTable recipes will be safe for you. For example, gluten can be found in many <a href="https://celiac.org/live-gluten-free/glutenfreediet/sources-of-gluten/" title="The Celiac Disease Foundation's list of sources of gluten" target="_blank">non-wheat ingredients</a> and if you select gluten, we will be sure that recipes will not include those ingredients. But if you are sensitive only to wheat itself and not ingredients such as soy sauce, selecting "wheat" instead of "gluten" gives you and your hosts more options.</p>
-                        <input type="submit" class="btn btn-sm btn-default" value="Update">
+                        <input type="submit" class="btn btn-sm btn-info" value="Update">
                         <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close">
                             Close
                         </button>
