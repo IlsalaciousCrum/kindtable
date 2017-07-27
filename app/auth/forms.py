@@ -8,6 +8,7 @@ from wtforms.validators import (InputRequired, Length, Email, EqualTo, Optional,
 from wtforms.widgets import TextArea
 from ..models import Profile, Diet, User, Intolerance
 from .. import db
+from sqlalchemy import and_
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -58,8 +59,9 @@ class RegistrationForm(Form):
     submit = SubmitField('Register')
 
     def validate_email(self, field):
-
-        if db.session.query(User).join(Profile).filter(Profile.email == field.data, User.profile_id == Profile.profile_id).first():
+        cheese = db.session.query(User).join(Profile).filter(and_(Profile.email == field.data, User.profile_id == Profile.profile_id)).first()
+        print cheese
+        if cheese:
             raise ValidationError('Email address already registered.')
 
 

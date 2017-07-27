@@ -19,8 +19,7 @@
                     <h4 class="alert alert-danger" role="alert">Hi {{  profile.first_name  }},<br><br>
                         Please check the email account you used to register for an email with 
                         a link in it for confirming your email account. Once I know your email account
-                        is real, I would love for you to start using Kind Table to plan some 
-                        amazing meals.</h2>
+                        is real, I would love for you to start using Kind Table.</h2>
                 {% elif profile.email_verified == true %}
 <h1>Welcome back, {% if current_user.profile.first_name is not none %}
                         {{  current_user.profile.first_name  }}!

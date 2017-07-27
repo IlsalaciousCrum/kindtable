@@ -9,7 +9,7 @@
     <div class="modal-dialog">
         <div class="modal-content" role="document">
             <div class="modal-header">
-                <h4 class="modal-title" id="removeFriendModalLabel">Remove {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend.friend_profile.email }}{%endif %}</h4>
+                <h4 class="modal-title" id="removeFriendModalLabel">Remove {% if friend_profile.first_name is not none %}{{ friend_profile.first_name }}{% else %}{{ friend_profile.email }}{%endif %}</h4>
                 <div id="flashedalert"></div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -103,9 +103,9 @@
 
 <!-- Begin Content -->
 
-<h1 class="text-left" style="padding-left: 3em">{% if friend_profile.first_name is not none %}{{ friend_profile.first_name }} {{  friend_profile.last_name  }}'s
+<h1 class="text-left" style="padding-left: 3em">{% if friend_profile.first_name is not none %}{{ friend_profile.first_name }} {{  friend_profile.last_name  }}
 {% else %}
-{{ friend.friend_profile.email }}'s
+{{ friend_profile.email }}
 {%endif %} Profile</h1>
 
 

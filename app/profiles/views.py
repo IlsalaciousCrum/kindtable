@@ -197,6 +197,7 @@ def connect_friends():
                                                          find_friend_form.friend_email.data,
                                                          Profile.profile_id ==
                                                          User.profile_id).first()
+        elligible_unclaimed_profile = Profile.query.filter(Profile.email == find_friend_form.friend_email.data, Profile.owned_by_user_id == None).first()
 
         if find_friend_form.friend_email.data == this_user.profile.email:
             flash("You just tried to friend yourself. :) Would you like to add someone else?")
@@ -227,6 +228,20 @@ def connect_friends():
                 friendship.update({"friend_request_sent": True})
                 flash('A connection request email has been sent to %s.' % existing_user.profile.email, "success")
                 return redirect(url_for('profiles.show_dashboard'))
+        elif elligible_unclaimed_profile:
+            new_friend_profile = elligible_unclaimed_profile
+            friendship = Friend.create_record(user_id=current_user.id,
+                                              friend_profile_id=new_friend_profile.profile_id)
+            token = friendship.generate_email_token()
+            send_email(to=new_friend_profile.email,
+                       subject=' {0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
+                                                                               this_user.profile.last_name,
+                                                                               this_user.profile.email),
+                       template='profiles/email/friend_new_user',
+                       friend=this_user.profile, token=token)
+            flash('A connection request email has been sent to %s.'
+                  % new_friend_profile.email, "success")
+            return redirect(url_for('profiles.show_dashboard'))
         else:
             new_friend_profile = Profile.create_record(email=find_friend_form.friend_email.data)
             friendship = Friend.create_record(user_id=current_user.id,
@@ -234,8 +249,8 @@ def connect_friends():
             token = friendship.generate_email_token()
             send_email(to=new_friend_profile.email,
                        subject=' {0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
-                                                                              this_user.profile.last_name,
-                                                                              this_user.profile.email),
+                                                                               this_user.profile.last_name,
+                                                                               this_user.profile.email),
                        template='profiles/email/friend_new_user',
                        friend=this_user.profile, token=token)
             flash('A connection request email has been sent to %s.'
@@ -283,10 +298,12 @@ def confirm_friendship_with_existing_user(token):
     """Validates an email token and confirms friendship between
     two existing users"""
 
-    current_user_id = current_user.id
+    user = current_user
 
     friendship = Friend.process_email_token(token=token,
-                                            current_user_id=current_user_id)
+                                            profile=user.profile,
+                                            user=user)
+
     if friendship == "logout":
         flash("Oops! Looks likes another user was still logged in on this computer. We have logged them out. Please follow the link from your email again.")
         return redirect(url_for('auth.logout'))
@@ -295,13 +312,20 @@ def confirm_friendship_with_existing_user(token):
     elif not friendship:
         abort(404)
     else:
-        friend = User.query.get(friendship.user_id)
-
-        Friend.create_record(user_id=current_user_id,
-                             friend_profile_id=friend.profile.profile_id,
+        try:
+            initiator = User.query.get(friendship.user_id)
+        except:
+            flash("It looks like your friend deleted their Kind Table account but you can still add a private profile for them.")
+            return redirect(url_for('profile.show_dashboard'))
+        Friend.create_record(user_id=user.id,
+                             friend_profile_id=initiator.profile.profile_id,
                              friendship_verified_by_email=True)
-        flash("Congratulations! You are now friends with %s!" % str(friend.profile.first_name), "success")
-        return redirect('profiles/friendprofile/%s' % friend.profile.profile_id)
+        flash("Congratulations! You are now friends with %s!" % str(initiator.profile.first_name), "success")
+        return redirect('profiles/friendprofile/%s' % initiator.profile.profile_id)
+
+# TIL: I didn't need two ways to confirm a friend, just two ways of initiating. But now I have users and
+# their email friend requests would be invalidated if I changed it now. I can fix this by changing it and sending
+# new friend request emails to any friendships not validated.
 
 
 @profiles.route('/confirm_friendship_new_user/<token>', methods=['GET'])
@@ -310,8 +334,12 @@ def confirm_friendship_with_existing_user(token):
 def confirm_friendship_with_new_user(token):
     """Validates an email token and registers a new user"""
 
-    user_id = current_user.id
-    friendship = Friend.process_email_token(token, current_user_id=user_id)
+    user = current_user
+
+    friendship = Friend.process_email_token(token=token,
+                                            profile=user.profile,
+                                            user=user)
+
     if friendship == "logout":
         flash("Oops! Looks likes another user was still logged in on this computer. We have logged them out. Please follow the link from your email again.")
         return redirect(url_for('auth.logout'))
@@ -320,9 +348,16 @@ def confirm_friendship_with_new_user(token):
     elif not friendship:
         abort(404)
     else:
-        new_friend = friendship.user.profile
-        flash("Congratulations! You are now friends!", "success")
-        return redirect('profiles/friendprofile/%s' % new_friend.profile_id)
+        try:
+            initiator = User.query.get(friendship.user_id)
+        except:
+            flash("It looks like your friend deleted their Kind Table account but you can still add a private profile for them.")
+            return redirect(url_for('profile.show_dashboard'))
+        Friend.create_record(user_id=user.id,
+                             friend_profile_id=initiator.profile.profile_id,
+                             friendship_verified_by_email=True)
+        flash("Congratulations! You are now friends with %s!" % str(initiator.profile.first_name), "success")
+        return redirect('profiles/friendprofile/%s' % initiator.profile.profile_id)
 
 
 @profiles.route('/party_profile/<int:party_id>')

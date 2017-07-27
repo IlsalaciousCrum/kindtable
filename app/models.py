@@ -122,9 +122,8 @@ class Profile(BaseMixin, db.Model):
         if data['profile_id'] != self.profile_id and data['email'] != self.email:
             return False
         else:
-            self.email_verified = True
-            db.session.commit()
-            return True
+            user = User.query.get(self.owned_by_user_id)
+            return user
 
     def remove_profile(self):
         '''Deletes an unofficial profile and all affected records'''
@@ -307,23 +306,35 @@ class Friend(BaseMixin, db.Model):
         return email_serializer.dumps({'friend_record_id': self.record_id, 'friend_profile_id': self.friend_profile.profile_id, 'user_id': self.user_id})
 
     @classmethod
-    def process_email_token(self, token, current_user_id):
+    def process_email_token(self, token, profile, user):
         email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
         try:
             data = email_serializer.loads(token)
         except:
             flash("It looks like there is something wrong with your token. Please email kindtableapp@gmail.com")
+            print 1
             return False
 
         friendship = Friend.query.get(data['friend_record_id'])
 
-        if data['user_id'] == current_user_id:
+        if data['user_id'] == user.id:
             return "logout"
 
         if not friendship:
+            print 2
             return False
 
-        if data['friend_profile_id'] != friendship.friend_profile_id or data['user_id'] != friendship.user_id:
+        initiator_user = User.query.get(data['user_id'])
+
+        # is the information in the token correct
+        if data['friend_profile_id'] != friendship.friend_profile_id or data['user_id'] != initiator_user.id:
+            print 3
+            return False
+        # is this the user that the initator meant to connect with
+        elif data['friend_profile_id'] != profile.profile_id:
+            print 4
+            print data['friend_profile_id']
+            print profile.profile_id
             return False
         else:
             friendship.friendship_verified_by_email = True

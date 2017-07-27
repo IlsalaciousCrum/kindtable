@@ -199,14 +199,24 @@ def delete_stored_reason():
 def register():
     '''Register a new user'''
 
+    # existing user validation in the form
+
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         email = form.email.data
-        profile = Profile.create_record(email=email.lower(),
-                                        first_name=form.first_name.data,
-                                        last_name=form.last_name.data,
-                                        diet_id=form.diet.data,
-                                        diet_reason=form.diet_reason.data)
+        profile = Profile.query.filter(Profile.owned_by_user_id == None, Profile.email == form.email.data).one()
+        if profile:
+            profile.first_name = form.first_name.data
+            profile.last_name = form.last_name.data
+            profile.diet_id = form.diet.data,
+            profile.diet_reason = form.diet_reason.data
+            db.session.commit()
+        else:
+            profile = Profile.create_record(email=email.lower(),
+                                            first_name=form.first_name.data,
+                                            last_name=form.last_name.data,
+                                            diet_id=form.diet.data,
+                                            diet_reason=form.diet_reason.data)
         user = User.create_record(profile_id=profile.profile_id,
                                   password=form.password.data)
         intolerances = session['intol_dict']
@@ -262,11 +272,10 @@ def register():
 def confirm(token):
 
     confirm = current_user.profile.confirm(token)
+    currentuser = current_user
 
     if current_user.profile.email_verified:
         return redirect(url_for('main.index'))
-    elif confirm is True:
-        flash('You have confirmed your account. Thanks!', 'success')
     elif type(confirm) is dict:
         profile = Profile.query.get(confirm['profile_id'])
         if profile.email == confirm['email']:
@@ -276,9 +285,12 @@ def confirm(token):
             flash('That confirmation email is more than 24 hours old. I just \
                 sent you a new one. Please check your email account again and \
                 follow the instructions in the email')
+    elif currentuser == confirm:
+        flash("Thank you for confirming your account, enjoy the app!")
+        confirm.profile.email_verified = True
+        db.session.commit()
     else:
         flash('The confirmation link is invalid.')
-
     return redirect(url_for('main.index'))
 
 
@@ -324,7 +336,7 @@ def delete_account():
 
     this_user = current_user
     if this_user.friends:
-        for friend in this_user.friends:
+        for friend in this_user.friend:
             friend.remove_friendship()
 
     friendship = Friend.query.filter(Friend.friend_profile_id == this_user.profile.profile_id).all()
