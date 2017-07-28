@@ -312,7 +312,6 @@ class Friend(BaseMixin, db.Model):
             data = email_serializer.loads(token)
         except:
             flash("It looks like there is something wrong with your token. Please email kindtableapp@gmail.com")
-            print 1
             return False
 
         friendship = Friend.query.get(data['friend_record_id'])
@@ -321,20 +320,15 @@ class Friend(BaseMixin, db.Model):
             return "logout"
 
         if not friendship:
-            print 2
             return False
 
         initiator_user = User.query.get(data['user_id'])
 
         # is the information in the token correct
         if data['friend_profile_id'] != friendship.friend_profile_id or data['user_id'] != initiator_user.id:
-            print 3
             return False
         # is this the user that the initator meant to connect with
         elif data['friend_profile_id'] != profile.profile_id:
-            print 4
-            print data['friend_profile_id']
-            print profile.profile_id
             return False
         else:
             friendship.friendship_verified_by_email = True

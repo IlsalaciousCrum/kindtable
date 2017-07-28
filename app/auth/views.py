@@ -336,7 +336,7 @@ def delete_account():
 
     this_user = current_user
     if this_user.friends:
-        for friend in this_user.friend:
+        for friend in this_user.friends:
             friend.remove_friendship()
 
     friendship = Friend.query.filter(Friend.friend_profile_id == this_user.profile.profile_id).all()
