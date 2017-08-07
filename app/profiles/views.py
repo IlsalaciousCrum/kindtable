@@ -36,6 +36,8 @@ import json
 
 from pytz import timezone
 
+from smtplib import SMTPException
+
 
 @profiles.route('/dashboard', methods=['GET'])
 @login_required
@@ -216,16 +218,20 @@ def connect_friends():
                 friendship = Friend.create_record(user_id=this_user.id,
                                                   friend_profile_id=existing_user.profile_id)
                 token = friendship.generate_email_token()
-                send_email(to=existing_user.profile.email,
-                           subject=' {0} {1}({2}) wants to connect\
-                           on KindTable'.format(this_user.profile.first_name,
-                                                this_user.profile.last_name,
-                                                this_user.profile.email),
-                           template='profiles/email/friend_existing_user',
-                           profile=existing_user.profile,
-                           friend=this_user.profile,
-                           token=token)
-                friendship.update({"friend_request_sent": True})
+                try:
+                    send_email(to=existing_user.profile.email,
+                               subject=' {0} {1}({2}) wants to connect\
+                               on KindTable'.format(this_user.profile.first_name,
+                                                    this_user.profile.last_name,
+                                                    this_user.profile.email),
+                               template='profiles/email/friend_existing_user',
+                               profile=existing_user.profile,
+                               friend=this_user.profile,
+                               token=token)
+                except SMTPException:
+                    flash("That email didn't go through. Please check your friend's email address and if you are still getting this error, email kindtableapp@gmail.com")
+                    return redirect(request.referrer) 
+                friendship.update({'friend_request_sent': True})
                 flash('A connection request email has been sent to %s.' % existing_user.profile.email, "success")
                 return redirect(url_for('profiles.show_dashboard'))
         elif elligible_unclaimed_profile:
@@ -233,12 +239,17 @@ def connect_friends():
             friendship = Friend.create_record(user_id=current_user.id,
                                               friend_profile_id=new_friend_profile.profile_id)
             token = friendship.generate_email_token()
-            send_email(to=new_friend_profile.email,
-                       subject=' {0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
-                                                                               this_user.profile.last_name,
-                                                                               this_user.profile.email),
-                       template='profiles/email/friend_new_user',
-                       friend=this_user.profile, token=token)
+            try:
+                send_email(to=new_friend_profile.email,
+                           subject=' {0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
+                                                                                   this_user.profile.last_name,
+                                                                                   this_user.profile.email),
+                           template='profiles/email/friend_new_user',
+                           friend=this_user.profile, token=token)
+            except SMTPException:
+                flash("That email didn't go through. Please check your friend's email address and if you are still getting this error, email kindtableapp@gmail.com")
+                return redirect(request.referrer)
+            friendship.update({'friend_request_sent': True})
             flash('A connection request email has been sent to %s.'
                   % new_friend_profile.email, "success")
             return redirect(url_for('profiles.show_dashboard'))
@@ -247,12 +258,17 @@ def connect_friends():
             friendship = Friend.create_record(user_id=current_user.id,
                                               friend_profile_id=new_friend_profile.profile_id)
             token = friendship.generate_email_token()
-            send_email(to=new_friend_profile.email,
-                       subject=' {0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
-                                                                               this_user.profile.last_name,
-                                                                               this_user.profile.email),
-                       template='profiles/email/friend_new_user',
-                       friend=this_user.profile, token=token)
+            try:
+                send_email(to=new_friend_profile.email,
+                           subject=' {0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
+                                                                                   this_user.profile.last_name,
+                                                                                   this_user.profile.email),
+                           template='profiles/email/friend_new_user',
+                           friend=this_user.profile, token=token)
+            except SMTPException:
+                flash("That email didn't go through. Please check your friend's email address and if you are still getting this error, email kindtableapp@gmail.com")
+                return redirect(request.referrer)
+            friendship.update({'friend_request_sent': True})
             flash('A connection request email has been sent to %s.'
                   % new_friend_profile.email, "success")
             return redirect(url_for('profiles.show_dashboard'))
