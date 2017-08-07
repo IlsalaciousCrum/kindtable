@@ -19,7 +19,7 @@ any dietary preferences? The process will be even quicker. :)
 <p>To become friends with {{ friend.first_name}} {{ friend.last_name  }}({{  friend.email  }}), click 
 on the following link and sign in to your KindTable account:</p>
 
-<p><a href="{{ url_for('profiles.confirm_friendship_with_new_user', token=token, _external=True) }}">{{ url_for('profiles.confirm_friendship_with_new_user', token=token, _external=True) }}</a></p>
+<p><a href="{{ url_for('profiles.confirm_friendship', token=token, _external=True) }}">{{ url_for('profiles.confirm_friendship', token=token, _external=True) }}</a></p>
 
 <p>Sincerely,</p>
 
