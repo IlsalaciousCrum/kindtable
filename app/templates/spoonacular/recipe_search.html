@@ -13,7 +13,7 @@
     <div class="col-md-4 side_column">
         <div class="row display_guest">
             <div class="guest_name">
-                <h3>{{ responses.get('totalResults', None) - offset }} Recipes <br>found<br>for<br> <a href="{{ url_for('profiles.show_party_profile',party_id=party.party_id) }}">{{ party.title }}</a></h3>  
+                <h3>{{ responses.get('totalResults', None) - offset }} Recipes <br>found<br>for your event:<br> <b>{{ party.title }}</b></h3>  
             </div>
         </div>   
 

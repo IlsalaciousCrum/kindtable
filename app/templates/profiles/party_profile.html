@@ -148,7 +148,13 @@
 
 <span class="text-info alert alert-info pull-right" style="display: none;width: 100%" id="emailSuccess">An email with the menu has been sent to the email address you registered with.</span>
 
-<h1 class="text-left" style="padding-left: 3em">{{  party.title  }}</h3>
+<h1 class="text-left" style="padding-left: 3em"></h3>
+
+<div class="row" style="padding-top: 3 em">
+<div class="col-md-10 page_title col-md-offset-1"> 
+<h1><span class="glyphicon glyphicon-cutlery"></span>&emsp;Event:&emsp;{{  party.title  }}</h1>
+</div>
+</div>  
 
     <div class="row well-spaced dashboard" style="padding-top: 3em">
         <div class="col-md-4 col-md-offset-1">      
@@ -173,13 +179,22 @@
                         </button>&emsp; <strong>Date:</strong>&emsp;<span class="dtm-dtm">{{ moment(party.datetime_of_party).format('LLLL') }}</span>
                     </div>
                 </div>
-                <div class="party_notes">
-                    <div id="party_notes">
-                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Change the notes for the event" data-target="#notesModal">
-                            <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>
-                        </button>&emsp; <strong>Notes:</strong>&emsp;{{ party.party_notes }}
+
+                <div class='party_notes'>
+                    <div id="party_notes" style="padding-top: 1em">
+                        {% if party.party_notes %}
+                        <h3>Notes&emsp;
+                        <button type="button" class="btn btn-sm btn-default" data-toggle="modal" data-target="#notesModal" title="Add or update the notes for this party"><span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span></button></h3>
+                            {{  party.party_notes}}</dd>
+                        {% else %}
+                            <h3>Notes&emsp;<button type="button" class="btn btn-sm btn-default" title="Add some notes about this party" data-toggle="modal" data-target="#notesModal">add</button></h3>
+                            <span class="text-muted strong">No notes added.<br>Add any other information you would like.</span> 
+                        {% endif %}
                     </div>
                 </div>
+
+
+
 
                 <div class="guests">
                     <div id="guests">

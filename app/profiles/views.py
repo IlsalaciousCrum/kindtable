@@ -95,38 +95,40 @@ def show_dashboard():
 def show_friend_profile(friend_id):
     """Show logged in user's friends profile"""
 
-    user = current_user
+    print "monkey"
 
-    is_friend = Friend.query.filter(Friend.user_id ==
-                                    user.id,
-                                    Friend.friend_profile_id ==
-                                    friend_id).first()
+    now = datetime.now(pytz.utc)
+
+    user = current_user
 
     friend_profile = Profile.query.get(friend_id)
 
-    parties = Party.query.filter(Party.user_id == current_user.id).all()
+    friendship = Friend.query.filter(Friend.user_id == user.id, Friend.friend_profile_id == friend_id).first()
 
-    inviteform = InviteForm(request.form)
+    if friendship:
+        parties = Party.query.filter(Party.user_id == current_user.id).all()
 
-    upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id,
-                                                      Party.datetime_of_party >= datetime.utcnow()).all()
+        inviteform = InviteForm(request.form)
 
-    upcoming_parties_invited_to = db.session.query(Party).join(PartyGuest).filter(Party.user_id == current_user.id,
-                                                                                  Party.datetime_of_party >= datetime.utcnow(),
-                                                                                  PartyGuest.friend_profile_id == friend_id).order_by(Party.datetime_of_party).all()
+        upcoming_parties = db.session.query(Party).filter(Party.user_id == current_user.id,
+                                                          Party.datetime_of_party >= datetime.utcnow()).all()
 
-    inviteform.parties.choices = [(party.party_id, party.title) for party in upcoming_parties]
+        upcoming_parties_invited_to = db.session.query(Party).join(PartyGuest).filter(Party.user_id == current_user.id,
+                                                                                      Party.datetime_of_party >= datetime.utcnow(),
+                                                                                      PartyGuest.friend_profile_id == friend_id).order_by(Party.datetime_of_party).all()
 
-    inviteform.parties.data = [party.party_id for party in upcoming_parties_invited_to]
+        inviteform.parties.choices = [(party.party_id, party.title) for party in upcoming_parties]
 
-    if is_friend:
+        inviteform.parties.data = [party.party_id for party in upcoming_parties_invited_to]
+        friend_user = User.query.filter(User.profile_id == friend_id).first()
+        friendship = Friend.query.filter(Friend.user_id == user.id, Friend.friend_profile_id == friend_id).first()
+        notes_form = FriendNotesForm(request.form)
+        notes_form.notes.data = friendship.friend_notes
         parties_invited = db.session.query(Party).join(PartyGuest).filter(Party.user_id == current_user.id,
                                                                           PartyGuest.friend_profile_id == friend_id).all()
-        email_form = ChangeFriendEmailForm(request.form)
-        notes_form = FriendNotesForm(request.form)
-        notes_form.notes.data = is_friend.friend_notes
 
         if friend_profile.owned_by_user_id == current_user.id:
+            print "Wow"
             diet_form = DietForm(request.form)
             deleteppform = DeletePrivateProfileForm(request.form)
             diet_reason_form = DietReasonForm(request.form)
@@ -142,9 +144,6 @@ def show_friend_profile(friend_id):
                                                              ProfileIntolerance.profile_id ==
                                                              friend_profile.profile_id).all()
             intol_form.intolerances.data = [(intol.intol_id) for intol in profile_intolerances]
-
-            now = datetime.now(pytz.utc)
-
             return render_template("/profiles/friend_profile_editable.html",
                                    profile_id=current_user.profile.profile_id,
                                    friend_profile=friend_profile,
@@ -156,16 +155,15 @@ def show_friend_profile(friend_id):
                                    diet_reason_form=diet_reason_form,
                                    add_avoid_form=add_avoid_form,
                                    update_avoid_form=update_avoid_form,
-                                   email_form=email_form,
-                                   friend_profile_notes=is_friend.friend_notes,
+                                   friend_profile_notes=friendship.friend_notes,
                                    notes_form=notes_form,
                                    now=now,
                                    parties=parties,
                                    inviteform=inviteform,
                                    upcoming_parties=upcoming_parties,
                                    title_form=title_form)
-        elif is_friend and is_friend.friendship_verified_by_email:
-            now = datetime.now(pytz.utc)
+        else:
+            print "blargh"
             delete_form = DeleteFriendForm(request.form)
             return render_template("/profiles/friend_profile_fixed.html",
                                    profile_id=current_user.profile.profile_id,
@@ -174,12 +172,13 @@ def show_friend_profile(friend_id):
                                    profile=current_user.profile,
                                    delete_form=delete_form,
                                    notes_form=notes_form,
-                                   friend_profile_notes=is_friend.friend_notes,
+                                   friend_profile_notes=friendship.friend_notes,
                                    now=now,
                                    parties=parties,
                                    inviteform=inviteform,
                                    upcoming_parties=upcoming_parties)
     else:
+        print "uh-oh"
         flash("Hmm...I don't know that one. Your friends can be accessed from the dropdown menu above or from your Dashboard.")
         return redirect(request.referrer)
 
@@ -332,6 +331,7 @@ def confirm_friendship(token):
         except:
             flash("It looks like your friend deleted their Kind Table account but you can still add a private profile for them.")
             return redirect(url_for('profile.show_dashboard'))
+        friendship.update({"friendship_verified_by_email": True})
         Friend.create_record(user_id=user.id,
                              friend_profile_id=initiator.profile.profile_id,
                              friendship_verified_by_email=True)
@@ -643,7 +643,7 @@ def intol():
                                          ).filter(ProfileIntolerance.intol_id ==
                                                   profile_intolerance,
                                                   ProfileIntolerance.profile_id ==
-                                                  profile.profile_id).one()
+                                                  profile.profile_id).first()
                 intol.remove_intolerance()
                 profile.update({"last_updated": datetime.utcnow()})
         return jsonify(data={'message': 'Intolerances updated'})
@@ -826,7 +826,7 @@ def changefriendnotes():
     profile = Profile.query.get(form.friend_profile_id.data)
     friendship = Friend.query.filter(Friend.friend_profile_id ==
                                      profile.profile_id, Friend.user_id ==
-                                     current_user.id).one()
+                                     current_user.id).first()
     if form.validate():
         friendship.update({"friend_notes": form.notes.data,
                            "last_updated": datetime.utcnow()})
@@ -849,7 +849,7 @@ def clearfriendnotes():
     profile = Profile.query.get(form.friend_profile_id.data)
     friendship = Friend.query.filter(Friend.friend_profile_id ==
                                      profile.profile_id, Friend.user_id ==
-                                     current_user.id).one()
+                                     current_user.id).first()
     if form.validate():
         friendship.update({"friend_notes": None,
                            "last_updated": datetime.utcnow()})

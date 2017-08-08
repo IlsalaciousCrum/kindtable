@@ -23,6 +23,8 @@
                                             {{ render_field(saveform.notes,  placeholder="Optional", id="note_input", style="width: 100%", rows="3",  maxlength=300) }}
                                         <input type="submit" class="btn btn-lg btn-success" id="saveRecipeButton" value="Save Recipe">
                                     </form>
+                            {% else %}
+                            <b style="color: green">This recipe is already saved for your event</b>
                             {% endif %}
                         </div>
                             <br><button type="button" class="btn btn-sm btn-info print" onClick="window.print();return false">Print</button>&emsp;<button type="button" class="btn btn-sm btn-default recipe_close_button" data-dismiss="modal">Close</button><br><br>

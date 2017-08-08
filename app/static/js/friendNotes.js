@@ -28,7 +28,7 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     "use strict";
-    $('#deletenote').on('click', (function(event) {
+    $('#deletefriendnote').on('click', (function(event) {
         var url = Flask.url_for("profiles.clearfriendnotes");
         $.ajax({
             type: "POST",

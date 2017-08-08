@@ -90,6 +90,8 @@ display:none;
                     <li>
                         <a href="{{  url_for('profiles.show_dashboard')  }}">My Dashboard</a>
                     </li>
+                    
+                    {% if current_user.valid_friends() %}
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Friends<span class="caret"></span></a>
                         <ul class="dropdown-menu" id="friendsDropDown">
@@ -113,10 +115,17 @@ display:none;
                             {% endfor %}
                             {% else %}
                             {% endif %}
-
+                    {% else %}
+                        <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-star-empty"></span> Add some friends<span class="caret"></span></a>
+                        <ul class="dropdown-menu" id="friendsDropDown">
+                            <li><a data-toggle="modal" id="findFriendLink" data-target="#findFriendModal"><b>Connect a new friend</b></a></li>
+                            <li><a data-toggle="modal" id="addFriendProfileLink" data-target="#addFriendProfileModal"><b>Create Your Own Profile for a Friend</b></a></li>
+                    {% endif %}
 
                         </ul>    
                     </li>
+                    {% if current_user.parties %}
                     <li class="dropdown" id="partiesDropDown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Events<span class="caret"></span></a>
                         <ul class="dropdown-menu">
@@ -130,6 +139,9 @@ display:none;
                             {% endfor %}
                             {% else %}
                             {% endif %}
+                    {% else %}
+                        <li id="CreateAParty"><a data-toggle="modal" id="addPartyLink" data-target="#addPartyModal"><span class="glyphicon glyphicon-star-empty"></span> Create a new event</a></li>
+                    {% endif %}
                            
 
                         </ul>
@@ -151,7 +163,7 @@ display:none;
           {% with messages = get_flashed_messages() %}
             {% if messages %}
               {% for message in messages %}
-                       <div class="alert alert-info alert-dismissible" role="alert">{{ message }}
+                       <div class="alert alert-success alert-dismissible" role="alert">{{ message }}
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>
               {% endfor %}
             {% endif %}
