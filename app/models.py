@@ -4,7 +4,7 @@ from datetime import datetime
 from passlib.hash import bcrypt
 from . import db, login_manager
 from flask import flash
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from itsdangerous import JSONWebSignatureSerializer, URLSafeTimedSerializer, URLSafeSerializer, BadSignature, SignatureExpired, BadData
 import os
 from sqlalchemy import and_, or_
@@ -303,10 +303,13 @@ class Friend(BaseMixin, db.Model):
         '''Creates an encrypted token to send via email to new user'''
 
         email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
-        return email_serializer.dumps({'friend_record_id': self.record_id, 'friend_profile_id': self.friend_profile.profile_id, 'user_id': self.user_id})
+        return email_serializer.dumps({'requesting_user_id': self.user_id,
+                                       'new_friend_profile_id': self.friend_profile_id,
+                                       'friendship_id': self.record_id})
 
     @classmethod
-    def process_email_token(self, token, profile, user):
+    def process_email_token(self, token, responding_user):
+
         email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
         try:
             data = email_serializer.loads(token)
@@ -314,21 +317,14 @@ class Friend(BaseMixin, db.Model):
             flash("It looks like there is something wrong with your token. Please email kindtableapp@gmail.com")
             return False
 
-        friendship = Friend.query.get(data['friend_record_id'])
+        friendship = Friend.query.get(data['friendship_id'])
 
-        if data['user_id'] == user.id:
+        # is the requesting user still logged in
+        if data['requesting_user_id'] == responding_user.id:
             return "logout"
 
-        if not friendship:
-            return False
-
-        initiator_user = User.query.get(data['user_id'])
-
         # is the information in the token correct
-        if data['friend_profile_id'] != friendship.friend_profile_id or data['user_id'] != initiator_user.id:
-            return False
-        # is this the user that the initator meant to connect with
-        elif data['friend_profile_id'] != profile.profile_id:
+        if not friendship:
             return False
         else:
             friendship.friendship_verified_by_email = True

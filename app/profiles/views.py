@@ -183,101 +183,6 @@ def show_friend_profile(friend_id):
         return redirect(request.referrer)
 
 
-@profiles.route('/connect_friends', methods=['GET', 'POST'])
-@login_required
-@email_confirmation_required
-def connect_friends():
-    """Processes a request to send a friend request"""
-
-    find_friend_form = FindaFriendForm(request.form)
-    if request.method == 'POST' and find_friend_form.validate():
-        this_user = current_user
-        existing_user = db.session.query(User
-                                         ).join(Profile
-                                                ).filter(Profile.email ==
-                                                         find_friend_form.friend_email.data,
-                                                         Profile.profile_id ==
-                                                         User.profile_id).first()
-        elligible_unclaimed_profile = Profile.query.filter(Profile.email == find_friend_form.friend_email.data, Profile.owned_by_user_id == None).first()
-        if find_friend_form.friend_email.data == this_user.profile.email:
-            flash("You just tried to friend yourself. :) Would you like to add someone else?")
-            return redirect(request.referrer)
-        elif existing_user:
-            friend_request = Friend.query.filter(Friend.user_id == this_user.id,
-                                                 Friend.friend_profile_id ==
-                                                 existing_user.profile_id).first()
-            if Friend.already_friends(this_user, existing_user):
-                flash("Looks like you are already connected to that person, would you like to add someone else?")
-                return redirect(request.referrer)
-            elif friend_request and friend_request.friend_request_sent:
-                flash("Looks like you have already sent this person a friend request. Maybe check with them personally or create a friend profile for them yourself?")
-                return redirect(request.referrer)
-            else:
-                friendship = Friend.create_record(user_id=this_user.id,
-                                                  friend_profile_id=existing_user.profile_id)
-                token = friendship.generate_email_token()
-                try:
-                    send_email(to=existing_user.profile.email,
-                               subject=' {0} {1}({2}) wants to connect\
-                               on KindTable'.format(this_user.profile.first_name,
-                                                    this_user.profile.last_name,
-                                                    this_user.profile.email),
-                               template='profiles/email/friend_existing_user',
-                               profile=existing_user.profile,
-                               friend=this_user.profile,
-                               token=token)
-                except SMTPException:
-                    flash("That email didn't go through. Please check your friend's email address and if you are still getting this error, email kindtableapp@gmail.com")
-                    return redirect(request.referrer)
-                friendship.update({'friend_request_sent': True})
-                flash('A connection request email has been sent to %s.' % existing_user.profile.email, "success")
-                return redirect(url_for('profiles.show_dashboard'))
-        elif elligible_unclaimed_profile:
-            new_friend_profile = elligible_unclaimed_profile
-            friendship = Friend.create_record(user_id=current_user.id,
-                                              friend_profile_id=new_friend_profile.profile_id)
-            token = friendship.generate_email_token()
-            try:
-                send_email(to=new_friend_profile.email,
-                           subject=' {0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
-                                                                                   this_user.profile.last_name,
-                                                                                   this_user.profile.email),
-                           template='profiles/email/friend_new_user',
-                           friend=this_user.profile, token=token)
-            except SMTPException:
-                flash("That email didn't go through. Please check your friend's email address and if you are still getting this error, email kindtableapp@gmail.com")
-                return redirect(request.referrer)
-            friendship.update({'friend_request_sent': True})
-            flash('A connection request email has been sent to %s.'
-                  % new_friend_profile.email, "success")
-            return redirect(url_for('profiles.show_dashboard'))
-        else:
-            new_friend_profile = Profile.create_record(email=find_friend_form.friend_email.data)
-            friendship = Friend.create_record(user_id=current_user.id,
-                                              friend_profile_id=new_friend_profile.profile_id)
-            token = friendship.generate_email_token()
-            try:
-                send_email(to=new_friend_profile.email,
-                           subject=' {0} {1} wants to connect on KindTable'.format(this_user.profile.first_name,
-                                                                                   this_user.profile.last_name,
-                                                                                   this_user.profile.email),
-                           template='profiles/email/friend_new_user',
-                           friend=this_user.profile, token=token)
-            except SMTPException:
-                flash("That email didn't go through. Please check your friend's email address and if you are still getting this error, email kindtableapp@gmail.com")
-                return redirect(request.referrer)
-            friendship.update({'friend_request_sent': True})
-            flash('A connection request email has been sent to %s.'
-                  % new_friend_profile.email, "success")
-            return redirect(url_for('profiles.show_dashboard'))
-    elif request.method == 'POST' and not find_friend_form.validate():
-        flash_errors(find_friend_form)
-        return redirect(request.referrer)
-    else:
-        return render_template("profiles/find_a_friend.html",
-                               find_friend_form=find_friend_form)
-
-
 @profiles.route('/add_friend_profile', methods=['GET', 'POST'])
 @login_required
 @email_confirmation_required
@@ -304,39 +209,110 @@ def add_friend_profile():
         return render_template("profiles/add_friend_profile.html",
                                private_profile_title_form=private_profile_title_form)
 
-
-@profiles.route('/confirm_friendship/<token>', methods=['GET'])
+@profiles.route('/connect_friends', methods=['GET', 'POST'])
 @login_required
 @email_confirmation_required
-def confirm_friendship(token):
-    """Validates an email token and confirms friendship between
-    two existing users"""
+def connect_friends():
+    """Processes user request to send a friend request"""
 
-    user = current_user
+    find_friend_form = FindaFriendForm(request.form)
+    if request.method == 'POST' and find_friend_form.validate():
+        requesting_user = current_user
+        print "The next line is the requesting user:"
+        print requesting_user
+        if find_friend_form.friend_email.data == requesting_user.profile.email:
+            flash("You just tried to friend yourself. :) Would you like to add someone else?")
+            return redirect(request.referrer)
 
-    friendship = Friend.process_email_token(token=token,
-                                            profile=user.profile,
-                                            user=user)
+        responding_user = db.session.query(User
+                                           ).join(Profile
+                                                  ).filter(Profile.email ==
+                                                           find_friend_form.friend_email.data,
+                                                           Profile.profile_id ==
+                                                           User.profile_id).first()
+        print "The next line is the responding user, if exists:"
+        print responding_user
 
-    if friendship == "logout":
-        flash("Oops! Looks likes another user was still logged in on this computer. We have logged them out. Please follow the link from your email again.")
-        return redirect(url_for('auth.logout'))
-    elif friendship == "false":
-        flash("There seems to be an error. Please email kindtableapp@gmail.com with what you were doing when the error happened. Thank you.")
-    elif not friendship:
-        abort(404)
-    else:
+        existing_friendship = Friend.query.filter((Friend.user_id == requesting_user.id)
+                                                  & (Friend.friend_profile_id ==
+                                                     responding_user.profile_id)
+                                                  & (Friend.friendship_verified_by_email == True)
+                                                  | (Friend.private_profile == False)).first()
+        print "The next line is the existing friendship, if exists:"
+        print existing_friendship
+        if existing_friendship:
+            flash("You are already friends with that person.")
+            return redirect(url_for('show_friend_profile', friend_id=responding_user.profile_id))
+
+        outstanding_request = Friend.query.filter(Friend.user_id ==
+                                                  responding_user.id,
+                                                  Friend.friend_profile_id ==
+                                                  requesting_user.profile_id).first()
+        print "If there is an outstanding request, it will show on the next line:"
+        print outstanding_request
+        if outstanding_request:
+            friendship = Friend.create_record(user_id=requesting_user.id,
+                                              friend_profile_id=responding_user.profile_id,
+                                              friendship_verified_by_email=True)
+            flash("Success! It looks like that person had already sent you a friend request, you\
+                  are now friends.")
+            return redirect(url_for('show_friend_profile', friend_id=responding_user.profile_id))
+
+        new_friend = Profile.create_record(email=find_friend_form.friend_email.data)
+        friendship = Friend.create_record(user_id=requesting_user.id, friend_profile_id=new_friend.profile_id)
+        token = friendship.generate_email_token()
+        print "The token is below"
+        print token
         try:
-            initiator = User.query.get(friendship.user_id)
-        except:
-            flash("It looks like your friend deleted their Kind Table account but you can still add a private profile for them.")
-            return redirect(url_for('profile.show_dashboard'))
-        friendship.update({"friendship_verified_by_email": True})
-        Friend.create_record(user_id=user.id,
-                             friend_profile_id=initiator.profile.profile_id,
-                             friendship_verified_by_email=True)
-        flash("Congratulations! You are now friends with %s!" % str(initiator.profile.first_name), "success")
-        return redirect('profiles/friendprofile/%s' % initiator.profile.profile_id)
+            send_email(to=find_friend_form.friend_email.data,
+                       subject=' {0} {1} wants to connect on KindTable'.format(requesting_user.profile.first_name,
+                                                                               requesting_user.profile.last_name,
+                                                                               requesting_user.profile.email),
+                       template='profiles/email/friend_request',
+                       token=token)
+            flash('A connection request email has been sent to %s.'
+                  % find_friend_form.friend_email.data, "success")
+            return redirect(url_for('profiles.show_dashboard'))
+        except SMTPException:
+            flash("That email didn't go through. Please check the spelling of\
+                  your friend's email address and if you are still getting this\
+                  error, email kindtableapp@gmail.com")
+            return redirect(request.referrer)
+
+
+@profiles.route('/confirm_friendship/<token>', methods=['GET'])
+def confirm_friendship(token):
+    """Validates an email token and confirms friendship"""
+
+    if current_user:
+        responding_user = current_user
+
+        friendship = Friend.process_email_token(token=token,
+                                                responding_user=responding_user)
+        print "the response to processing is below"
+        print friendship
+
+        if friendship == "logout":
+            flash("Oops! Looks likes another user was still logged in on this computer. We have logged them out. Please follow the link from your email again.")
+            return redirect(url_for('auth.logout'))
+        elif friendship == "false":
+            flash("There seems to be an error. Please email kindtableapp@gmail.com with what you were doing when the error happened. Thank you.")
+        elif not friendship:
+            abort(404)
+        else:
+            try:
+                requesting_user = User.query.get(friendship.user_id)
+            except:
+                flash("It looks like your friend deleted their Kind Table account but you could still add a private profile for them.")
+                return redirect(url_for('profile.show_dashboard'))
+            Friend.create_record(user_id=responding_user.id,
+                                 friend_profile_id=requesting_user.profile_id,
+                                 friendship_verified_by_email=True)
+            flash("Congratulations! You are now friends with %s!" % str(requesting_user.profile.first_name), "success")
+            return redirect('profiles/friendprofile/%s' % requesting_user.profile.profile_id)
+    else:
+        session['friend_token'] = token
+        return redirect(url_for('auth.register'))
 
 
 @profiles.route('/party_profile/<int:party_id>')

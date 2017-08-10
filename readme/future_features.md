@@ -1,0 +1,2 @@
+- Use Facebook API to connect friends
+- control how many friend requests a user can send an email address

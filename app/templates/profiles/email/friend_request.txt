@@ -1,0 +1,21 @@
+Hello!
+{{ friend.first_name}} {{ friend.last_name  }} ({{  friend.email  }}) would like to 
+connect with you on KindTable.
+
+If you are already a user, great! Skip down to the link below to confirm that you would like to connect with {{ friend.first_name}} {{ friend.last_name  }} ({{  friend.email  }}).
+
+If you are new to Kind Table, welcome!
+
+KindTable is a webapp I made that organizes dietary information such as diet (ex: vegan, paleo, vegetarian),
+common allergies/intolerances (ex: gluten, peanut), and ingredients to avoid (ex: bell pepper, pork) and helps
+the host pick recipes that will work for everyone invited to a meal.
+
+By clicking the link below, you will be asked to complete a quick registration process to provide your dietary information. Don't have
+any dietary preferences? The process will be even quicker. :) Once you are registered, you will be able to see your friend's dietary information and they will be able to see yours. You can change this at any time. Here is the link:
+
+<a href="{{ url_for('profiles.confirm_friendship', token=token, _external=True) }}">{{ url_for('profiles.confirm_friendship', token=token, _external=True) }}</a>
+
+Sincerely,
+
+Ilsa Gordon
+www.kindtable.com
