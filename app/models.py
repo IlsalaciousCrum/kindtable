@@ -299,14 +299,6 @@ class Friend(BaseMixin, db.Model):
     friend_profile = db.relationship('Profile', backref='friend')
     user = db.relationship('User', backref='friends')
 
-    def generate_email_token(self):
-        '''Creates an encrypted token to send via email to new user'''
-
-        email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
-        return email_serializer.dumps({'requesting_user_id': self.user_id,
-                                       'new_friend_profile_id': self.friend_profile_id,
-                                       'friendship_id': self.record_id})
-
     @classmethod
     def process_email_token(self, token, responding_user):
 
@@ -317,19 +309,34 @@ class Friend(BaseMixin, db.Model):
             flash("It looks like there is something wrong with your token. Please email kindtableapp@gmail.com")
             return False
 
-        friendship = Friend.query.get(data['friendship_id'])
+        requesting_user = User.query.get(data['requesting_user_id'])
 
         # is the requesting user still logged in
         if data['requesting_user_id'] == responding_user.id:
             return "logout"
 
-        # is the information in the token correct
-        if not friendship:
-            return False
+        # is the requesting_user from the token still a user:
+
+        if not requesting_user:
+            return "not found"
+
+        # did you already become friends in another way
+        existing_friendship = Friend.query.filter((Friend.user_id == requesting_user.id)
+                                                  & (Friend.friend_profile_id ==
+                                                     responding_user.profile_id)
+                                                  & (Friend.friendship_verified_by_email == True)
+                                                  | (Friend.private_profile == False)).first()
+
+        if existing_friendship:
+            return "already friends"
         else:
-            friendship.friendship_verified_by_email = True
-            db.session.commit()
-            return friendship
+            requesting_friendship = Friend.create_record(user_id=requesting_user.id,
+                                                         friend_profile_id=responding_user.profile_id,
+                                                         friendship_verified_by_email == True)
+            responding_friendship = Friend.create_record(user_id=responding_user.id,
+                                                         friend_profile_id=requesting_user.profile_id,
+                                                         friendship_verified_by_email == True)
+            return responding_friendship
 
     def remove_friendship(self):
         '''Removes the friendship and all relevant records'''
@@ -359,6 +366,43 @@ class Friend(BaseMixin, db.Model):
                                              self.user_id,
                                              self.friend_profile_id,
                                              self.friendship_verified_by_email)
+
+
+class FriendRequest(BaseMixin, db.Model):
+    '''Holds single use friend requests'''
+
+    __tablename__ = 'friendrequests'
+
+    record_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    requesting_user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                                   nullable=False)
+    email_sent_to = db.Column(db.String(200), unique=False, nullable=True)
+    token = db.Column(db.String(300), unique=False)
+
+    user = db.relationship('User', backref='friend_requests')
+    date_sent = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def generate_email_token(self, requesting_user_id, email_sent_to=None):
+        '''Creates an encrypted token to send via email to new user'''
+
+        email_serializer = URLSafeSerializer(os.environ['APP_SECRET_KEY'])
+        new_token = email_serializer.dumps({'requesting_user_id': requesting_user_id})
+        new_record = FriendRequest.create_record(requesting_user_id=requesting_user_id,
+                                                 email_sent_to=email_sent_to,
+                                                 token=new_token)
+        print "new friend request record below"
+        print new_record
+        return new_token
+
+    def __repr__(self):
+        '''Provide helpful representation when printed.'''
+
+        return '<FriendRequest record_id=%s requesting_user_id=%s  email_sent_to=%s \
+        token=%s date_sent=%s>' % (self.record_id,
+                                   self.requesting_user_id,
+                                   self.email_sent_to,
+                                   self.token,
+                                   self.date_sent)
 
 
 class Intolerance(BaseMixin, db.Model):

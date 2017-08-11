@@ -297,7 +297,7 @@ def confirm(token):
 
     else:
         flash('The confirmation link is invalid.')
-    return redirect(url_for('main.index'))
+    return redirect(request.args.get('next') or url_for('main.index'))
 
 
 @auth.route('/change_email', methods=['GET', 'POST'])

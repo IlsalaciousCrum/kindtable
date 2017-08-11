@@ -9,7 +9,7 @@ from . import profiles
 from .. import db
 
 from ..models import (User, Profile, Intolerance, Party, PartyGuest,
-                      IngToAvoid, ProfileIntolerance, Friend)
+                      IngToAvoid, ProfileIntolerance, Friend, FriendRequest)
 
 from flask_login import login_required, current_user
 
@@ -120,7 +120,6 @@ def show_friend_profile(friend_id):
         inviteform.parties.choices = [(party.party_id, party.title) for party in upcoming_parties]
 
         inviteform.parties.data = [party.party_id for party in upcoming_parties_invited_to]
-        friend_user = User.query.filter(User.profile_id == friend_id).first()
         friendship = Friend.query.filter(Friend.user_id == user.id, Friend.friend_profile_id == friend_id).first()
         notes_form = FriendNotesForm(request.form)
         notes_form.notes.data = friendship.friend_notes
@@ -209,6 +208,7 @@ def add_friend_profile():
         return render_template("profiles/add_friend_profile.html",
                                private_profile_title_form=private_profile_title_form)
 
+
 @profiles.route('/connect_friends', methods=['GET', 'POST'])
 @login_required
 @email_confirmation_required
@@ -244,23 +244,21 @@ def connect_friends():
             flash("You are already friends with that person.")
             return redirect(url_for('show_friend_profile', friend_id=responding_user.profile_id))
 
-        outstanding_request = Friend.query.filter(Friend.user_id ==
-                                                  responding_user.id,
-                                                  Friend.friend_profile_id ==
-                                                  requesting_user.profile_id).first()
+        outstanding_request = FriendRequest.query.filter((FriendRequest.user_id ==
+                                                          responding_user.id)
+                                                         & (FriendRequest.email ==
+                                                            find_friend_form.friend_email.data)).first()
         print "If there is an outstanding request, it will show on the next line:"
         print outstanding_request
         if outstanding_request:
-            friendship = Friend.create_record(user_id=requesting_user.id,
-                                              friend_profile_id=responding_user.profile_id,
-                                              friendship_verified_by_email=True)
+            Friend.create_record(user_id=requesting_user.id,
+                                 friend_profile_id=responding_user.profile_id,
+                                 friendship_verified_by_email=True)
             flash("Success! It looks like that person had already sent you a friend request, you\
                   are now friends.")
             return redirect(url_for('show_friend_profile', friend_id=responding_user.profile_id))
-
-        new_friend = Profile.create_record(email=find_friend_form.friend_email.data)
-        friendship = Friend.create_record(user_id=requesting_user.id, friend_profile_id=new_friend.profile_id)
-        token = friendship.generate_email_token()
+        token = FriendRequest.generate_email_token(user_id=requesting_user,
+                                                   email=find_friend_form.friend_email.data)
         print "The token is below"
         print token
         try:
@@ -282,7 +280,7 @@ def connect_friends():
 
 @profiles.route('/confirm_friendship/<token>', methods=['GET'])
 def confirm_friendship(token):
-    """Validates an email token and confirms friendship"""
+    """Validates token and confirms friendship"""
 
     if current_user:
         responding_user = current_user
@@ -295,24 +293,23 @@ def confirm_friendship(token):
         if friendship == "logout":
             flash("Oops! Looks likes another user was still logged in on this computer. We have logged them out. Please follow the link from your email again.")
             return redirect(url_for('auth.logout'))
+        elif friendship == "not found":
+            flash("It looks like the person that sent you the friend request is no longer a user on Kind Table. Do you want to create a private profile for them?")
+            return redirect(url_for(profiles.show_dashboard))
+        elif friendship == "already friends":
+            flash("Looks like you were already connected to that person. Here is their profile page.")
+            return redirect(url_for('show_friend_profile', friend_id=responding_user.profile_id))
         elif friendship == "false":
             flash("There seems to be an error. Please email kindtableapp@gmail.com with what you were doing when the error happened. Thank you.")
         elif not friendship:
             abort(404)
         else:
-            try:
-                requesting_user = User.query.get(friendship.user_id)
-            except:
-                flash("It looks like your friend deleted their Kind Table account but you could still add a private profile for them.")
-                return redirect(url_for('profile.show_dashboard'))
-            Friend.create_record(user_id=responding_user.id,
-                                 friend_profile_id=requesting_user.profile_id,
-                                 friendship_verified_by_email=True)
-            flash("Congratulations! You are now friends with %s!" % str(requesting_user.profile.first_name), "success")
-            return redirect('profiles/friendprofile/%s' % requesting_user.profile.profile_id)
+            new_friend = Profile.query.get(friendship.friend_profile_id)
+            flash("Congratulations! You are now friends with %s!" % str(new_friend.first_name), "success")
+            return redirect('profiles/friendprofile/%s' % new_friend.profile_id)
     else:
         session['friend_token'] = token
-        return redirect(url_for('auth.register'))
+        return redirect(url_for('auth.register', next=url_for('confirm_friendship', token)))
 
 
 @profiles.route('/party_profile/<int:party_id>')
