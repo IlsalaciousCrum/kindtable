@@ -8,6 +8,10 @@
 **APIs:** Spoonacular  
 **Front-End**: HTML/CSS, Bootstrap, JQuery, JavaScript
 
+Food ingredient dataset provided by The New York Times and cleaned up pythonically.
+https://open.blogs.nytimes.com/2016/04/27/structured-ingredients-data-tagging/?mcubz=0
+
+
 
 Kind Table
 --------

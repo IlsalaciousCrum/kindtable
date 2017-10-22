@@ -341,6 +341,11 @@ def delete_account():
     # on the model but perfect is the enemy of done.
 
     this_user = current_user
+
+    if this_user.friend_requests:
+        for each in this_user.friend_requests:
+            each._delete_()
+
     if this_user.friends:
         for friend in this_user.friends:
             friend.remove_friendship()

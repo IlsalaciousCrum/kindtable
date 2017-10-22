@@ -332,10 +332,11 @@ class Friend(BaseMixin, db.Model):
         else:
             requesting_friendship = Friend.create_record(user_id=requesting_user.id,
                                                          friend_profile_id=responding_user.profile_id,
-                                                         friendship_verified_by_email == True)
+                                                         friendship_verified_by_email=True)
             responding_friendship = Friend.create_record(user_id=responding_user.id,
                                                          friend_profile_id=requesting_user.profile_id,
-                                                         friendship_verified_by_email == True)
+                                                         friendship_verified_by_email=True)
+            self._delete_()
             return responding_friendship
 
     def remove_friendship(self):
@@ -382,6 +383,7 @@ class FriendRequest(BaseMixin, db.Model):
     user = db.relationship('User', backref='friend_requests')
     date_sent = db.Column(db.DateTime, default=datetime.utcnow)
 
+    @classmethod
     def generate_email_token(self, requesting_user_id, email_sent_to=None):
         '''Creates an encrypted token to send via email to new user'''
 

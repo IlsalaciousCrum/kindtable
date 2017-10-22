@@ -142,7 +142,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content" role="document">
             <div class="modal-header">
-                <h5 class="modal-title" id="addIntolModalLabel">Change Allergy/Intolerance Groups</h5>
+                <h5 class="modal-title" id="addIntolModalLabel">Change Common Allergy/Intolerance Groups</h5>
                 <div id="flashedalert"></div>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -308,7 +308,7 @@
                         {% if friend_profile.intolerances %}
                             <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add another allergy/intolerance group" data-target="#intolModal">
                                 <span class="glyphicon glyphicon-pencil text-info" aria-hidden="true"></span>&ensp; <span class="glyphicon glyphicon-plus text-info" aria-hidden="true"></span>
-                            </button>&emsp; <strong>Allergies/intolerances:</strong>
+                            </button>&emsp; <strong>Common Allergies/intolerances:</strong>
                             <ul>
                                 {% for intolerance in friend_profile.intolerances|sort(attribute='intol_name') %}
                                     <li>
@@ -317,7 +317,7 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add an allergy/intolerance group" data-target="#intolModal">add</button>&emsp;<span class="text-muted strong">No allergy/intolerance groups added yet</span>
+                            <button type="button" class="btn btn-sm btn-default" data-toggle="modal" title="Add an allergy/intolerance group" data-target="#intolModal">add</button>&emsp;<span class="text-muted strong">No common allergy/intolerance groups added yet</span>
                         {% endif %}
                     </div>
                 </div>

@@ -227,27 +227,24 @@ def connect_friends():
         responding_user = db.session.query(User
                                            ).join(Profile
                                                   ).filter(Profile.email ==
-                                                           find_friend_form.friend_email.data,
-                                                           Profile.profile_id ==
-                                                           User.profile_id).first()
+                                                           find_friend_form.friend_email.data).first()
         print "The next line is the responding user, if exists:"
         print responding_user
+        if responding_user:
+            existing_friendship = Friend.query.filter(Friend.user_id == requesting_user.id,
+                                                      Friend.friend_profile_id == responding_user.profile_id)\
+                                              .filter((Friend.friendship_verified_by_email == True)
+                                                      | (Friend.private_profile == False)).first()
+            outstanding_request = FriendRequest.query.filter((FriendRequest.requesting_user_id ==
+                                                              responding_user.id)
+                                                             & (FriendRequest.email_sent_to ==
+                                                                 find_friend_form.friend_email.data)).first()
+            print "The next line is the existing friendship, if exists:"
+            print existing_friendship
+            if existing_friendship:
+                flash("You are already friends with %s." % responding_user.profile.first_name)
+                return redirect(url_for('profiles.show_friend_profile', friend_id=responding_user.profile_id))
 
-        existing_friendship = Friend.query.filter((Friend.user_id == requesting_user.id)
-                                                  & (Friend.friend_profile_id ==
-                                                     responding_user.profile_id)
-                                                  & (Friend.friendship_verified_by_email == True)
-                                                  | (Friend.private_profile == False)).first()
-        print "The next line is the existing friendship, if exists:"
-        print existing_friendship
-        if existing_friendship:
-            flash("You are already friends with that person.")
-            return redirect(url_for('show_friend_profile', friend_id=responding_user.profile_id))
-
-        outstanding_request = FriendRequest.query.filter((FriendRequest.user_id ==
-                                                          responding_user.id)
-                                                         & (FriendRequest.email ==
-                                                            find_friend_form.friend_email.data)).first()
         print "If there is an outstanding request, it will show on the next line:"
         print outstanding_request
         if outstanding_request:
@@ -256,18 +253,20 @@ def connect_friends():
                                  friendship_verified_by_email=True)
             flash("Success! It looks like that person had already sent you a friend request, you\
                   are now friends.")
-            return redirect(url_for('show_friend_profile', friend_id=responding_user.profile_id))
-        token = FriendRequest.generate_email_token(user_id=requesting_user,
-                                                   email=find_friend_form.friend_email.data)
+            return redirect(url_for('profiles.show_friend_profile', friend_id=responding_user.profile_id))
+        token = FriendRequest.generate_email_token(requesting_user_id=requesting_user.id,
+                                                   email_sent_to=find_friend_form.friend_email.data)
         print "The token is below"
         print token
+        session['friend_token'] = token
         try:
             send_email(to=find_friend_form.friend_email.data,
                        subject=' {0} {1} wants to connect on KindTable'.format(requesting_user.profile.first_name,
                                                                                requesting_user.profile.last_name,
                                                                                requesting_user.profile.email),
                        template='profiles/email/friend_request',
-                       token=token)
+                       token=token,
+                       friend=requesting_user.profile)
             flash('A connection request email has been sent to %s.'
                   % find_friend_form.friend_email.data, "success")
             return redirect(url_for('profiles.show_dashboard'))
@@ -276,9 +275,20 @@ def connect_friends():
                   your friend's email address and if you are still getting this\
                   error, email kindtableapp@gmail.com")
             return redirect(request.referrer)
+    elif request.method == 'POST' and not find_friend_form.validate():
+        for field, error in find_friend_form.errors.items():
+            flash(u"Error in %s -  %s" % (
+                  getattr(find_friend_form, field).label.text,
+                  error[0]), 'danger')
+        return redirect(request.referrer)
+    else:
+        return render_template("profiles/find_a_friend.html",
+                               find_friend_form=find_friend_form)
 
 
 @profiles.route('/confirm_friendship/<token>', methods=['GET'])
+@login_required
+@email_confirmation_required
 def confirm_friendship(token):
     """Validates token and confirms friendship"""
 
@@ -295,10 +305,10 @@ def confirm_friendship(token):
             return redirect(url_for('auth.logout'))
         elif friendship == "not found":
             flash("It looks like the person that sent you the friend request is no longer a user on Kind Table. Do you want to create a private profile for them?")
-            return redirect(url_for(profiles.show_dashboard))
+            return redirect(url_for('profiles.show_dashboard'))
         elif friendship == "already friends":
             flash("Looks like you were already connected to that person. Here is their profile page.")
-            return redirect(url_for('show_friend_profile', friend_id=responding_user.profile_id))
+            return redirect(url_for('profiles.show_friend_profile', friend_id=responding_user.profile_id))
         elif friendship == "false":
             flash("There seems to be an error. Please email kindtableapp@gmail.com with what you were doing when the error happened. Thank you.")
         elif not friendship:
@@ -742,22 +752,23 @@ def delete_friend():
     """Takes an Ajax request and deletes a friend"""
 
     form = DeleteFriendForm(request.form)
-    friend_profile = Profile.query.get(form.friend_profile_id.data)
-    friendship1 = db.session.query(Friend).filter(Friend.user_id ==
-                                                  current_user.id,
-                                                  Friend.friend_profile_id ==
-                                                  form.friend_profile_id.data).first()
     if request.method == 'POST' and form.validate():
+        user = current_user
+        friend_profile = Profile.query.get(form.friend_profile_id.data)
+        friend_user = User.query.filter(User.profile_id == friend_profile.profile_id).first()
+        friendship1 = db.session.query(Friend).filter(Friend.user_id ==
+                                                      user.id,
+                                                      Friend.friend_profile_id ==
+                                                      form.friend_profile_id.data).first()
         if friend_profile.owned_by_user_id == current_user.id:
             friend_profile.remove_profile()
         else:
             friendship2 = db.session.query(Friend).filter(Friend.user_id ==
-                                                          friend_profile.owned_by_user_id,
+                                                          friend_user.id,
                                                           Friend.friend_profile_id ==
-                                                          current_user.profile_id).first()
+                                                          user.profile_id).first()
             friendship2.remove_friendship()
-
-        friendship1.remove_friendship()
+            friendship1.remove_friendship()
         flash("Friend removed from your account.")
         return redirect(url_for('profiles.show_dashboard'))
     else:

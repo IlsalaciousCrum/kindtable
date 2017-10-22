@@ -75,7 +75,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content" role="document">
             <div class="modal-header">
-                <h5 class="modal-title" id="addIntolModalLabel">Change Allergy/Intolerance Groups</h5>
+                <h5 class="modal-title" id="addIntolModalLabel">Change Common Allergy/Intolerance Groups</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -132,12 +132,12 @@
     <div class="col-md-4">
         <div class = "row round_hidden_div" style="padding-top: 2em">
           
-                <h4>Allergies and Intolerances&ensp;<a role="button" tabindex="0" data-container="body" data-toggle="popover" data-html='true' data-trigger="focus" data-placement="left" title="Allergies/Intolerances" data-content="For example, gluten can be found in many <a href=https://celiac.org/live-gluten-free/glutenfreediet/sources-of-gluten/' title='The Celiac Disease Foundation's list of sources of gluten' target='_blank'>non-wheat ingredients</a> and if you select gluten, we will be sure that recipes will not include those ingredients. But if you are sensitive only to wheat itself and not ingredients such as soy sauce, selecting 'wheat' instead of 'gluten' gives you and your hosts more options."><span class="glyphicon glyphicon-info-sign text-info"></span></a></h4>
+                <h4>Common Allergies and Intolerances&ensp;<a role="button" tabindex="0" data-container="body" data-toggle="popover" data-html='true' data-trigger="focus" data-placement="left" title="Allergies/Intolerances" data-content="For example, gluten can be found in many <a href=https://celiac.org/live-gluten-free/glutenfreediet/sources-of-gluten/' title='The Celiac Disease Foundation's list of sources of gluten' target='_blank'>non-wheat ingredients</a> and if you select gluten, we will be sure that recipes will not include those ingredients. But if you are sensitive only to wheat itself and not ingredients such as soy sauce, selecting 'wheat' instead of 'gluten' gives you and your hosts more options."><span class="glyphicon glyphicon-info-sign text-info"></span></a></h4>
 
                 {% if not session.intol_dict %}<div class="intols"><p class = "text-muted">Telling us about any allergy/intolerance groups that apply to you can help make sure that KindTable recipes will be safe for you. Do any of these apply to you? Dairy, egg, gluten, peanut, sesame, seafood, shellfish, soy, sulfites, tree nut, wheat.</p></div>{% else %}<div class="intols"><div id="intols">{% for intol in session['intol_dict'] %}{% for each in session['intol_dict'][intol] %}<a role="button" type="button" href="#" data-toggle="modal" data-target="#intolRegisterModal"><span class="glyphicon glyphicon-pencil text-info" title="Change your allergies/intolerances." aria-hidden="true"></span></a>&emsp;{{  each  }} - {{  session['intol_dict'][intol][each]  }}<br>{% endfor %}{% endfor %}</div></div><br>{% endif %}
                 
                 
-                <p><button type="button" class="btn btn-primary" href="#" data-toggle="modal" data-target="#intolRegisterModal">Select Allergy/Intolerance groups</button>&ensp;<span style="display: none" class="alert alert-success glyphicon glyphicon-ok" id="intol-success"></span></p>
+                <p><button type="button" class="btn btn-primary" href="#" data-toggle="modal" data-target="#intolRegisterModal">Select Common Allergy/Intolerance groups</button>&ensp;<span style="display: none" class="alert alert-success glyphicon glyphicon-ok" id="intol-success"></span></p>
 
              <h4 style="padding-top: 1em">Ingredients to Avoid</h4>
 
