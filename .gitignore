@@ -3,7 +3,7 @@
 secrets.sh
 .DS_Store
 *.env*
-migrations/*
+
 
 #File for adding document git commit messages
 message.txt
