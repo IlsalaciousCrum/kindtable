@@ -125,7 +125,7 @@ def logout():
     return redirect(url_for('main.index'))
 
 
-@auth.route('/add_intols.json', methods=['POST'])
+@auth.route('/store_intols.json', methods=['POST'])
 def store_intols():
     '''Store allergies/intolerances for registration'''
 
@@ -289,12 +289,11 @@ def confirm(token):
         flash("Thank you for confirming your account, enjoy the app!")
         confirm.profile.email_verified = True
         db.session.commit()
-        if session['friend_token']:
-            flash("Thank you for confirming your account, enjoy the app!")
-            return redirect(url_for('confirm_friendship', token=session['friend_token']))
-        else:
-            return redirect(url_for('main.index'))
-
+        # if session['friend_token']:
+        #     flash("Thank you for confirming your account, enjoy the app!")
+        #     return redirect(url_for('confirm_friendship', token=session['friend_token']))
+        # else:
+        #     return redirect(url_for('main.index'))
     else:
         flash('The confirmation link is invalid.')
     return redirect(request.args.get('next') or url_for('main.index'))
